@@ -624,7 +624,25 @@ const CONFIG = {
   CONFIRM_MSG: '¡Tu cita ha sido agendada! Recibirás una invitación de Google Calendar.',
 
   // 14. ID del calendario (usa 'primary' para el calendario principal)
-  CALENDAR_ID: 'primary'
+  CALENDAR_ID: 'primary',
+
+  // ─────────────────────────────────────────────
+  //  EMAILJS — Correos automáticos
+  //  Pasos para configurar (GRATIS):
+  //  1. Ve a https://www.emailjs.com y crea cuenta gratis
+  //  2. En "Email Services" conecta tu Gmail (estuval2022@gmail.com)
+  //  3. Copia el SERVICE ID y pégalo abajo
+  //  4. En "Email Templates" crea dos plantillas (ver instrucciones abajo)
+  //  5. Copia los TEMPLATE IDs y pégalos abajo
+  //  6. En "Account" copia tu PUBLIC KEY y pégala abajo
+  // ─────────────────────────────────────────────
+  EMAILJS_PUBLIC_KEY:       'l8klrftm9RT_1UTwc',
+  EMAILJS_SERVICE_ID:       'service_x45l1oy',
+  EMAILJS_TEMPLATE_CLIENTE: 'template_oulw4u7',
+  EMAILJS_TEMPLATE_SANDRA:  'template_jwnaab7',
+
+  // Correo de Sandra donde llegan las notificaciones
+  OWNER_EMAIL: 'estuval2022@gmail.com'
 };
 </script>
 <!-- ══════════════════════════════════════════
@@ -775,6 +793,15 @@ const CONFIG = {
             <label>Motivo de la reunión</label>
             <textarea id="f-reason" placeholder="Describe brevemente el propósito de la cita..." maxlength="500"></textarea>
           </div>
+          <div class="fgroup full">
+            <label>Modalidad de la reunión <em>*</em></label>
+            <select id="f-type">
+              <option value="">-- Selecciona una opción --</option>
+              <option value="Presencial">🏢 Presencial</option>
+              <option value="Virtual (Google Meet)">💻 Virtual (Google Meet)</option>
+            </select>
+            <span class="err-msg" id="e-type"></span>
+          </div>
         </div>
 
         <div class="btn-row">
@@ -807,6 +834,8 @@ const CONFIG = {
 
 <!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client" async></script>
+<!-- EmailJS SDK para envío de correos -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>
 // ══════════════════════════════════════════════
@@ -855,6 +884,14 @@ function startAuth() {
   client.requestAccessToken();
 }
 
+// Inicializar EmailJS
+function initEmailJS() {
+  if (CONFIG.EMAILJS_PUBLIC_KEY && !CONFIG.EMAILJS_PUBLIC_KEY.includes('TU_')) {
+    emailjs.init({ publicKey: CONFIG.EMAILJS_PUBLIC_KEY });
+    console.log('EmailJS iniciado');
+  }
+}
+
 async function onTokenResponse(tokenResponse) {
   if (tokenResponse.error) {
     toast('Error de autenticación: ' + tokenResponse.error, 'err');
@@ -890,6 +927,7 @@ function logout() {
 function initApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
+  initEmailJS();
 
   // Header
   const name = userData.name || userData.email || 'Usuario';
@@ -1188,15 +1226,18 @@ function renderSummary() {
 //  CREAR RESERVA EN GOOGLE CALENDAR
 // ══════════════════════════════════════════════
 async function createBooking() {
-  const name   = document.getElementById('f-name').value.trim();
-  const email  = document.getElementById('f-email').value.trim();
-  const phone  = document.getElementById('f-phone').value.trim();
-  const reason = document.getElementById('f-reason').value.trim();
+  const name    = document.getElementById('f-name').value.trim();
+  const email   = document.getElementById('f-email').value.trim();
+  const phone   = document.getElementById('f-phone').value.trim();
+  const reason  = document.getElementById('f-reason').value.trim();
+  const mtype   = document.getElementById('f-type').value;
 
   // Limpiar errores
-  ['name','email'].forEach(f => {
-    document.getElementById('f-'+f).classList.remove('field-error');
-    document.getElementById('e-'+f).textContent = '';
+  ['name','email','type'].forEach(f => {
+    const el = document.getElementById('f-'+f);
+    if (el) el.classList.remove('field-error');
+    const er = document.getElementById('e-'+f);
+    if (er) er.textContent = '';
   });
 
   // Validar
@@ -1209,6 +1250,11 @@ async function createBooking() {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     document.getElementById('f-email').classList.add('field-error');
     document.getElementById('e-email').textContent = 'Ingresa un correo válido';
+    ok = false;
+  }
+  if (!mtype) {
+    document.getElementById('f-type').classList.add('field-error');
+    document.getElementById('e-type').textContent = 'Selecciona la modalidad';
     ok = false;
   }
   if (!ok) return;
@@ -1283,7 +1329,7 @@ async function createBooking() {
     }
 
     const event = await r.json();
-    showConfirmation({ event, name, email, phone, reason });
+    showConfirmation({ event, name, email, phone, reason, mtype });
 
   } catch(e) {
     toast('Error: ' + e.message, 'err');
@@ -1293,9 +1339,61 @@ async function createBooking() {
 }
 
 // ══════════════════════════════════════════════
+//  ENVÍO DE CORREOS CON EMAILJS
+// ══════════════════════════════════════════════
+async function sendEmails({ name, email, phone, reason, mtype, fmtDate, fmtSt, fmtEnd, meetLink }) {
+  if (!CONFIG.EMAILJS_PUBLIC_KEY || CONFIG.EMAILJS_PUBLIC_KEY.includes('TU_')) {
+    console.warn('EmailJS no configurado — omitiendo envío de correos');
+    return;
+  }
+
+  const params = {
+    // Datos del cliente
+    client_name:  name,
+    client_email: email,
+    client_phone: phone || 'No proporcionado',
+    meeting_reason: reason || 'No especificado',
+    meeting_type:   mtype  || 'No especificado',
+    // Datos de la cita
+    meeting_date:  fmtDate,
+    meeting_start: fmtSt,
+    meeting_end:   fmtEnd,
+    meeting_duration: selDur + ' minutos',
+    meet_link:     meetLink || 'No aplica',
+    // Datos del organizador
+    owner_name:  CONFIG.OWNER_NAME,
+    owner_email: CONFIG.OWNER_EMAIL
+  };
+
+  try {
+    // Correo al CLIENTE con confirmación
+    await emailjs.send(
+      CONFIG.EMAILJS_SERVICE_ID,
+      CONFIG.EMAILJS_TEMPLATE_CLIENTE,
+      { ...params, to_email: email, to_name: name }
+    );
+    console.log('✓ Correo enviado al cliente');
+  } catch(e) {
+    console.error('Error enviando correo al cliente:', e);
+  }
+
+  try {
+    // Notificación a SANDRA
+    await emailjs.send(
+      CONFIG.EMAILJS_SERVICE_ID,
+      CONFIG.EMAILJS_TEMPLATE_SANDRA,
+      { ...params, to_email: CONFIG.OWNER_EMAIL, to_name: CONFIG.OWNER_NAME }
+    );
+    console.log('✓ Notificación enviada a Sandra');
+  } catch(e) {
+    console.error('Error enviando notificación a Sandra:', e);
+  }
+}
+
+// ══════════════════════════════════════════════
 //  CONFIRMACIÓN
 // ══════════════════════════════════════════════
-function showConfirmation({ event, name, email, phone, reason }) {
+function showConfirmation({ event, name, email, phone, reason, mtype }) {
   goStep(3);
 
   document.getElementById('conf-msg').textContent = CONFIG.CONFIRM_MSG;
@@ -1306,6 +1404,10 @@ function showConfirmation({ event, name, email, phone, reason }) {
   const fmtSt  = start.toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit', timeZone: CONFIG.TIMEZONE });
   const fmtEnd = end.toLocaleTimeString('es-CO',   { hour:'2-digit', minute:'2-digit', timeZone: CONFIG.TIMEZONE });
 
+  // Enviar correos automáticamente
+  const meetLink = event.conferenceData?.entryPoints?.find(e => e.entryPointType === 'video')?.uri;
+  sendEmails({ name, email, phone, reason, mtype, fmtDate: fmtD.charAt(0).toUpperCase()+fmtD.slice(1), fmtSt, fmtEnd, meetLink });
+
   document.getElementById('conf-details').innerHTML = `
     <div class="cd-row"><span class="cd-label">Cliente</span><span class="cd-val">${name}</span></div>
     <div class="cd-row"><span class="cd-label">Email</span><span class="cd-val">${email}</span></div>
@@ -1314,9 +1416,9 @@ function showConfirmation({ event, name, email, phone, reason }) {
     <div class="cd-row"><span class="cd-label">Hora</span><span class="cd-val">${fmtSt} – ${fmtEnd}</span></div>
     <div class="cd-row"><span class="cd-label">Duración</span><span class="cd-val">${selDur} minutos</span></div>
     ${reason ? `<div class="cd-row"><span class="cd-label">Motivo</span><span class="cd-val">${reason}</span></div>` : ''}
+    <div class="cd-row"><span class="cd-label">Modalidad</span><span class="cd-val">${mtype}</span></div>
   `;
 
-  const meetLink = event.conferenceData?.entryPoints?.find(e => e.entryPointType === 'video')?.uri;
   document.getElementById('conf-meet').innerHTML = meetLink
     ? `<a href="${meetLink}" target="_blank" class="meet-link-btn">🎥 Unirse a Google Meet</a><br>`
     : '';
@@ -1334,6 +1436,7 @@ function resetBooking() {
   document.getElementById('f-email').value  = '';
   document.getElementById('f-phone').value  = '';
   document.getElementById('f-reason').value = '';
+  document.getElementById('f-type').value   = '';
   document.getElementById('slots-area').style.display = 'none';
   goStep(1);
 }
