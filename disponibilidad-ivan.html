@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda una reunión</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --text: #1a1a18;
+    --muted: #7a7870;
+    --accent: #2D5016;
+    --accent-light: #EBF2E3;
+    --accent-mid: #4a8024;
+    --border: #e4e1d8;
+    --danger: #c0392b;
+    --success: #2D5016;
+    --warn-bg: #FEF9EC;
+    --warn-border: #f0c040;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 16px;
+  }
+
+  /* CONFIG PANEL — solo visible con #config en la URL o si falta la API key */
+  #config-screen {
+    display: none;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  #config-screen.visible { display: flex; }
+  .config-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem;
+    max-width: 520px;
+    width: 100%;
+  }
+  .config-card h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    margin-bottom: 6px;
+  }
+  .config-card p { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 1.5rem; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; }
+  .field input, .field select {
+    width: 100%; padding: 10px 14px;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    background: var(--bg); color: var(--text);
+    outline: none; transition: border-color .15s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent-mid); }
+  .steps-mini { background: var(--accent-light); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; }
+  .steps-mini p { color: var(--accent); font-size: 13px; margin-bottom: 0; line-height: 1.7; }
+  .steps-mini a { color: var(--accent-mid); font-weight: 500; }
+  .btn-save {
+    width: 100%; padding: 12px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 8px;
+    font-size: 15px; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; font-weight: 500; transition: opacity .15s;
+  }
+  .btn-save:hover { opacity: .88; }
+
+  /* MAIN APP */
+  #app-screen { display: none; min-height: 100vh; }
+  #app-screen.visible { display: block; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1.2rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .host-info { display: flex; align-items: center; gap: 14px; }
+  .avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 20px;
+  }
+  .host-name { font-family: 'DM Serif Display', serif; font-size: 20px; }
+  .host-sub { font-size: 13px; color: var(--muted); margin-top: 1px; }
+  .header-meta { font-size: 13px; color: var(--muted); text-align: right; }
+  .pill {
+    display: inline-block; font-size: 12px; padding: 3px 10px;
+    border-radius: 100px; font-weight: 500;
+    background: var(--accent-light); color: var(--accent);
+    margin-top: 4px;
+  }
+
+  main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media(max-width:680px){ .layout { grid-template-columns: 1fr; } }
+
+  .panel-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px; font-weight: 500; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+  .panel-body { padding: 1.25rem; }
+
+  /* CALENDAR */
+  .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .cal-nav button {
+    background: none; border: 1px solid var(--border);
+    border-radius: 6px; width: 30px; height: 30px;
+    cursor: pointer; font-size: 16px; color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    transition: background .12s;
+  }
+  .cal-nav button:hover { background: var(--bg); }
+  .month-title { font-family: 'DM Serif Display', serif; font-size: 17px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+  .cal-hd { font-size: 11px; text-align: center; color: var(--muted); padding: 4px 0; font-weight: 500; }
+  .cal-day {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; border-radius: 8px; color: var(--muted); cursor: default;
+    transition: all .12s;
+  }
+  .cal-day.past { opacity: .35; }
+  .cal-day.avail {
+    background: var(--accent-light); color: var(--accent);
+    cursor: pointer; font-weight: 500;
+    border: 1px solid #c5dfaa;
+  }
+  .cal-day.avail:hover { background: #d6ecbf; }
+  .cal-day.selected { background: var(--accent) !important; color: #fff !important; border-color: var(--accent) !important; }
+  .cal-day.today { border: 1px solid var(--border); color: var(--text); }
+
+  /* SLOTS */
+  #slots-panel { min-height: 200px; }
+  .slot-item {
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px; margin-bottom: 8px;
+    cursor: pointer; transition: all .12s;
+  }
+  .slot-item:hover { border-color: var(--accent-mid); background: var(--accent-light); }
+  .slot-item.selected { border-color: var(--accent); background: var(--accent-light); }
+  .slot-time { font-size: 15px; font-weight: 500; color: var(--text); }
+  .slot-dur { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* BOOKING FORM */
+  #booking-form { display: none; }
+  #booking-form.visible { display: block; }
+  .form-title { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 4px; }
+  .form-sub { font-size: 13px; color: var(--muted); margin-bottom: 1rem; }
+  .form-field { margin-bottom: 12px; }
+  .form-field label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+  .form-field input {
+    width: 100%; padding: 10px 12px;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    background: var(--bg); color: var(--text); outline: none;
+    transition: border-color .15s;
+  }
+  .form-field input:focus { border-color: var(--accent-mid); }
+  .btn-confirm {
+    width: 100%; padding: 12px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 8px;
+    font-size: 15px; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; font-weight: 500; transition: opacity .15s; margin-top: 4px;
+  }
+  .btn-confirm:hover { opacity: .88; }
+  .btn-back {
+    background: none; border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; cursor: pointer;
+    color: var(--muted); font-family: 'DM Sans', sans-serif;
+    margin-bottom: 12px; transition: background .12s;
+  }
+  .btn-back:hover { background: var(--bg); }
+
+  /* SUCCESS */
+  #success-screen { display: none; }
+  #success-screen.visible { display: block; }
+  .success-box {
+    background: var(--accent-light); border: 1px solid #c5dfaa;
+    border-radius: 14px; padding: 1.5rem; text-align: center;
+  }
+  .success-icon { font-size: 36px; margin-bottom: 10px; }
+  .success-title { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 6px; color: var(--accent); }
+  .success-detail { font-size: 14px; color: var(--accent); line-height: 1.6; }
+
+  /* LOADING / ERROR */
+  .loading { text-align: center; padding: 2rem; color: var(--muted); font-size: 14px; }
+  .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; margin-right: 8px; vertical-align: -4px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-box { background: #fdf0ef; border: 1px solid #f5c6c2; border-radius: 10px; padding: 1rem; font-size: 13px; color: var(--danger); line-height: 1.5; }
+  .empty-msg { text-align: center; padding: 1.5rem; color: var(--muted); font-size: 14px; }
+
+  /* CONFIG LINK */
+  .cfg-link { font-size: 12px; color: var(--border); text-decoration: none; transition: color .15s; }
+  .cfg-link:hover { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ══════════ CONFIG SCREEN ══════════ -->
+<div id="config-screen">
+  <div class="config-card">
+    <h1>Configurar organizador</h1>
+    <p>Ingresa tus datos una sola vez. Quedan guardados en este navegador.</p>
+
+    <div class="steps-mini">
+      <p>
+        <strong>Cómo obtener tu API Key de Google Calendar (gratis):</strong><br>
+        1. Ve a <a href="https://console.cloud.google.com/" target="_blank">console.cloud.google.com</a><br>
+        2. Crea un proyecto → "APIs y Servicios" → "Habilitar APIs"<br>
+        3. Busca y activa <strong>Google Calendar API</strong><br>
+        4. Ve a "Credenciales" → "Crear credencial" → <strong>Clave de API</strong><br>
+        5. Copia la clave y pégala abajo. Opcional: restringe la clave a tu dominio.
+      </p>
+    </div>
+
+    <div class="field">
+      <label>Tu nombre (aparece en la página)</label>
+      <input type="text" id="cfg-name" placeholder="Ej: Ivan Estrada" value="">
+    </div>
+    <div class="field">
+      <label>Tu cargo / descripción (opcional)</label>
+      <input type="text" id="cfg-role" placeholder="Ej: Especialista en Calidad del Aire — CORPONOR">
+    </div>
+    <div class="field">
+      <label>Correo del calendario de Google</label>
+      <input type="email" id="cfg-email" placeholder="estuval2022@gmail.com" value="estuval2022@gmail.com">
+    </div>
+    <div class="field">
+      <label>API Key de Google Calendar</label>
+      <input type="text" id="cfg-apikey" placeholder="AIzaSy...">
+    </div>
+    <div class="field">
+      <label>Título de la reunión</label>
+      <input type="text" id="cfg-meeting" placeholder="Ej: Reunión con Ivan" value="Reunión con Ivan">
+    </div>
+    <div class="field">
+      <label>Duración de cada reunión</label>
+      <select id="cfg-dur">
+        <option value="30">30 minutos</option>
+        <option value="45">45 minutos</option>
+        <option value="60" selected>60 minutos</option>
+        <option value="90">90 minutos</option>
+        <option value="120">2 horas</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Horario laboral — inicio</label>
+      <input type="time" id="cfg-wstart" value="08:00">
+    </div>
+    <div class="field">
+      <label>Horario laboral — fin</label>
+      <input type="time" id="cfg-wend" value="17:00">
+    </div>
+    <div class="field">
+      <label>Ubicación / modalidad</label>
+      <input type="text" id="cfg-loc" placeholder="Google Meet / Presencial en Cúcuta" value="Google Meet / Presencial">
+    </div>
+    <button class="btn-save" onclick="saveConfig()">Guardar y abrir página</button>
+  </div>
+</div>
+
+<!-- ══════════ APP SCREEN ══════════ -->
+<div id="app-screen">
+  <header>
+    <div class="host-info">
+      <div class="avatar" id="hdr-avatar">I</div>
+      <div>
+        <div class="host-name" id="hdr-name">Ivan</div>
+        <div class="host-sub" id="hdr-role">Especialista — CORPONOR</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div id="hdr-meeting">Reunión con Ivan</div>
+      <span class="pill" id="hdr-dur">60 min</span>
+      <br>
+      <a href="#config" class="cfg-link" onclick="openConfig()">⚙ configurar</a>
+    </div>
+  </header>
+
+  <main>
+    <div id="booking-form" class="panel-card" style="padding:1.5rem;margin-bottom:24px">
+      <button class="btn-back" onclick="closeForm()">← Volver al calendario</button>
+      <div class="form-title" id="form-title">Confirmar reserva</div>
+      <div class="form-sub" id="form-sub"></div>
+      <div class="form-field">
+        <label>Tu nombre completo</label>
+        <input type="text" id="f-name" placeholder="Nombre Apellido">
+      </div>
+      <div class="form-field">
+        <label>Tu correo electrónico</label>
+        <input type="email" id="f-email" placeholder="correo@ejemplo.com">
+      </div>
+      <div class="form-field">
+        <label>Motivo de la reunión (opcional)</label>
+        <input type="text" id="f-reason" placeholder="Breve descripción">
+      </div>
+      <button class="btn-confirm" onclick="confirmBooking()">Confirmar reserva</button>
+    </div>
+
+    <div id="success-screen">
+      <div class="success-box">
+        <div class="success-icon">✓</div>
+        <div class="success-title">¡Reserva confirmada!</div>
+        <div class="success-detail" id="success-detail"></div>
+      </div>
+    </div>
+
+    <div class="layout" id="main-layout">
+      <div class="panel-card">
+        <div class="panel-header">Selecciona un día</div>
+        <div class="panel-body">
+          <div class="cal-nav">
+            <button onclick="prevMonth()" aria-label="Mes anterior">&#8249;</button>
+            <span class="month-title" id="month-title"></span>
+            <button onclick="nextMonth()" aria-label="Mes siguiente">&#8250;</button>
+          </div>
+          <div class="cal-grid" id="cal-head"></div>
+          <div class="cal-grid" id="cal-body"></div>
+          <div style="margin-top:12px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px">
+            <span style="display:inline-block;width:12px;height:12px;background:var(--accent-light);border:1px solid #c5dfaa;border-radius:3px"></span>
+            Días con disponibilidad
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-card" id="slots-panel">
+        <div class="panel-header" id="slots-header">Horarios disponibles</div>
+        <div class="panel-body" id="slots-body">
+          <div class="empty-msg">Selecciona un día del calendario para ver los horarios disponibles.</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────
+const CFG_KEY = 'ivan_cal_config';
+
+function getConfig() {
+  try { return JSON.parse(localStorage.getItem(CFG_KEY)) || {}; } catch(e) { return {}; }
+}
+
+function saveConfig() {
+  const cfg = {
+    name:    document.getElementById('cfg-name').value.trim() || 'Ivan',
+    role:    document.getElementById('cfg-role').value.trim(),
+    email:   document.getElementById('cfg-email').value.trim(),
+    apiKey:  document.getElementById('cfg-apikey').value.trim(),
+    meeting: document.getElementById('cfg-meeting').value.trim() || 'Reunión',
+    dur:     parseInt(document.getElementById('cfg-dur').value),
+    wstart:  document.getElementById('cfg-wstart').value,
+    wend:    document.getElementById('cfg-wend').value,
+    loc:     document.getElementById('cfg-loc').value.trim(),
+  };
+  if (!cfg.email || !cfg.apiKey) {
+    alert('El correo y la API Key son obligatorios.');
+    return;
+  }
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+  applyConfig(cfg);
+  showApp();
+}
+
+function openConfig() {
+  const cfg = getConfig();
+  document.getElementById('cfg-name').value    = cfg.name    || '';
+  document.getElementById('cfg-role').value    = cfg.role    || '';
+  document.getElementById('cfg-email').value   = cfg.email   || 'estuval2022@gmail.com';
+  document.getElementById('cfg-apikey').value  = cfg.apiKey  || '';
+  document.getElementById('cfg-meeting').value = cfg.meeting || 'Reunión con Ivan';
+  document.getElementById('cfg-dur').value     = cfg.dur     || 60;
+  document.getElementById('cfg-wstart').value  = cfg.wstart  || '08:00';
+  document.getElementById('cfg-wend').value    = cfg.wend    || '17:00';
+  document.getElementById('cfg-loc').value     = cfg.loc     || '';
+  document.getElementById('config-screen').classList.add('visible');
+  document.getElementById('app-screen').classList.remove('visible');
+}
+
+function showApp() {
+  document.getElementById('config-screen').classList.remove('visible');
+  document.getElementById('app-screen').classList.add('visible');
+  initApp();
+}
+
+function applyConfig(cfg) {
+  const initial = (cfg.name || 'I')[0].toUpperCase();
+  document.getElementById('hdr-avatar').textContent  = initial;
+  document.getElementById('hdr-name').textContent    = cfg.name    || 'Ivan';
+  document.getElementById('hdr-role').textContent    = cfg.role    || '';
+  document.getElementById('hdr-meeting').textContent = cfg.meeting || 'Reunión';
+  document.getElementById('hdr-dur').textContent     = (cfg.dur || 60) + ' min';
+}
+
+// ── STATE ──────────────────────────────────────────────────────
+let viewDate = new Date();
+viewDate.setDate(1);
+let busySlots = [];       // {start: Date, end: Date}
+let availDates = new Set();
+let selectedDate = null;
+let selectedSlot = null;
+let loadedMonths = new Set();
+
+const DAYS   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+// ── GOOGLE CALENDAR API ────────────────────────────────────────
+async function fetchBusy(year, month) {
+  const cfg = getConfig();
+  if (!cfg.apiKey || !cfg.email) return;
+
+  const key = `${year}-${month}`;
+  if (loadedMonths.has(key)) return;
+  loadedMonths.add(key);
+
+  const tMin = new Date(year, month, 1).toISOString();
+  const tMax = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
+  const calId = encodeURIComponent(cfg.email);
+  const url = `https://www.googleapis.com/calendar/v3/calendars/${calId}/events?key=${cfg.apiKey}&timeMin=${tMin}&timeMax=${tMax}&singleEvents=true&orderBy=startTime&maxResults=250`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || res.statusText);
+    }
+    const data = await res.json();
+    const items = data.items || [];
+    items.forEach(ev => {
+      if (ev.status === 'cancelled') return;
+      if (ev.transparency === 'transparent') return;
+      const s = ev.start?.dateTime || ev.start?.date;
+      const e = ev.end?.dateTime   || ev.end?.date;
+      if (!s || !e) return;
+      busySlots.push({ start: new Date(s), end: new Date(e) });
+    });
+    computeAvailDates(year, month);
+    renderCal();
+  } catch(err) {
+    showSlotError(`Error al consultar Google Calendar: ${err.message}. Verifica tu API Key y que el calendario sea público o que la clave tenga acceso.`);
+  }
+}
+
+function computeAvailDates(year, month) {
+  const cfg = getConfig();
+  const dur = (cfg.dur || 60) * 60000;
+  const [wsH, wsM] = (cfg.wstart || '08:00').split(':').map(Number);
+  const [weH, weM] = (cfg.wend   || '17:00').split(':').map(Number);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const day = new Date(year, month, d);
+    if (day < today) continue;
+    const dow = day.getDay();
+    // Solo lunes-viernes por defecto
+    if (dow === 0 || dow === 6) continue;
+
+    const dayStart = new Date(year, month, d, wsH, wsM, 0, 0);
+    const dayEnd   = new Date(year, month, d, weH, weM, 0, 0);
+    const dayBusy  = busySlots.filter(b => b.start < dayEnd && b.end > dayStart);
+
+    let cursor = new Date(dayStart);
+    while (cursor.getTime() + dur <= dayEnd.getTime()) {
+      const slotEnd = new Date(cursor.getTime() + dur);
+      const overlap = dayBusy.some(b => b.start < slotEnd && b.end > cursor);
+      if (!overlap) {
+        const pad = n => String(n).padStart(2,'0');
+        const ds = `${year}-${pad(month+1)}-${pad(d)}`;
+        availDates.add(ds);
+        break;
+      }
+      cursor = new Date(cursor.getTime() + 30 * 60000);
+    }
+  }
+}
+
+function getFreeSlots(dateStr) {
+  const cfg = getConfig();
+  const dur = (cfg.dur || 60) * 60000;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const [wsH, wsM] = (cfg.wstart || '08:00').split(':').map(Number);
+  const [weH, weM] = (cfg.wend   || '17:00').split(':').map(Number);
+
+  const dayStart = new Date(y, m-1, d, wsH, wsM, 0, 0);
+  const dayEnd   = new Date(y, m-1, d, weH, weM, 0, 0);
+  const dayBusy  = busySlots.filter(b => b.start < dayEnd && b.end > dayStart);
+
+  const slots = [];
+  let cursor = new Date(dayStart);
+  while (cursor.getTime() + dur <= dayEnd.getTime()) {
+    const slotEnd = new Date(cursor.getTime() + dur);
+    const overlap = dayBusy.some(b => b.start < slotEnd && b.end > cursor);
+    if (!overlap) {
+      slots.push({ start: new Date(cursor), end: new Date(slotEnd) });
+    }
+    cursor = new Date(cursor.getTime() + 30 * 60000);
+  }
+  return slots;
+}
+
+// ── CALENDAR RENDER ────────────────────────────────────────────
+function renderCalHead() {
+  document.getElementById('cal-head').innerHTML =
+    DAYS.map(d => `<div class="cal-hd">${d}</div>`).join('');
+}
+
+function renderCal() {
+  const y = viewDate.getFullYear(), m = viewDate.getMonth();
+  document.getElementById('month-title').textContent = `${MONTHS[m]} ${y}`;
+  const first = new Date(y, m, 1).getDay();
+  const last  = new Date(y, m+1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const pad   = n => String(n).padStart(2,'0');
+
+  let html = '';
+  for (let i = 0; i < first; i++) html += `<div class="cal-day"></div>`;
+  for (let d = 1; d <= last; d++) {
+    const ds  = `${y}-${pad(m+1)}-${pad(d)}`;
+    const day = new Date(y, m, d);
+    const isPast   = day < today;
+    const isToday  = day.getTime() === today.getTime();
+    const isAvail  = availDates.has(ds);
+    const isSel    = ds === selectedDate;
+    let cls = 'cal-day';
+    if (isPast)   cls += ' past';
+    if (isToday)  cls += ' today';
+    if (isAvail && !isPast)  cls += ' avail';
+    if (isSel)    cls += ' selected';
+    const click = (isAvail && !isPast) ? `onclick="pickDate('${ds}')"` : '';
+    html += `<div class="${cls}" ${click}>${d}</div>`;
+  }
+  document.getElementById('cal-body').innerHTML = html;
+}
+
+function prevMonth() {
+  viewDate.setMonth(viewDate.getMonth() - 1);
+  fetchBusy(viewDate.getFullYear(), viewDate.getMonth());
+  renderCal();
+}
+function nextMonth() {
+  viewDate.setMonth(viewDate.getMonth() + 1);
+  fetchBusy(viewDate.getFullYear(), viewDate.getMonth());
+  renderCal();
+}
+
+// ── SLOT SELECTION ─────────────────────────────────────────────
+function pickDate(ds) {
+  selectedDate = ds;
+  selectedSlot = null;
+  renderCal();
+
+  const cfg = getConfig();
+  const [y, m, d] = ds.split('-').map(Number);
+  const dateLabel = `${DAYS[new Date(y,m-1,d).getDay()]} ${d} de ${MONTHS[m-1]} ${y}`;
+  document.getElementById('slots-header').textContent = dateLabel;
+
+  const freeSlots = getFreeSlots(ds);
+  if (!freeSlots.length) {
+    document.getElementById('slots-body').innerHTML =
+      `<div class="empty-msg">Sin horarios disponibles este día.</div>`;
+    return;
+  }
+
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('slots-body').innerHTML = freeSlots.map((s,i) => `
+    <div class="slot-item" id="slot-${i}" onclick="pickSlot(${i}, this)">
+      <div class="slot-time">${pad(s.start.getHours())}:${pad(s.start.getMinutes())} – ${pad(s.end.getHours())}:${pad(s.end.getMinutes())}</div>
+      <div class="slot-dur">${cfg.dur || 60} minutos · ${cfg.loc || ''}</div>
+    </div>`).join('');
+
+  window._freeSlots = freeSlots;
+}
+
+function pickSlot(i, el) {
+  document.querySelectorAll('.slot-item').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSlot = window._freeSlots[i];
+
+  const cfg = getConfig();
+  const pad = n => String(n).padStart(2,'0');
+  const [y, m, d] = selectedDate.split('-').map(Number);
+  const dateLabel = `${DAYS[new Date(y,m-1,d).getDay()]} ${d} de ${MONTHS[m-1]} ${y}`;
+  const timeLabel = `${pad(selectedSlot.start.getHours())}:${pad(selectedSlot.start.getMinutes())} – ${pad(selectedSlot.end.getHours())}:${pad(selectedSlot.end.getMinutes())}`;
+
+  document.getElementById('form-title').textContent = cfg.meeting || 'Reunión';
+  document.getElementById('form-sub').textContent   = `${dateLabel} · ${timeLabel}`;
+  document.getElementById('booking-form').classList.add('visible');
+  document.getElementById('booking-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeForm() {
+  document.getElementById('booking-form').classList.remove('visible');
+  selectedSlot = null;
+  document.querySelectorAll('.slot-item').forEach(e => e.classList.remove('selected'));
+}
+
+function confirmBooking() {
+  const name   = document.getElementById('f-name').value.trim();
+  const email  = document.getElementById('f-email').value.trim();
+  const reason = document.getElementById('f-reason').value.trim();
+  if (!name || !email) { alert('Por favor completa nombre y correo.'); return; }
+
+  const cfg = getConfig();
+  const pad = n => String(n).padStart(2,'0');
+  const [y, m, d] = selectedDate.split('-').map(Number);
+  const dateLabel = `${DAYS[new Date(y,m-1,d).getDay()]} ${d} de ${MONTHS[m-1]} ${y}`;
+  const timeLabel = `${pad(selectedSlot.start.getHours())}:${pad(selectedSlot.start.getMinutes())} – ${pad(selectedSlot.end.getHours())}:${pad(selectedSlot.end.getMinutes())}`;
+
+  // Guardar reserva localmente
+  const bookings = JSON.parse(localStorage.getItem('ivan_bookings') || '[]');
+  bookings.push({ name, email, reason, date: selectedDate, from: timeLabel.split(' – ')[0], to: timeLabel.split(' – ')[1], ts: Date.now() });
+  localStorage.setItem('ivan_bookings', JSON.stringify(bookings));
+
+  // Marcar como ocupado
+  busySlots.push({ start: new Date(selectedSlot.start), end: new Date(selectedSlot.end) });
+  availDates.delete(selectedDate);
+  const stillHas = getFreeSlots(selectedDate).length > 0;
+  if (stillHas) availDates.add(selectedDate);
+
+  document.getElementById('main-layout').style.display = 'none';
+  document.getElementById('booking-form').classList.remove('visible');
+  document.getElementById('success-screen').classList.add('visible');
+  document.getElementById('success-detail').innerHTML =
+    `<strong>${cfg.meeting || 'Reunión'}</strong><br>${dateLabel}<br>${timeLabel}<br><br>
+    Recibirás la confirmación en <strong>${email}</strong>.<br>
+    ${reason ? `<em>"${reason}"</em>` : ''}`;
+
+  renderCal();
+}
+
+function showSlotError(msg) {
+  document.getElementById('slots-body').innerHTML =
+    `<div class="error-box">${msg}</div>`;
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+function initApp() {
+  const cfg = getConfig();
+  applyConfig(cfg);
+  renderCalHead();
+  renderCal();
+
+  // Cargar mes actual y siguiente
+  const now = new Date();
+  fetchBusy(now.getFullYear(), now.getMonth()).then(() => {
+    const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    fetchBusy(next.getFullYear(), next.getMonth());
+  });
+}
+
+// ── BOOT ───────────────────────────────────────────────────────
+(function boot() {
+  const cfg = getConfig();
+  if (!cfg.apiKey || !cfg.email) {
+    openConfig();
+  } else {
+    showApp();
+  }
+})();
+</script>
+</body>
+</html>
