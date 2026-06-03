@@ -644,12 +644,11 @@ const CONFIG = {
   // Correo de Sandra donde llegan las notificaciones
   OWNER_EMAIL: 'estuval2022@gmail.com',
 
-  // API Key pública para lectura del calendario (modo cliente)
-  API_KEY: 'AIzaSyDVbFV9haagvNa_Sl1c-tAjR2k7t4OVjxs',
+  // URL del Apps Script (maneja reservas sin login del cliente)
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwuc8ajM5wKzbps_TDmk8enidM5hw8UJPb9y2AOpifADOEjC4DRgbEpfLlGzFVBgA1y/exec',
 
-  // ID público del calendario de Sandra (compartido públicamente)
-  // Para obtenerlo: Google Calendar → Configuración del calendario → Dirección del calendario en formato iCal
-  // El formato es: estuval2022@gmail.com o un ID largo
+  // API Key para leer disponibilidad del calendario
+  API_KEY: 'AIzaSyDVbFV9haagvNa_Sl1c-tAjR2k7t4OVjxs',
   CALENDAR_ID_PUBLIC: 'estuval2022@gmail.com'
 };
 </script>
@@ -982,7 +981,7 @@ function changeDuration(d) {
 //  GOOGLE CALENDAR — LEER EVENTOS
 // ══════════════════════════════════════════════
 async function fetchBusyTimes(timeMin, timeMax) {
-  // Modo cliente: usar API Key pública (sin OAuth)
+  // Leer eventos con API Key pública — sin login
   const calId = encodeURIComponent(CONFIG.CALENDAR_ID_PUBLIC || CONFIG.CALENDAR_ID);
   const url = `https://www.googleapis.com/calendar/v3/calendars/${calId}/events?` +
     `key=${CONFIG.API_KEY}` +
@@ -991,13 +990,8 @@ async function fetchBusyTimes(timeMin, timeMax) {
     `&singleEvents=true&orderBy=startTime&maxResults=250`;
 
   const r = await fetch(url);
-  if (!r.ok) {
-    const err = await r.json();
-    console.error('Error Calendar API:', err);
-    throw new Error('Error al leer el calendario');
-  }
+  if (!r.ok) throw new Error('Error al leer el calendario');
   const data = await r.json();
-  // Convertir eventos a formato busy
   return (data.items || [])
     .filter(e => e.status !== 'cancelled' && (e.start?.dateTime || e.start?.date))
     .map(e => ({
@@ -1308,22 +1302,6 @@ async function createBooking() {
       };
     }
 
-    // Para crear eventos necesitamos el token OAuth de Sandra
-    // El cliente debe autorizar esto una vez
-    if (!gToken) {
-      await new Promise((resolve, reject) => {
-        const authClient = google.accounts.oauth2.initTokenClient({
-          client_id: CONFIG.CLIENT_ID,
-          scope: 'https://www.googleapis.com/auth/calendar.events',
-          hint: CONFIG.OWNER_EMAIL,
-          callback: (resp) => {
-            if (resp.error) reject(new Error(resp.error));
-            else { gToken = resp.access_token; resolve(); }
-          }
-        });
-        authClient.requestAccessToken();
-      });
-    }
     const qs = CONFIG.CREATE_MEET ? '?conferenceDataVersion=1&sendUpdates=all' : '?sendUpdates=all';
     const r = await fetch(
       `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CONFIG.CALENDAR_ID)}/events${qs}`,
@@ -1467,18 +1445,15 @@ function toast(msg, type = 'ok') {
 }
 
 // ══════════════════════════════════════════════
-//  ARRANQUE MODO CLIENTE — directo, sin login
+//  ARRANQUE DIRECTO — MODO CLIENTE SIN LOGIN
 // ══════════════════════════════════════════════
 window.addEventListener('load', () => {
   initEmailJS();
   userData = { name: CONFIG.OWNER_NAME, email: CONFIG.OWNER_EMAIL };
-  // Ocultar pantalla de carga y mostrar app
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-  // Ocultar header de usuario
   const header = document.getElementById('app-header');
   if (header) header.style.display = 'none';
-  // Inicializar UI
   document.getElementById('owner-name-display').textContent = CONFIG.OWNER_NAME;
   document.getElementById('owner-bio-display').textContent  = CONFIG.OWNER_BIO;
   const emailEl = document.getElementById('owner-email-display');
