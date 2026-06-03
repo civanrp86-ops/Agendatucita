@@ -642,7 +642,15 @@ const CONFIG = {
   EMAILJS_TEMPLATE_SANDRA:  'template_jwnaab7',
 
   // Correo de Sandra donde llegan las notificaciones
-  OWNER_EMAIL: 'estuval2022@gmail.com'
+  OWNER_EMAIL: 'estuval2022@gmail.com',
+
+  // API Key pública para lectura del calendario (modo cliente)
+  API_KEY: 'AIzaSyDVbFV9haagvNa_Sl1c-tAjR2k7t4OVjxs',
+
+  // ID público del calendario de Sandra (compartido públicamente)
+  // Para obtenerlo: Google Calendar → Configuración del calendario → Dirección del calendario en formato iCal
+  // El formato es: estuval2022@gmail.com o un ID largo
+  CALENDAR_ID_PUBLIC: 'estuval2022@gmail.com'
 };
 </script>
 <!-- ══════════════════════════════════════════
@@ -974,25 +982,28 @@ function changeDuration(d) {
 //  GOOGLE CALENDAR — LEER EVENTOS
 // ══════════════════════════════════════════════
 async function fetchBusyTimes(timeMin, timeMax) {
-  const body = {
-    timeMin: timeMin.toISOString(),
-    timeMax: timeMax.toISOString(),
-    timeZone: CONFIG.TIMEZONE,
-    items: [{ id: CONFIG.CALENDAR_ID }]
-  };
+  // Modo cliente: usar API Key pública (sin OAuth)
+  const calId = encodeURIComponent(CONFIG.CALENDAR_ID_PUBLIC || CONFIG.CALENDAR_ID);
+  const url = `https://www.googleapis.com/calendar/v3/calendars/${calId}/events?` +
+    `key=${CONFIG.API_KEY}` +
+    `&timeMin=${encodeURIComponent(timeMin.toISOString())}` +
+    `&timeMax=${encodeURIComponent(timeMax.toISOString())}` +
+    `&singleEvents=true&orderBy=startTime&maxResults=250`;
 
-  const r = await fetch('https://www.googleapis.com/calendar/v3/freeBusy', {
-    method: 'POST',
-    headers: {
-      Authorization:  'Bearer ' + gToken,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
-
-  if (!r.ok) throw new Error('Error al leer el calendario');
+  const r = await fetch(url);
+  if (!r.ok) {
+    const err = await r.json();
+    console.error('Error Calendar API:', err);
+    throw new Error('Error al leer el calendario');
+  }
   const data = await r.json();
-  return (data.calendars?.[CONFIG.CALENDAR_ID]?.busy) || [];
+  // Convertir eventos a formato busy
+  return (data.items || [])
+    .filter(e => e.status !== 'cancelled' && (e.start?.dateTime || e.start?.date))
+    .map(e => ({
+      start: e.start.dateTime || e.start.date + 'T00:00:00',
+      end:   e.end.dateTime   || e.end.date   + 'T23:59:59'
+    }));
 }
 
 // ══════════════════════════════════════════════
@@ -1297,6 +1308,22 @@ async function createBooking() {
       };
     }
 
+    // Para crear eventos necesitamos el token OAuth de Sandra
+    // El cliente debe autorizar esto una vez
+    if (!gToken) {
+      await new Promise((resolve, reject) => {
+        const authClient = google.accounts.oauth2.initTokenClient({
+          client_id: CONFIG.CLIENT_ID,
+          scope: 'https://www.googleapis.com/auth/calendar.events',
+          hint: CONFIG.OWNER_EMAIL,
+          callback: (resp) => {
+            if (resp.error) reject(new Error(resp.error));
+            else { gToken = resp.access_token; resolve(); }
+          }
+        });
+        authClient.requestAccessToken();
+      });
+    }
     const qs = CONFIG.CREATE_MEET ? '?conferenceDataVersion=1&sendUpdates=all' : '?sendUpdates=all';
     const r = await fetch(
       `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CONFIG.CALENDAR_ID)}/events${qs}`,
@@ -1440,58 +1467,37 @@ function toast(msg, type = 'ok') {
 }
 
 // ══════════════════════════════════════════════
-//  ARRANQUE AUTOMÁTICO — MODO CLIENTE
-//  El cliente entra directo, sin ver ningún login
+//  ARRANQUE MODO CLIENTE — directo, sin login
 // ══════════════════════════════════════════════
 window.addEventListener('load', () => {
   initEmailJS();
-  // Solicitar token de Google silenciosamente usando la cuenta de Sandra
-  const client = google.accounts.oauth2.initTokenClient({
-    client_id: CONFIG.CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/calendar',
-    prompt: '',
-    hint: CONFIG.OWNER_EMAIL,
-    callback: async (resp) => {
-      if (resp.error) {
-        document.getElementById('login-screen').innerHTML = `
-          <div style="text-align:center;padding:40px;max-width:380px">
-            <div style="font-size:48px;margin-bottom:16px">📅</div>
-            <h2 style="font-family:var(--font-display);font-size:22px;margin-bottom:8px">${CONFIG.OWNER_NAME}</h2>
-            <p style="font-size:14px;color:var(--ink3);margin-bottom:20px">${CONFIG.OWNER_BIO}</p>
-            <div style="background:var(--warm-l);border-radius:10px;padding:16px;font-size:13px;color:var(--warm)">
-              El sistema aún no ha sido activado por el propietario.<br>
-              Por favor intenta más tarde.
-            </div>
-          </div>`;
-        return;
-      }
-      gToken = resp.access_token;
-      userData = { name: CONFIG.OWNER_NAME, email: CONFIG.OWNER_EMAIL };
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-      // Inicializar UI para el cliente
-      document.getElementById('app-header').style.display = 'none';
-      document.getElementById('owner-name-display').textContent = CONFIG.OWNER_NAME;
-      document.getElementById('owner-bio-display').textContent  = CONFIG.OWNER_BIO;
-      document.getElementById('owner-email-display').style.display = 'none';
-      selDur = CONFIG.DEFAULT_DURATION;
-      document.getElementById('info-duration').textContent = selDur + ' minutos';
-      document.getElementById('f-dur-disp').value = selDur + ' minutos';
-      const hoursText = CONFIG.WORK_START2
-        ? CONFIG.WORK_START + ' – ' + CONFIG.WORK_END + '  |  ' + CONFIG.WORK_START2 + ' – ' + CONFIG.WORK_END2
-        : CONFIG.WORK_START + ' – ' + CONFIG.WORK_END;
-      document.getElementById('info-hours').textContent = hoursText;
-      const workdayNames = CONFIG.WORK_DAYS.map(d => ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][d]);
-      document.getElementById('info-workdays').textContent = workdayNames.join(', ');
-      document.getElementById('info-tz').textContent = CONFIG.TIMEZONE;
-      renderDurationChips();
-      const now = new Date();
-      viewYear  = now.getFullYear();
-      viewMonth = now.getMonth();
-      loadCalendar();
-    }
-  });
-  client.requestAccessToken();
+  userData = { name: CONFIG.OWNER_NAME, email: CONFIG.OWNER_EMAIL };
+  // Ocultar pantalla de carga y mostrar app
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  // Ocultar header de usuario
+  const header = document.getElementById('app-header');
+  if (header) header.style.display = 'none';
+  // Inicializar UI
+  document.getElementById('owner-name-display').textContent = CONFIG.OWNER_NAME;
+  document.getElementById('owner-bio-display').textContent  = CONFIG.OWNER_BIO;
+  const emailEl = document.getElementById('owner-email-display');
+  if (emailEl) emailEl.style.display = 'none';
+  selDur = CONFIG.DEFAULT_DURATION;
+  document.getElementById('info-duration').textContent = selDur + ' minutos';
+  document.getElementById('f-dur-disp').value = selDur + ' minutos';
+  const hoursText = CONFIG.WORK_START2
+    ? CONFIG.WORK_START + ' – ' + CONFIG.WORK_END + '  |  ' + CONFIG.WORK_START2 + ' – ' + CONFIG.WORK_END2
+    : CONFIG.WORK_START + ' – ' + CONFIG.WORK_END;
+  document.getElementById('info-hours').textContent = hoursText;
+  const workdayNames = CONFIG.WORK_DAYS.map(d => ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][d]);
+  document.getElementById('info-workdays').textContent = workdayNames.join(', ');
+  document.getElementById('info-tz').textContent = CONFIG.TIMEZONE;
+  renderDurationChips();
+  const now = new Date();
+  viewYear  = now.getFullYear();
+  viewMonth = now.getMonth();
+  loadCalendar();
 });
 </script>
 </body>
