@@ -562,6 +562,13 @@
             <label>Correo electrónico</label>
             <input type="email" id="inp-email" placeholder="tu@correo.com">
           </div>
+          <div class="form-group">
+            <label>Modalidad</label>
+            <select id="inp-modalidad">
+              <option value="Presencial">🏥 Presencial</option>
+              <option value="Virtual">💻 Virtual</option>
+            </select>
+          </div>
           <div class="form-group full">
             <label>Motivo de la consulta</label>
             <textarea id="inp-motivo" placeholder="Describe brevemente tu condición o motivo de la cita…"></textarea>
@@ -813,7 +820,8 @@ function goStep3() {
   errDiv.innerHTML = '';
   formData = {
     nombre, apellido, tel,
-    email:  document.getElementById('inp-email').value.trim(),
+    email:     document.getElementById('inp-email').value.trim(),
+    modalidad: document.getElementById('inp-modalidad').value,
     motivo: document.getElementById('inp-motivo').value.trim()
   };
   show('panel-step3'); hide('panel-step1'); hide('panel-step2');
@@ -870,14 +878,13 @@ async function confirmarCita() {
   const nombre   = `${formData.nombre} ${formData.apellido}`;
 
   const payload = {
-    nombre,
-    telefono: formData.tel,
-    email:    formData.email,
-    motivo:   formData.motivo || 'No especificado',
-    startDateTime: startISO,
-    endDateTime:   endISO,
-    fecha: selectedDate.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric' }),
-    hora:  `${selectedHour} – ${addHour(selectedHour)}`
+    client_name:    nombre,
+    client_phone:   formData.tel,
+    client_email:   formData.email || '',
+    meeting_reason: formData.motivo || 'No especificado',
+    meeting_type:   formData.modalidad || 'Presencial',
+    start_time:     startISO,
+    end_time:       endISO
   };
 
   try {
