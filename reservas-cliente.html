@@ -3,1477 +3,940 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reservar cita — Sandra Estupiñán</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<title>AgendaTuCita — Sandra Estupiñán</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <style>
-/* ════════════════════════════════════════════
-   CONFIGURACIÓN DE COLORES Y VARIABLES
-   ════════════════════════════════════════════ */
-:root {
-  --ink:      #1a1916;
-  --ink2:     #4a4845;
-  --ink3:     #8a8885;
-  --paper:    #faf8f4;
-  --paper2:   #f2efe8;
-  --paper3:   #e8e4da;
-  --accent:   #2d6a4f;
-  --accent2:  #40916c;
-  --accent-l: #d8f3dc;
-  --warm:     #b7791f;
-  --warm-l:   #fef3c7;
-  --red:      #9b2335;
-  --red-l:    #fee2e2;
-  --border:   rgba(26,25,22,0.12);
-  --shadow:   0 4px 32px rgba(26,25,22,0.08);
-  --r:        12px;
-  --font-display: 'Playfair Display', Georgia, serif;
-  --font-body:    'DM Sans', system-ui, sans-serif;
-}
+  :root {
+    --primary:    #1B4F72;
+    --primary-lt: #2E86C1;
+    --accent:     #1ABC9C;
+    --accent-dk:  #148F77;
+    --bg:         #F4F6F9;
+    --surface:    #FFFFFF;
+    --border:     #D5DCE8;
+    --text:       #1C2833;
+    --text-muted: #7F8C8D;
+    --success:    #1ABC9C;
+    --error:      #E74C3C;
+    --radius:     12px;
+    --shadow:     0 4px 24px rgba(27,79,114,.10);
+  }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-  font-family: var(--font-body);
-  background: var(--paper);
-  color: var(--ink);
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
 
-/* ── Pantalla de login ─────────────────────── */
-#login-screen {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--paper);
-  padding: 24px;
-}
-.login-card {
-  background: var(--paper2);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 48px 40px;
-  max-width: 440px;
-  width: 100%;
-  text-align: center;
-  box-shadow: var(--shadow);
-}
-.login-logo {
-  width: 56px; height: 56px;
-  background: var(--accent);
-  border-radius: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  margin-bottom: 24px;
-}
-.login-title {
-  font-family: var(--font-display);
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  letter-spacing: -0.02em;
-}
-.login-sub {
-  font-size: 14px;
-  color: var(--ink2);
-  margin-bottom: 32px;
-  line-height: 1.6;
-}
-.config-note {
-  background: var(--warm-l);
-  border: 1px solid #f6d860;
-  border-radius: 10px;
-  padding: 14px 16px;
-  font-size: 13px;
-  color: #78350f;
-  text-align: left;
-  margin-bottom: 24px;
-  line-height: 1.6;
-}
-.config-note strong { display: block; margin-bottom: 4px; }
-.btn-google {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: 100%;
-  padding: 14px 24px;
-  background: var(--ink);
-  color: white;
-  border: none;
-  border-radius: 100px;
-  font-family: var(--font-body);
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all .2s;
-  letter-spacing: 0.01em;
-}
-.btn-google:hover { background: var(--ink2); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,25,22,0.2); }
-.btn-google:active { transform: translateY(0); }
-.google-icon { width: 20px; height: 20px; }
+  /* ── HEADER ─────────────────────────────── */
+  header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-lt) 100%);
+    color: #fff;
+    padding: 32px 24px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    letter-spacing: -0.5px;
+    position: relative;
+  }
+  header p {
+    font-size: .95rem;
+    opacity: .85;
+    margin-top: 6px;
+    position: relative;
+  }
+  .badge-esp {
+    display: inline-block;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: .78rem;
+    margin-top: 10px;
+    letter-spacing: .4px;
+    position: relative;
+  }
 
-/* ── App principal ─────────────────────────── */
-#app { display: none; }
-.app-header {
-  border-bottom: 1px solid var(--border);
-  background: var(--paper2);
-  padding: 0 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 60px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.app-brand {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.brand-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
-.user-pill {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--paper3);
-  border: 1px solid var(--border);
-  border-radius: 100px;
-  padding: 5px 14px 5px 5px;
-  font-size: 13px;
-  color: var(--ink2);
-}
-.user-avatar {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-.user-avatar-init {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: white;
-  font-size: 12px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.btn-logout {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 5px 12px;
-  font-size: 12px;
-  color: var(--ink3);
-  cursor: pointer;
-  transition: all .15s;
-  margin-left: 8px;
-}
-.btn-logout:hover { border-color: var(--ink2); color: var(--ink2); }
+  /* ── LAYOUT ─────────────────────────────── */
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 28px 16px 60px;
+  }
 
-/* ── Layout principal ──────────────────────── */
-.booking-layout {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  min-height: calc(100vh - 60px);
-}
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
 
-/* ── Panel izquierdo ───────────────────────── */
-.panel-left {
-  border-right: 1px solid var(--border);
-  background: var(--paper2);
-  padding: 40px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-.owner-section { margin-bottom: 32px; }
-.owner-name {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 6px;
-  letter-spacing: -0.01em;
-}
-.owner-email { font-size: 13px; color: var(--ink3); margin-bottom: 16px; }
+  .card-title {
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--primary-lt);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
 
-.meeting-type-label {
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  color: var(--ink3);
-  margin-bottom: 10px;
-}
-.duration-selector { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
-.dur-chip {
-  padding: 6px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: 100px;
-  font-size: 13px;
-  cursor: pointer;
-  background: var(--paper);
-  color: var(--ink2);
-  transition: all .15s;
-  font-family: var(--font-body);
-}
-.dur-chip:hover { border-color: var(--accent); color: var(--accent); }
-.dur-chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+  /* ── STEPS BAR ───────────────────────────── */
+  .steps {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 28px;
+  }
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .82rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .step.active { color: var(--primary); }
+  .step.done   { color: var(--accent); }
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .78rem; font-weight: 600;
+    background: var(--surface);
+    transition: all .3s;
+  }
+  .step.active .step-num {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+  .step.done .step-num {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .step-line {
+    width: 40px; height: 2px;
+    background: var(--border);
+    margin: 0 4px;
+  }
+  .step-line.done { background: var(--accent); }
 
-.info-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 13px;
-  color: var(--ink2);
-  margin-bottom: 12px;
-  line-height: 1.5;
-}
-.info-icon { font-size: 15px; margin-top: 1px; flex-shrink: 0; }
+  /* ── CALENDAR ────────────────────────────── */
+  .cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .cal-nav h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-transform: capitalize;
+  }
+  .btn-nav {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--primary);
+    font-size: 1.1rem;
+    transition: all .2s;
+  }
+  .btn-nav:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    gap: 4px;
+  }
+  .cal-head {
+    text-align: center;
+    font-size: .7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 6px 0;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .88rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+    font-weight: 500;
+    transition: all .2s;
+    position: relative;
+  }
+  .cal-day:hover:not(.disabled):not(.empty) {
+    background: rgba(27,79,114,.08);
+    border-color: var(--primary-lt);
+  }
+  .cal-day.today { border-color: var(--primary-lt); color: var(--primary-lt); font-weight: 700; }
+  .cal-day.selected {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .cal-day.disabled {
+    color: #C5CBD3;
+    cursor: not-allowed;
+    background: #F8F9FB;
+  }
+  .cal-day.empty { cursor: default; }
+  .cal-day.has-slots::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .cal-day.selected::after { background: rgba(255,255,255,.7); }
 
-.share-box {
-  background: var(--paper3);
-  border-radius: 10px;
-  padding: 14px;
-  margin-top: auto;
-}
-.share-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--ink3); margin-bottom: 8px; }
-.share-url {
-  font-size: 12px;
-  color: var(--accent);
-  word-break: break-all;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
+  /* ── TIME SLOTS ──────────────────────────── */
+  .slots-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .slots-header h4 {
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .slots-header span {
+    font-size: .82rem;
+    color: var(--text-muted);
+    background: var(--bg);
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+  .slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+  }
+  .slot-btn {
+    padding: 10px 6px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .85rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    color: var(--text);
+    transition: all .2s;
+  }
+  .slot-btn:hover:not(.taken) {
+    border-color: var(--primary-lt);
+    color: var(--primary);
+    background: rgba(27,79,114,.05);
+  }
+  .slot-btn.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+  .slot-btn.taken {
+    background: #F8F9FB;
+    color: #C5CBD3;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+  .slot-period {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 14px 0 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .slot-period::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: var(--border);
+  }
 
-/* ── Panel derecho ─────────────────────────── */
-.panel-right { padding: 40px 48px; background: var(--paper); }
+  /* ── FORM ────────────────────────────────── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media(max-width: 540px) { .form-grid { grid-template-columns: 1fr; } }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label {
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: .3px;
+    text-transform: uppercase;
+  }
+  input, select, textarea {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    padding: 11px 14px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--primary-lt);
+    background: #fff;
+  }
+  textarea { resize: vertical; min-height: 80px; }
 
-/* Pasos */
-.steps-bar { display: flex; gap: 6px; margin-bottom: 36px; }
-.step-seg { height: 2px; flex: 1; background: var(--paper3); border-radius: 2px; transition: background .4s; }
-.step-seg.done { background: var(--accent); }
+  /* ── BOOKING SUMMARY ─────────────────────── */
+  .summary-box {
+    background: linear-gradient(135deg, rgba(27,79,114,.06) 0%, rgba(26,188,156,.06) 100%);
+    border: 1px solid rgba(27,79,114,.15);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+  .summary-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: .92rem;
+  }
+  .summary-row + .summary-row { border-top: 1px solid rgba(27,79,114,.08); }
+  .summary-icon { font-size: 1rem; width: 20px; text-align: center; }
+  .summary-label { color: var(--text-muted); font-size: .82rem; min-width: 90px; }
+  .summary-val { font-weight: 600; color: var(--primary); }
 
-/* ── Calendario ───────────────────────────── */
-.screen { display: none; }
-.screen.active { display: block; }
+  /* ── BUTTONS ─────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all .25s;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-lt) 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(27,79,114,.3);
+    width: 100%;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(27,79,114,.4); }
+  .btn-primary:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--bg); color: var(--text); }
 
-.screen-title {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 4px;
-  letter-spacing: -0.01em;
-}
-.screen-sub { font-size: 14px; color: var(--ink3); margin-bottom: 28px; }
+  /* ── SUCCESS ─────────────────────────────── */
+  #success-screen {
+    display: none;
+    text-align: center;
+    padding: 20px;
+  }
+  .success-icon {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dk) 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 24px rgba(26,188,156,.3);
+  }
+  #success-screen h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+  }
+  #success-screen p {
+    color: var(--text-muted);
+    font-size: .95rem;
+    line-height: 1.6;
+    max-width: 420px;
+    margin: 0 auto 24px;
+  }
+  .confirm-details {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 18px;
+    text-align: left;
+    max-width: 420px;
+    margin: 0 auto 24px;
+    border: 1px solid var(--border);
+  }
 
-.cal-nav-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-.cal-month-name {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 600;
-}
-.cal-arrow {
-  width: 34px; height: 34px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: none;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .15s;
-  color: var(--ink2);
-}
-.cal-arrow:hover { background: var(--paper2); border-color: var(--ink3); }
+  /* ── LOADING / ERROR ─────────────────────── */
+  .loader {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px;
+    padding: 28px;
+    color: var(--text-muted);
+    font-size: .9rem;
+  }
+  .spinner {
+    width: 22px; height: 22px;
+    border: 2.5px solid var(--border);
+    border-top-color: var(--primary-lt);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-.cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
-}
-.cal-header-cell {
-  text-align: center;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--ink3);
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  padding: 6px 0 10px;
-}
-.cal-cell {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  font-size: 14px;
-  position: relative;
-  transition: all .15s;
-}
-.cal-cell.empty { }
-.cal-cell.past { color: var(--paper3); }
-.cal-cell.no-slots { color: var(--paper3); }
-.cal-cell.has-slots {
-  cursor: pointer;
-  color: var(--ink);
-  font-weight: 500;
-}
-.cal-cell.has-slots:hover { background: var(--accent-l); color: var(--accent); }
-.cal-cell.has-slots.today { background: var(--paper3); }
-.cal-cell.has-slots.today:hover { background: var(--accent-l); }
-.cal-cell.selected { background: var(--accent) !important; color: white !important; }
-.cal-cell.has-slots::after {
-  content: '';
-  width: 4px; height: 4px;
-  border-radius: 50%;
-  background: var(--accent);
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.cal-cell.selected::after { background: rgba(255,255,255,0.7); }
+  .alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: .88rem;
+    margin-top: 14px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .alert-error   { background: #FDECEA; color: #C0392B; border: 1px solid #F5C6CB; }
+  .alert-success { background: #E8F8F5; color: #148F77; border: 1px solid #A9DFBF; }
+  .alert-info    { background: #EBF5FB; color: #1B4F72; border: 1px solid #AED6F1; }
 
-/* ── Slots de hora ─────────────────────────── */
-.slots-section { margin-top: 28px; }
-.slots-date-label {
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 14px;
-  color: var(--ink);
-}
-.slots-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-.slot-btn {
-  padding: 11px 8px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  background: var(--paper);
-  font-size: 14px;
-  font-family: var(--font-body);
-  cursor: pointer;
-  text-align: center;
-  transition: all .15s;
-  color: var(--ink);
-}
-.slot-btn:hover { border-color: var(--accent); background: var(--accent-l); color: var(--accent); }
-.slot-btn.selected { background: var(--accent); border-color: var(--accent); color: white; font-weight: 500; }
+  /* ── INFO BAR ────────────────────────────── */
+  .info-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .info-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: .82rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .info-chip span { color: var(--primary); font-weight: 600; }
 
-.no-slots-msg {
-  text-align: center;
-  padding: 32px;
-  background: var(--paper2);
-  border-radius: 12px;
-  border: 1px dashed var(--border);
-  font-size: 14px;
-  color: var(--ink3);
-}
-
-/* ── Loading spinner ───────────────────────── */
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: var(--ink3);
-  font-size: 14px;
-}
-.spin {
-  display: inline-block;
-  width: 22px; height: 22px;
-  border: 2px solid var(--paper3);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin .7s linear infinite;
-  margin-bottom: 10px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── Formulario ────────────────────────────── */
-.booking-summary {
-  background: var(--accent-l);
-  border: 1.5px solid #95d5b2;
-  border-radius: 12px;
-  padding: 18px 20px;
-  margin-bottom: 28px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-.sum-item { display: flex; flex-direction: column; gap: 2px; }
-.sum-label { font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: .07em; font-weight: 500; }
-.sum-val { font-size: 14px; font-weight: 500; color: var(--accent); }
-
-.form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.fgroup { display: flex; flex-direction: column; gap: 6px; }
-.fgroup.full { grid-column: 1/-1; }
-.fgroup label { font-size: 13px; font-weight: 500; color: var(--ink); }
-.fgroup label em { color: var(--accent); font-style: normal; }
-.fgroup input,
-.fgroup textarea,
-.fgroup select {
-  padding: 11px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  font-size: 14px;
-  font-family: var(--font-body);
-  background: var(--paper);
-  color: var(--ink);
-  outline: none;
-  transition: border-color .15s;
-}
-.fgroup input:focus,
-.fgroup textarea:focus { border-color: var(--accent); }
-.fgroup textarea { resize: vertical; min-height: 88px; }
-.field-error { border-color: var(--red) !important; }
-.err-msg { font-size: 12px; color: var(--red); }
-
-/* ── Botones ───────────────────────────────── */
-.btn-row { display: flex; align-items: center; gap: 12px; margin-top: 28px; }
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  border-radius: 100px;
-  font-size: 14px;
-  font-family: var(--font-body);
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: all .15s;
-}
-.btn-primary { background: var(--accent); color: white; }
-.btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
-.btn-primary:disabled { background: var(--paper3); color: var(--ink3); cursor: not-allowed; transform: none; }
-.btn-ghost { background: transparent; color: var(--ink3); border: 1.5px solid var(--border); }
-.btn-ghost:hover { border-color: var(--ink2); color: var(--ink2); }
-.btn-spin { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: white; border-radius: 50%; animation: spin .6s linear infinite; }
-
-/* ── Confirmación ──────────────────────────── */
-.confirm-wrap {
-  text-align: center;
-  padding: 48px 32px;
-  background: var(--paper2);
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  max-width: 520px;
-}
-.confirm-icon { font-size: 56px; margin-bottom: 20px; }
-.confirm-title {
-  font-family: var(--font-display);
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  letter-spacing: -0.02em;
-}
-.confirm-sub { font-size: 15px; color: var(--ink2); margin-bottom: 24px; line-height: 1.6; }
-.confirm-details {
-  background: var(--paper);
-  border-radius: 12px;
-  padding: 18px 20px;
-  margin: 0 auto 24px;
-  text-align: left;
-  max-width: 400px;
-  border: 1px solid var(--border);
-}
-.cd-row { display: flex; justify-content: space-between; font-size: 14px; padding: 7px 0; border-bottom: 1px solid var(--border); }
-.cd-row:last-child { border-bottom: none; }
-.cd-label { color: var(--ink3); }
-.cd-val { font-weight: 500; color: var(--ink); }
-.meet-link-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: #4285F4;
-  color: white;
-  padding: 11px 22px;
-  border-radius: 100px;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 20px;
-  transition: all .15s;
-}
-.meet-link-btn:hover { background: #3367d6; }
-
-/* ── Toast ─────────────────────────────────── */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: var(--ink);
-  color: white;
-  padding: 12px 20px;
-  border-radius: 10px;
-  font-size: 14px;
-  transform: translateY(80px);
-  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
-  z-index: 999;
-  pointer-events: none;
-}
-.toast.show { transform: translateY(0); }
-.toast.err { background: var(--red); }
-.toast.ok  { background: var(--accent); }
-
-/* ── Error de config ───────────────────────── */
-.config-error {
-  background: var(--red-l);
-  border: 1.5px solid #fca5a5;
-  border-radius: 12px;
-  padding: 20px;
-  margin-top: 16px;
-  font-size: 13px;
-  color: var(--red);
-  text-align: left;
-  line-height: 1.7;
-}
-.config-error strong { display: block; font-size: 14px; margin-bottom: 6px; }
-.config-error code {
-  background: rgba(155,35,53,0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: monospace;
-  font-size: 12px;
-}
-
-@media (max-width: 768px) {
-  .booking-layout { grid-template-columns: 1fr; }
-  .panel-left { border-right: none; border-bottom: 1px solid var(--border); padding: 28px 20px; }
-  .panel-right { padding: 24px 20px; }
-  .slots-grid { grid-template-columns: repeat(3, 1fr); }
-  .form-2col { grid-template-columns: 1fr; }
-  .app-header { padding: 0 20px; }
-}
+  /* ── FOOTER ──────────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: .78rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+  footer strong { color: var(--primary); }
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════
-  ⚙️  CONFIGURACIÓN — EDITA ESTA SECCIÓN
-  ══════════════════════════════════════════ -->
-<script>
-const CONFIG = {
-  // 1. Tu Google OAuth Client ID
-  //    Obtenlo en: console.cloud.google.com → Credenciales → ID de cliente OAuth 2.0
-  //    Tipo: Aplicación web
-  //    Origen autorizado: el dominio o file:// donde abras este archivo
-  CLIENT_ID: '264077603671-cghhf64qjlpnomo6t4ps39ulqpsdfts1.apps.googleusercontent.com',
+<header>
+  <h1>📅 AgendaTuCita</h1>
+  <p>Fisioterapia & Rehabilitación Profesional</p>
+  <div class="badge-esp">Dra. Sandra Estupiñán · Cúcuta, Norte de Santander</div>
+</header>
 
-  // 2. Nombre que verán tus clientes en la página de reservas
-  OWNER_NAME: 'Sandra Estupiñán',
+<div class="container">
 
-  // 3. Texto descriptivo (opcional)
-  OWNER_BIO: 'Agenda tu cita fácilmente. Solo verás los horarios disponibles.',
-
-  // 4. Tu zona horaria
-  TIMEZONE: 'America/Bogota',
-
-  // 5. Duraciones disponibles para las citas (en minutos)
-  DURATIONS: [60, 90, 180],
-
-  // 6. Duración predeterminada
-  DEFAULT_DURATION: 60,
-
-  // 7. Franjas horarias de trabajo
-  //    Puedes tener UNA o DOS franjas (mañana y tarde)
-  //    Franja 1: mañana
-  WORK_START: '07:00',
-  WORK_END:   '11:00',
-  //    Franja 2: tarde (si no quieres segunda franja, pon WORK_START2: '' )
-  WORK_START2: '14:00',
-  WORK_END2:   '17:00',
-
-  // 8. Días laborables: 0=Dom, 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb
-  WORK_DAYS: [1, 2, 3, 4, 5],
-
-  // 9. Minutos de buffer entre citas (para descansos)
-  BUFFER_MINUTES: 0,
-
-  // 10. Mínimo de horas de anticipación para reservar
-  MIN_NOTICE_HOURS: 2,
-
-  // 11. Máximo de días hacia adelante para mostrar disponibilidad
-  MAX_ADVANCE_DAYS: 60,
-
-  // 12. Crear enlace de Google Meet automáticamente (true/false)
-  CREATE_MEET: true,
-
-  // 13. Mensaje de confirmación personalizado
-  CONFIRM_MSG: '¡Tu cita ha sido agendada! Recibirás una invitación de Google Calendar.',
-
-  // 14. ID del calendario (usa 'primary' para el calendario principal)
-  CALENDAR_ID: 'primary',
-
-  // ─────────────────────────────────────────────
-  //  EMAILJS — Correos automáticos
-  //  Pasos para configurar (GRATIS):
-  //  1. Ve a https://www.emailjs.com y crea cuenta gratis
-  //  2. En "Email Services" conecta tu Gmail (estuval2022@gmail.com)
-  //  3. Copia el SERVICE ID y pégalo abajo
-  //  4. En "Email Templates" crea dos plantillas (ver instrucciones abajo)
-  //  5. Copia los TEMPLATE IDs y pégalos abajo
-  //  6. En "Account" copia tu PUBLIC KEY y pégala abajo
-  // ─────────────────────────────────────────────
-  EMAILJS_PUBLIC_KEY:       'l8klrftm9RT_1UTwc',
-  EMAILJS_SERVICE_ID:       'service_ro19ta2',
-  EMAILJS_TEMPLATE_CLIENTE: 'template_oulw4u7',
-  EMAILJS_TEMPLATE_SANDRA:  'template_jwnaab7',
-
-  // Correo de Sandra donde llegan las notificaciones
-  OWNER_EMAIL: 'estuval2022@gmail.com',
-
-  // URL del Apps Script (maneja reservas sin login del cliente)
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwuc8ajM5wKzbps_TDmk8enidM5hw8UJPb9y2AOpifADOEjC4DRgbEpfLlGzFVBgA1y/exec',
-
-  // API Key para leer disponibilidad del calendario
-  API_KEY: 'AIzaSyDVbFV9haagvNa_Sl1c-tAjR2k7t4OVjxs',
-  CALENDAR_ID_PUBLIC: 'estuval2022@gmail.com'
-};
-</script>
-<!-- ══════════════════════════════════════════
-  FIN DE CONFIGURACIÓN
-  ══════════════════════════════════════════ -->
-
-<!-- Pantalla de carga para el cliente -->
-<div id="login-screen" style="display:flex;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:var(--paper)">
-  <div style="text-align:center">
-    <div style="font-size:52px;margin-bottom:16px">📅</div>
-    <div style="font-family:var(--font-display);font-size:26px;font-weight:700;margin-bottom:8px">Sandra Estupiñán</div>
-    <p style="font-size:14px;color:var(--ink3);margin-bottom:28px">Cargando disponibilidad...</p>
-    <div style="width:36px;height:36px;border:3px solid var(--paper3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto"></div>
+  <!-- PASO INDICADOR -->
+  <div class="steps" id="steps-bar">
+    <div class="step active" id="step1">
+      <div class="step-num">1</div>
+      <span>Fecha y hora</span>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step" id="step2">
+      <div class="step-num">2</div>
+      <span>Tus datos</span>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step" id="step3">
+      <div class="step-num">3</div>
+      <span>Confirmar</span>
+    </div>
   </div>
-</div>
 
-<!-- App principal -->
-<div id="app">
-  <header class="app-header" id="app-header">
-    <div class="app-brand">
-      <div class="brand-dot"></div>
-      GCal Reservas
-    </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div class="user-pill">
-        <div class="user-avatar-init" id="user-init">?</div>
-        <span id="user-name-header">—</span>
-      </div>
-      <button class="btn-logout" onclick="logout()">Salir</button>
-    </div>
-  </header>
+  <!-- INFO CHIPS -->
+  <div class="info-bar">
+    <div class="info-chip">🕐 <span>07:00–11:00</span> y <span>14:00–17:00</span></div>
+    <div class="info-chip">📅 <span>Lunes a Viernes</span></div>
+    <div class="info-chip">⏱ Sesión de <span>1 hora</span></div>
+  </div>
 
-  <div class="booking-layout">
-    <!-- Panel izquierdo -->
-    <aside class="panel-left">
-      <div class="owner-section">
-        <div class="owner-name" id="owner-name-display"></div>
-        <div class="owner-email" id="owner-email-display"></div>
-        <p style="font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:20px" id="owner-bio-display"></p>
-      </div>
+  <!-- ══ PANTALLA DE RESERVA ══ -->
+  <div id="booking-screen">
 
-      <div class="meeting-type-label">Duración de la cita</div>
-      <div class="duration-selector" id="duration-selector"></div>
-
-      <hr class="divider">
-
-      <div class="info-item">
-        <span class="info-icon">🕐</span>
-        <span id="info-duration">30 minutos</span>
-      </div>
-      <div class="info-item">
-        <span class="info-icon">📅</span>
-        <span id="info-workdays">Lunes a Viernes</span>
-      </div>
-      <div class="info-item">
-        <span class="info-icon">🕗</span>
-        <span id="info-hours">8:00 – 17:00</span>
-      </div>
-      <div class="info-item">
-        <span class="info-icon">🌎</span>
-        <span id="info-tz">America/Bogota</span>
-      </div>
-
-      <hr class="divider">
-
-      <div class="share-box">
-        <div class="share-label">Cómo compartir</div>
-        <p style="font-size:12px;color:var(--ink2);line-height:1.5">
-          Comparte este archivo HTML o súbelo a cualquier servidor web.
-          Tus clientes abrirán el mismo archivo y podrán hacer reservas directamente.
-        </p>
-      </div>
-    </aside>
-
-    <!-- Panel derecho -->
-    <div class="panel-right">
-      <div class="steps-bar">
-        <div class="step-seg done" id="seg0"></div>
-        <div class="step-seg"      id="seg1"></div>
-        <div class="step-seg"      id="seg2"></div>
-      </div>
-
-      <!-- PASO 1: Seleccionar fecha y hora -->
-      <div class="screen active" id="screen-1">
-        <div class="screen-title">Elige una fecha disponible</div>
-        <p class="screen-sub">Solo se muestran días con horarios libres en tu calendario</p>
-
-        <div class="cal-nav-row">
-          <button class="cal-arrow" onclick="prevMonth()">‹</button>
-          <div class="cal-month-name" id="cal-month"></div>
-          <button class="cal-arrow" onclick="nextMonth()">›</button>
+    <!-- PASO 1: CALENDARIO + HORARIOS -->
+    <div id="panel-step1">
+      <div class="card">
+        <div class="card-title">Selecciona una fecha</div>
+        <div class="cal-nav">
+          <button class="btn-nav" onclick="changeMonth(-1)">&#8249;</button>
+          <h3 id="month-label"></h3>
+          <button class="btn-nav" onclick="changeMonth(1)">&#8250;</button>
         </div>
-
-        <div class="cal-grid" id="cal-grid">
-          <div class="loading" style="grid-column:1/-1">
-            <div class="spin"></div><br>Cargando calendario...
-          </div>
-        </div>
-
-        <div id="slots-area" style="display:none">
-          <div class="slots-section">
-            <div class="slots-date-label" id="slots-label"></div>
-            <div class="slots-grid" id="slots-grid"></div>
-          </div>
-        </div>
+        <div class="cal-grid" id="calendar"></div>
       </div>
 
-      <!-- PASO 2: Formulario -->
-      <div class="screen" id="screen-2">
-        <div class="screen-title">Tus datos de contacto</div>
-        <p class="screen-sub">Completa el formulario para confirmar tu cita</p>
-
-        <div class="booking-summary" id="booking-summary"></div>
-
-        <div class="form-2col">
-          <div class="fgroup">
-            <label>Nombre completo <em>*</em></label>
-            <input type="text" id="f-name" placeholder="Tu nombre completo" maxlength="100">
-            <span class="err-msg" id="e-name"></span>
-          </div>
-          <div class="fgroup">
-            <label>Correo electrónico <em>*</em></label>
-            <input type="email" id="f-email" placeholder="tu@correo.com">
-            <span class="err-msg" id="e-email"></span>
-          </div>
-          <div class="fgroup">
-            <label>Teléfono</label>
-            <input type="tel" id="f-phone" placeholder="+57 300 000 0000">
-          </div>
-          <div class="fgroup">
-            <label>Duración</label>
-            <input type="text" id="f-dur-disp" readonly style="background:var(--paper2)">
-          </div>
-          <div class="fgroup full">
-            <label>Motivo de la reunión</label>
-            <textarea id="f-reason" placeholder="Describe brevemente el propósito de la cita..." maxlength="500"></textarea>
-          </div>
-          <div class="fgroup full">
-            <label>Modalidad de la reunión <em>*</em></label>
-            <select id="f-type">
-              <option value="">-- Selecciona una opción --</option>
-              <option value="Presencial">🏢 Presencial</option>
-              <option value="Virtual (Google Meet)">💻 Virtual (Google Meet)</option>
-            </select>
-            <span class="err-msg" id="e-type"></span>
-          </div>
+      <div class="card" id="slots-card" style="display:none">
+        <div class="card-title">Horarios disponibles</div>
+        <div id="slots-container">
+          <div class="loader"><div class="spinner"></div> Consultando disponibilidad…</div>
         </div>
-
-        <div class="btn-row">
-          <button class="btn btn-ghost" onclick="goStep(1)">← Volver</button>
-          <button class="btn btn-primary" id="btn-confirm" onclick="createBooking()">
-            Confirmar cita →
+        <div style="margin-top:18px">
+          <button class="btn btn-primary" id="btn-next1" onclick="goStep2()" disabled>
+            Continuar →
           </button>
         </div>
       </div>
+    </div>
 
-      <!-- PASO 3: Confirmación -->
-      <div class="screen" id="screen-3">
-        <div class="confirm-wrap">
-          <div class="confirm-icon">✅</div>
-          <div class="confirm-title">¡Cita confirmada!</div>
-          <p class="confirm-sub" id="conf-msg"></p>
-          <div id="conf-meet"></div>
-          <div class="confirm-details" id="conf-details"></div>
-          <p style="font-size:13px;color:var(--ink3);margin-bottom:20px">
-            Revisa tu correo — Google Calendar te enviará una invitación automáticamente.
-          </p>
-          <button class="btn btn-ghost" onclick="resetBooking()">Agendar otra cita</button>
+    <!-- PASO 2: DATOS DEL PACIENTE -->
+    <div id="panel-step2" style="display:none">
+      <div class="card">
+        <div class="card-title">Tus datos</div>
+
+        <!-- Resumen de selección -->
+        <div class="summary-box" id="mini-summary"></div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" id="inp-nombre" placeholder="Tu nombre" required>
+          </div>
+          <div class="form-group">
+            <label>Apellido</label>
+            <input type="text" id="inp-apellido" placeholder="Tu apellido" required>
+          </div>
+          <div class="form-group">
+            <label>Teléfono / WhatsApp</label>
+            <input type="tel" id="inp-tel" placeholder="300 000 0000" required>
+          </div>
+          <div class="form-group">
+            <label>Correo electrónico</label>
+            <input type="email" id="inp-email" placeholder="tu@correo.com">
+          </div>
+          <div class="form-group full">
+            <label>Motivo de la consulta</label>
+            <textarea id="inp-motivo" placeholder="Describe brevemente tu condición o motivo de la cita…"></textarea>
+          </div>
+        </div>
+        <div id="form-error"></div>
+        <div style="display:flex; gap:12px; margin-top:20px">
+          <button class="btn btn-ghost" onclick="goStep1()">← Volver</button>
+          <button class="btn btn-primary" onclick="goStep3()" style="flex:1">Revisar cita →</button>
         </div>
       </div>
     </div>
+
+    <!-- PASO 3: CONFIRMACIÓN -->
+    <div id="panel-step3" style="display:none">
+      <div class="card">
+        <div class="card-title">Confirma tu cita</div>
+        <div class="summary-box" id="full-summary"></div>
+        <div id="confirm-error"></div>
+        <div style="display:flex; gap:12px; margin-top:20px">
+          <button class="btn btn-ghost" onclick="goStep2()">← Editar</button>
+          <button class="btn btn-primary" id="btn-confirm" onclick="confirmarCita()" style="flex:1">
+            ✅ Confirmar cita
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /booking-screen -->
+
+  <!-- ══ PANTALLA DE ÉXITO ══ -->
+  <div id="success-screen" class="card">
+    <div class="success-icon">✓</div>
+    <h2>¡Cita confirmada!</h2>
+    <p>Tu reserva quedó registrada en el calendario de la Dra. Sandra Estupiñán. Nos vemos pronto.</p>
+    <div class="confirm-details" id="success-details"></div>
+    <div class="alert alert-info" style="max-width:420px;margin:0 auto 20px;text-align:left">
+      📌 <div><strong>Recuerda:</strong> Si necesitas cancelar o reprogramar, comunícate con antelación.</div>
+    </div>
+    <button class="btn btn-primary" onclick="reiniciar()" style="max-width:260px">
+      + Agendar otra cita
+    </button>
   </div>
-</div>
 
-<div class="toast" id="toast"></div>
+</div><!-- /container -->
 
-<!-- Google Identity Services -->
-<script src="https://accounts.google.com/gsi/client" async></script>
-<!-- EmailJS SDK para envío de correos -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<footer>
+  <strong>AgendaTuCita</strong> · Dra. Sandra Estupiñán · Fisioterapia &amp; Rehabilitación
+</footer>
 
 <script>
 // ══════════════════════════════════════════════
-//  ESTADO GLOBAL
+//  CONFIGURACIÓN
 // ══════════════════════════════════════════════
-let gToken    = null;   // access token de Google
-let userData  = {};     // perfil del usuario logueado
-let gcalBusy  = [];     // períodos ocupados de Google Calendar
-let slotsMap  = {};     // { 'YYYY-MM-DD': [{start, end, label}] }
-let selDate   = null;
-let selSlot   = null;
-let selDur    = CONFIG.DEFAULT_DURATION;
-let viewYear, viewMonth;
+const API_KEY      = 'AIzaSyCnzyqYEA3_0n5hZd0x6P6Nf5mLWKkhmY';
+const CALENDAR_ID  = 'estuval2022@gmail.com';
+const APPS_SCRIPT  = 'https://script.google.com/macros/s/AKfycbzcs6d1mgg7wdHGup1x4PFWV7MlDft0x3Sg_AmkXPOWjc_ksKlNvZcGgva1agi5akuH/exec';
 
-const MONTH_NAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
-                     'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-const DAY_NAMES   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-const DAY_FULL    = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+// Horarios disponibles (bloques de 1h)
+const HORARIOS_AM = ['07:00','08:00','09:00','10:00'];
+const HORARIOS_PM = ['14:00','15:00','16:00'];
+const TODOS_HORARIOS = [...HORARIOS_AM, ...HORARIOS_PM];
 
 // ══════════════════════════════════════════════
-//  AUTENTICACIÓN GOOGLE
+//  ESTADO
 // ══════════════════════════════════════════════
-function startAuth() {
-  if (!CONFIG.CLIENT_ID || CONFIG.CLIENT_ID.includes('TU_CLIENT_ID')) {
-    document.getElementById('login-error').innerHTML = `
-      <div class="config-error">
-        <strong>⚠️ CLIENT_ID no configurado</strong>
-        Abre este archivo HTML en un editor de texto y reemplaza
-        <code>TU_CLIENT_ID_AQUI.apps.googleusercontent.com</code>
-        con tu Client ID real de Google Cloud Console.
-        <br><br>
-        <strong>Pasos:</strong><br>
-        1. Ve a <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color:var(--red)">console.cloud.google.com/apis/credentials</a><br>
-        2. Crea un ID de cliente OAuth 2.0 (Tipo: Aplicación web)<br>
-        3. Agrega <code>${location.origin}</code> como origen autorizado<br>
-        4. Copia el Client ID y pégalo en CONFIG.CLIENT_ID
-      </div>`;
-    return;
-  }
-
-  const client = google.accounts.oauth2.initTokenClient({
-    client_id: CONFIG.CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-    callback: onTokenResponse
-  });
-  client.requestAccessToken();
-}
-
-// Inicializar EmailJS
-function initEmailJS() {
-  if (CONFIG.EMAILJS_PUBLIC_KEY && !CONFIG.EMAILJS_PUBLIC_KEY.includes('TU_')) {
-    emailjs.init({ publicKey: CONFIG.EMAILJS_PUBLIC_KEY });
-    console.log('EmailJS iniciado');
-  }
-}
-
-async function onTokenResponse(tokenResponse) {
-  if (tokenResponse.error) {
-    toast('Error de autenticación: ' + tokenResponse.error, 'err');
-    return;
-  }
-  gToken = tokenResponse.access_token;
-
-  // Obtener perfil del usuario
-  try {
-    const r = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-      headers: { Authorization: 'Bearer ' + gToken }
-    });
-    userData = await r.json();
-    initApp();
-  } catch(e) {
-    toast('Error al obtener perfil de Google', 'err');
-  }
-}
-
-function logout() {
-  gToken = null;
-  userData = {};
-  gcalBusy = [];
-  slotsMap = {};
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  google.accounts.oauth2.revoke(gToken, () => {});
-}
+let currentDate  = new Date();
+let selectedDate = null;
+let selectedHour = null;
+let busySlots    = {};   // { 'YYYY-MM-DD': ['08:00', ...] }
+let formData     = {};
 
 // ══════════════════════════════════════════════
-//  INICIALIZAR APP
+//  INIT
 // ══════════════════════════════════════════════
-function initApp() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  initEmailJS();
-
-  // Header
-  const name = userData.name || userData.email || 'Usuario';
-  document.getElementById('user-name-header').textContent = name;
-  document.getElementById('user-init').textContent = name[0].toUpperCase();
-
-  // Panel izquierdo
-  document.getElementById('owner-name-display').textContent = CONFIG.OWNER_NAME;
-  document.getElementById('owner-email-display').textContent = userData.email || '';
-  document.getElementById('owner-bio-display').textContent  = CONFIG.OWNER_BIO;
-  document.getElementById('info-tz').textContent     = CONFIG.TIMEZONE;
-  const hoursText = CONFIG.WORK_START2
-    ? CONFIG.WORK_START + ' – ' + CONFIG.WORK_END + '  |  ' + CONFIG.WORK_START2 + ' – ' + CONFIG.WORK_END2
-    : CONFIG.WORK_START + ' – ' + CONFIG.WORK_END;
-  document.getElementById('info-hours').textContent = hoursText;
-
-  const workdayNames = CONFIG.WORK_DAYS.map(d => DAY_FULL[d]);
-  document.getElementById('info-workdays').textContent = workdayNames.join(', ');
-
-  // Duración predeterminada
-  selDur = CONFIG.DEFAULT_DURATION;
-  document.getElementById('info-duration').textContent = selDur + ' minutos';
-  document.getElementById('f-dur-disp').value = selDur + ' minutos';
-  renderDurationChips();
-
-  // Calendario
-  const now = new Date();
-  viewYear  = now.getFullYear();
-  viewMonth = now.getMonth();
-
-  loadCalendar();
-}
+renderCalendar();
+loadMonthBusy(currentDate.getFullYear(), currentDate.getMonth());
 
 // ══════════════════════════════════════════════
-//  DURACIÓN
+//  CALENDARIO
 // ══════════════════════════════════════════════
-function renderDurationChips() {
-  const container = document.getElementById('duration-selector');
-  container.innerHTML = CONFIG.DURATIONS.map(d =>
-    `<button class="dur-chip ${d === selDur ? 'active' : ''}"
-      onclick="changeDuration(${d})">${d} min</button>`
-  ).join('');
-}
-
-function changeDuration(d) {
-  selDur = d;
-  selDate = null;
-  selSlot = null;
-  document.getElementById('info-duration').textContent = d + ' minutos';
-  document.getElementById('f-dur-disp').value = d + ' minutos';
-  renderDurationChips();
-  document.getElementById('slots-area').style.display = 'none';
-  loadCalendar();
-}
-
-// ══════════════════════════════════════════════
-//  GOOGLE CALENDAR — LEER EVENTOS
-// ══════════════════════════════════════════════
-async function fetchBusyTimes(timeMin, timeMax) {
-  // Leer eventos con API Key pública — sin login
-  const calId = encodeURIComponent(CONFIG.CALENDAR_ID_PUBLIC || CONFIG.CALENDAR_ID);
-  const url = `https://www.googleapis.com/calendar/v3/calendars/${calId}/events?` +
-    `key=${CONFIG.API_KEY}` +
-    `&timeMin=${encodeURIComponent(timeMin.toISOString())}` +
-    `&timeMax=${encodeURIComponent(timeMax.toISOString())}` +
-    `&singleEvents=true&orderBy=startTime&maxResults=250`;
-
-  const r = await fetch(url);
-  if (!r.ok) throw new Error('Error al leer el calendario');
-  const data = await r.json();
-  return (data.items || [])
-    .filter(e => e.status !== 'cancelled' && (e.start?.dateTime || e.start?.date))
-    .map(e => ({
-      start: e.start.dateTime || e.start.date + 'T00:00:00',
-      end:   e.end.dateTime   || e.end.date   + 'T23:59:59'
-    }));
-}
-
-// ══════════════════════════════════════════════
-//  CALCULAR SLOTS DISPONIBLES
-// ══════════════════════════════════════════════
-function timeToMinutes(timeStr) {
-  const [h, m] = timeStr.split(':').map(Number);
-  return h * 60 + m;
-}
-
-function toLocalDate(isoString) {
-  // Convierte ISO string a fecha en la zona horaria configurada
-  return new Date(new Date(isoString).toLocaleString('en-US', { timeZone: CONFIG.TIMEZONE }));
-}
-
-function buildSlots(busyTimes) {
-  slotsMap = {};
-  const now = new Date();
-  const minNoticeMs = CONFIG.MIN_NOTICE_HOURS * 60 * 60 * 1000;
-
-  // Definir franjas horarias — soporte para mañana y tarde
-  const franjas = [
-    { start: timeToMinutes(CONFIG.WORK_START), end: timeToMinutes(CONFIG.WORK_END) }
-  ];
-  if (CONFIG.WORK_START2 && CONFIG.WORK_END2) {
-    franjas.push({ start: timeToMinutes(CONFIG.WORK_START2), end: timeToMinutes(CONFIG.WORK_END2) });
-  }
-
-  // Procesar los períodos ocupados
-  const busy = busyTimes.map(b => ({
-    start: new Date(b.start),
-    end:   new Date(b.end)
-  }));
-
-  // Generar slots para los próximos MAX_ADVANCE_DAYS días
-  for (let offset = 0; offset <= CONFIG.MAX_ADVANCE_DAYS; offset++) {
-    const day = new Date();
-    day.setDate(day.getDate() + offset);
-
-    // Verificar si es día laboral
-    const dayLocal = toLocalDate(day.toISOString());
-    const dow = dayLocal.getDay();
-    if (!CONFIG.WORK_DAYS.includes(dow)) continue;
-
-    const yyyy = dayLocal.getFullYear();
-    const mm   = String(dayLocal.getMonth() + 1).padStart(2, '0');
-    const dd   = String(dayLocal.getDate()).padStart(2, '0');
-    const dateKey = `${yyyy}-${mm}-${dd}`;
-
-    const daySlots = [];
-
-    // Recorrer cada franja horaria (mañana y/o tarde)
-    for (const franja of franjas) {
-      let slotMinute = franja.start;
-      while (slotMinute + selDur <= franja.end) {
-        // Construir fecha/hora del slot en la zona horaria del usuario
-        const slotStart = new Date(`${dateKey}T${String(Math.floor(slotMinute/60)).padStart(2,'0')}:${String(slotMinute%60).padStart(2,'0')}:00`);
-        // Ajustar a zona horaria (offset UTC)
-        const tzDate  = new Date(slotStart.toLocaleString('en-US', { timeZone: CONFIG.TIMEZONE }));
-        const utcDate = new Date(slotStart.getTime() - (tzDate.getTime() - slotStart.getTime()));
-        const slotEnd = new Date(utcDate.getTime() + selDur * 60 * 1000);
-
-        // Verificar aviso mínimo
-        const hasNotice = (utcDate.getTime() - now.getTime()) >= minNoticeMs;
-        if (!hasNotice) { slotMinute += selDur; continue; }
-
-        // Verificar que no se superpone con eventos ocupados (incluyendo buffer)
-        const bufferedStart = new Date(utcDate.getTime() - CONFIG.BUFFER_MINUTES * 60 * 1000);
-        const bufferedEnd   = new Date(slotEnd.getTime()  + CONFIG.BUFFER_MINUTES * 60 * 1000);
-        const isFree = !busy.some(b => bufferedStart < b.end && bufferedEnd > b.start);
-
-        if (isFree) {
-          const label = `${String(Math.floor(slotMinute/60)).padStart(2,'0')}:${String(slotMinute%60).padStart(2,'0')}`;
-          daySlots.push({ start: utcDate.toISOString(), end: slotEnd.toISOString(), label });
-        }
-        slotMinute += selDur;
-      }
-    }
-
-    if (daySlots.length > 0) slotsMap[dateKey] = daySlots;
-  }
-}
-
-// ══════════════════════════════════════════════
-//  CARGAR Y RENDERIZAR CALENDARIO
-// ══════════════════════════════════════════════
-async function loadCalendar() {
-  document.getElementById('cal-grid').innerHTML =
-    '<div class="loading" style="grid-column:1/-1"><div class="spin"></div><br>Consultando Google Calendar...</div>';
-
-  try {
-    const rangeStart = new Date();
-    const rangeEnd   = new Date();
-    rangeEnd.setDate(rangeEnd.getDate() + CONFIG.MAX_ADVANCE_DAYS + 1);
-
-    gcalBusy = await fetchBusyTimes(rangeStart, rangeEnd);
-    buildSlots(gcalBusy);
-    renderCalendar();
-
-  } catch(e) {
-    document.getElementById('cal-grid').innerHTML =
-      '<div class="loading" style="grid-column:1/-1;color:var(--red)">Error al conectar con Google Calendar.<br>Verifica que la API está habilitada.</div>';
-    console.error(e);
-  }
-}
-
 function renderCalendar() {
-  const now   = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const y = currentDate.getFullYear();
+  const m = currentDate.getMonth();
+  const label = new Date(y, m, 1).toLocaleDateString('es-CO', { month:'long', year:'numeric' });
+  document.getElementById('month-label').textContent = label.charAt(0).toUpperCase() + label.slice(1);
 
-  document.getElementById('cal-month').textContent = `${MONTH_NAMES[viewMonth]} ${viewYear}`;
+  const grid = document.getElementById('calendar');
+  grid.innerHTML = '';
 
-  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
-  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  // Cabeceras días
+  ['Lu','Ma','Mi','Ju','Vi','Sá','Do'].forEach(d => {
+    const h = document.createElement('div');
+    h.className = 'cal-head';
+    h.textContent = d;
+    grid.appendChild(h);
+  });
 
-  let html = DAY_NAMES.map(d => `<div class="cal-header-cell">${d}</div>`).join('');
+  const firstDay = new Date(y, m, 1).getDay(); // 0=Dom
+  const startOffset = firstDay === 0 ? 6 : firstDay - 1; // ajuste a lun=0
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
 
-  // Celdas vacías al inicio
-  for (let i = 0; i < firstDay; i++) html += '<div class="cal-cell empty"></div>';
+  // Celdas vacías inicio
+  for (let i = 0; i < startOffset; i++) {
+    const e = document.createElement('div');
+    e.className = 'cal-day empty';
+    grid.appendChild(e);
+  }
 
   for (let d = 1; d <= daysInMonth; d++) {
-    const mm  = String(viewMonth + 1).padStart(2, '0');
-    const dd  = String(d).padStart(2, '0');
-    const key = `${viewYear}-${mm}-${dd}`;
-    const cellDate = new Date(viewYear, viewMonth, d);
+    const date = new Date(y, m, d);
+    date.setHours(0,0,0,0);
+    const dow  = date.getDay(); // 0=Dom, 6=Sáb
+    const isWE = dow === 0 || dow === 6;
+    const isPast = date < today;
+    const dateStr = toDateStr(date);
+    const busy = busySlots[dateStr] || [];
+    const allBusy = busy.length >= TODOS_HORARIOS.length;
+    const isSelected = selectedDate && toDateStr(selectedDate) === dateStr;
+    const isToday = date.getTime() === today.getTime();
+    const hasSlots = !isWE && !isPast && !allBusy;
 
-    const isPast  = cellDate < today;
-    const hasSlots = !!slotsMap[key];
-    const isSel   = selDate === key;
-    const isToday = cellDate.getTime() === today.getTime();
+    const cell = document.createElement('div');
+    cell.className = 'cal-day';
+    if (isWE || isPast || allBusy) cell.classList.add('disabled');
+    if (isToday) cell.classList.add('today');
+    if (isSelected) cell.classList.add('selected');
+    if (hasSlots) cell.classList.add('has-slots');
+    cell.textContent = d;
 
-    let cls = 'cal-cell';
-    if (isPast)      { cls += ' past'; }
-    else if (hasSlots){ cls += ' has-slots'; if (isToday) cls += ' today'; if (isSel) cls += ' selected'; }
-    else             { cls += ' no-slots'; }
-
-    const onclick = (hasSlots && !isPast) ? `onclick="selectDate('${key}')"` : '';
-    html += `<div class="${cls}" ${onclick}>${d}</div>`;
+    if (!isWE && !isPast && !allBusy) {
+      cell.onclick = () => selectDate(date);
+    }
+    grid.appendChild(cell);
   }
-
-  document.getElementById('cal-grid').innerHTML = html;
 }
 
-function prevMonth() {
-  viewMonth--;
-  if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+function changeMonth(dir) {
+  currentDate.setMonth(currentDate.getMonth() + dir);
   renderCalendar();
+  loadMonthBusy(currentDate.getFullYear(), currentDate.getMonth());
+  // Limpiar selección si cambió el mes
+  if (selectedDate &&
+      (selectedDate.getMonth() !== currentDate.getMonth() ||
+       selectedDate.getFullYear() !== currentDate.getFullYear())) {
+    selectedDate = null;
+    selectedHour = null;
+    document.getElementById('slots-card').style.display = 'none';
+  }
 }
-function nextMonth() {
-  viewMonth++;
-  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+
+function selectDate(date) {
+  selectedDate = date;
+  selectedHour = null;
+  document.getElementById('btn-next1').disabled = true;
   renderCalendar();
+  renderSlots(date);
+  document.getElementById('slots-card').style.display = 'block';
+  document.getElementById('slots-card').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 // ══════════════════════════════════════════════
-//  SELECCIONAR FECHA Y SLOT
+//  DISPONIBILIDAD — Google Calendar API
 // ══════════════════════════════════════════════
-function selectDate(dateKey) {
-  selDate = dateKey;
-  selSlot = null;
-  renderCalendar();
-
-  const slots   = slotsMap[dateKey] || [];
-  const [y,m,d] = dateKey.split('-').map(Number);
-  const dateObj  = new Date(y, m-1, d);
-  const label    = dateObj.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' });
-  document.getElementById('slots-label').textContent = label.charAt(0).toUpperCase() + label.slice(1);
-
-  if (slots.length === 0) {
-    document.getElementById('slots-grid').innerHTML = '<div class="no-slots-msg" style="grid-column:1/-1">No hay horarios disponibles este día.</div>';
-  } else {
-    document.getElementById('slots-grid').innerHTML = slots.map(s =>
-      `<button class="slot-btn" data-start="${s.start}" onclick='selectSlot(${JSON.stringify(s)})'>${s.label}</button>`
-    ).join('');
+async function loadMonthBusy(year, month) {
+  const timeMin = new Date(year, month, 1).toISOString();
+  const timeMax = new Date(year, month + 1, 0, 23, 59).toISOString();
+  const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events`
+    + `?key=${API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.items) return;
+    data.items.forEach(ev => {
+      const start = new Date(ev.start.dateTime || ev.start.date);
+      const dateStr = toDateStr(start);
+      const hour = start.toTimeString().slice(0, 5);
+      if (!busySlots[dateStr]) busySlots[dateStr] = [];
+      if (!busySlots[dateStr].includes(hour)) busySlots[dateStr].push(hour);
+    });
+    renderCalendar();
+    if (selectedDate) renderSlots(selectedDate);
+  } catch(e) {
+    console.warn('Error cargando disponibilidad:', e);
   }
-
-  document.getElementById('slots-area').style.display = 'block';
-  document.getElementById('slots-area').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function selectSlot(slot) {
-  selSlot = slot;
-  document.querySelectorAll('.slot-btn').forEach(b =>
-    b.classList.toggle('selected', b.dataset.start === slot.start));
-  setTimeout(() => goStep(2), 350);
+function renderSlots(date) {
+  const dateStr = toDateStr(date);
+  const busy = busySlots[dateStr] || [];
+  const container = document.getElementById('slots-container');
+
+  const fmtDate = date.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long' });
+
+  let html = `<div class="slots-header">
+    <h4>${fmtDate.charAt(0).toUpperCase() + fmtDate.slice(1)}</h4>
+    <span>${TODOS_HORARIOS.length - busy.length} disponibles</span>
+  </div>`;
+
+  html += `<div class="slot-period">🌅 Mañana</div><div class="slots-grid">`;
+  HORARIOS_AM.forEach(h => {
+    const taken = busy.includes(h);
+    const sel   = h === selectedHour;
+    html += `<button class="slot-btn${taken?' taken':''}${sel?' selected':''}"
+      onclick="${taken?'':'selectHour(\''+h+'\')'}">${h}</button>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="slot-period">🌤 Tarde</div><div class="slots-grid">`;
+  HORARIOS_PM.forEach(h => {
+    const taken = busy.includes(h);
+    const sel   = h === selectedHour;
+    html += `<button class="slot-btn${taken?' taken':''}${sel?' selected':''}"
+      onclick="${taken?'':'selectHour(\''+h+'\')'}">${h}</button>`;
+  });
+  html += `</div>`;
+
+  container.innerHTML = html;
+}
+
+function selectHour(h) {
+  selectedHour = h;
+  renderSlots(selectedDate);
+  document.getElementById('btn-next1').disabled = false;
 }
 
 // ══════════════════════════════════════════════
 //  NAVEGACIÓN DE PASOS
 // ══════════════════════════════════════════════
-function goStep(step) {
-  ['screen-1','screen-2','screen-3'].forEach((id, i) => {
-    document.getElementById(id).classList.toggle('active', i + 1 === step);
-  });
-  [0,1,2].forEach(i => {
-    document.getElementById('seg' + i).classList.toggle('done', i < step);
-  });
-
-  if (step === 2) renderSummary();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+function goStep1() {
+  show('panel-step1'); hide('panel-step2'); hide('panel-step3');
+  setStep(1);
 }
-
-function renderSummary() {
-  const start   = new Date(selSlot.start);
-  const end     = new Date(selSlot.end);
-  const fmtDate = start.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone: CONFIG.TIMEZONE });
-  const fmtSt   = start.toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit', timeZone: CONFIG.TIMEZONE });
-  const fmtEnd  = end.toLocaleTimeString('es-CO',   { hour:'2-digit', minute:'2-digit', timeZone: CONFIG.TIMEZONE });
-
-  document.getElementById('booking-summary').innerHTML = `
-    <div class="sum-item"><span class="sum-label">📅 Fecha</span><span class="sum-val">${fmtDate.charAt(0).toUpperCase()+fmtDate.slice(1)}</span></div>
-    <div class="sum-item"><span class="sum-label">🕐 Hora</span><span class="sum-val">${fmtSt} – ${fmtEnd}</span></div>
-    <div class="sum-item"><span class="sum-label">⏱ Duración</span><span class="sum-val">${selDur} min</span></div>
-  `;
+function goStep2() {
+  show('panel-step2'); hide('panel-step1'); hide('panel-step3');
+  setStep(2);
+  document.getElementById('mini-summary').innerHTML = buildMiniSummary();
 }
-
-// ══════════════════════════════════════════════
-//  CREAR RESERVA EN GOOGLE CALENDAR
-// ══════════════════════════════════════════════
-async function createBooking() {
-  const name    = document.getElementById('f-name').value.trim();
-  const email   = document.getElementById('f-email').value.trim();
-  const phone   = document.getElementById('f-phone').value.trim();
-  const reason  = document.getElementById('f-reason').value.trim();
-  const mtype   = document.getElementById('f-type').value;
-
-  // Limpiar errores
-  ['name','email','type'].forEach(f => {
-    const el = document.getElementById('f-'+f);
-    if (el) el.classList.remove('field-error');
-    const er = document.getElementById('e-'+f);
-    if (er) er.textContent = '';
-  });
-
-  // Validar
-  let ok = true;
-  if (!name) {
-    document.getElementById('f-name').classList.add('field-error');
-    document.getElementById('e-name').textContent = 'El nombre es obligatorio';
-    ok = false;
-  }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    document.getElementById('f-email').classList.add('field-error');
-    document.getElementById('e-email').textContent = 'Ingresa un correo válido';
-    ok = false;
-  }
-  if (!mtype) {
-    document.getElementById('f-type').classList.add('field-error');
-    document.getElementById('e-type').textContent = 'Selecciona la modalidad';
-    ok = false;
-  }
-  if (!ok) return;
-
-  const btn = document.getElementById('btn-confirm');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="btn-spin"></div> Creando cita...';
-
-  try {
-    // Verificar disponibilidad en tiempo real antes de crear
-    const checkBusy = await fetchBusyTimes(new Date(selSlot.start), new Date(selSlot.end));
-    const slotStart = new Date(selSlot.start);
-    const slotEnd   = new Date(selSlot.end);
-    const conflict = checkBusy.some(b =>
-      slotStart < new Date(b.end) && slotEnd > new Date(b.start)
-    );
-    if (conflict) {
-      toast('Este horario ya no está disponible. Elige otro.', 'err');
-      btn.disabled = false;
-      btn.innerHTML = 'Confirmar cita →';
-      goStep(1);
-      loadCalendar();
-      return;
-    }
-
-    // Construir el evento
-    const eventBody = {
-      summary: `Cita: ${name}`,
-      description: [
-        `Cliente: ${name}`,
-        `Email: ${email}`,
-        phone ? `Teléfono: ${phone}` : '',
-        reason ? `Motivo: ${reason}` : ''
-      ].filter(Boolean).join('\n'),
-      start: { dateTime: selSlot.start, timeZone: CONFIG.TIMEZONE },
-      end:   { dateTime: selSlot.end,   timeZone: CONFIG.TIMEZONE },
-      attendees: [{ email, displayName: name }],
-      reminders: {
-        useDefault: false,
-        overrides: [
-          { method: 'email',  minutes: 24 * 60 },
-          { method: 'popup',  minutes: 30 }
-        ]
-      }
-    };
-
-    if (CONFIG.CREATE_MEET) {
-      eventBody.conferenceData = {
-        createRequest: {
-          requestId: 'booking-' + Date.now(),
-          conferenceSolutionKey: { type: 'hangoutsMeet' }
-        }
-      };
-    }
-
-    const qs = CONFIG.CREATE_MEET ? '?conferenceDataVersion=1&sendUpdates=all' : '?sendUpdates=all';
-    const r = await fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CONFIG.CALENDAR_ID)}/events${qs}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization:  'Bearer ' + gToken,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(eventBody)
-      }
-    );
-
-    if (!r.ok) {
-      const err = await r.json();
-      throw new Error(err.error?.message || 'Error al crear el evento');
-    }
-
-    const event = await r.json();
-    showConfirmation({ event, name, email, phone, reason, mtype });
-
-  } catch(e) {
-    toast('Error: ' + e.message, 'err');
-    btn.disabled = false;
-    btn.innerHTML = 'Confirmar cita →';
-  }
-}
-
-// ══════════════════════════════════════════════
-//  ENVÍO DE CORREOS CON EMAILJS
-// ══════════════════════════════════════════════
-async function sendEmails({ name, email, phone, reason, mtype, fmtDate, fmtSt, fmtEnd, meetLink }) {
-  if (!CONFIG.EMAILJS_PUBLIC_KEY || CONFIG.EMAILJS_PUBLIC_KEY.includes('TU_')) {
-    console.warn('EmailJS no configurado — omitiendo envío de correos');
+function goStep3() {
+  const nombre   = document.getElementById('inp-nombre').value.trim();
+  const apellido = document.getElementById('inp-apellido').value.trim();
+  const tel      = document.getElementById('inp-tel').value.trim();
+  const errDiv   = document.getElementById('form-error');
+  if (!nombre || !apellido || !tel) {
+    errDiv.innerHTML = `<div class="alert alert-error">⚠️ Por favor completa nombre, apellido y teléfono.</div>`;
     return;
   }
+  errDiv.innerHTML = '';
+  formData = {
+    nombre, apellido, tel,
+    email:  document.getElementById('inp-email').value.trim(),
+    motivo: document.getElementById('inp-motivo').value.trim()
+  };
+  show('panel-step3'); hide('panel-step1'); hide('panel-step2');
+  setStep(3);
+  document.getElementById('full-summary').innerHTML = buildFullSummary();
+}
 
-  const params = {
-    // Datos del cliente
-    client_name:  name,
-    client_email: email,
-    client_phone: phone || 'No proporcionado',
-    meeting_reason: reason || 'No especificado',
-    meeting_type:   mtype  || 'No especificado',
-    // Datos de la cita
-    meeting_date:  fmtDate,
-    meeting_start: fmtSt,
-    meeting_end:   fmtEnd,
-    meeting_duration: selDur + ' minutos',
-    meet_link:     meetLink || 'No aplica',
-    // Datos del organizador
-    owner_name:  CONFIG.OWNER_NAME,
-    owner_email: CONFIG.OWNER_EMAIL
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById(`step${i}`);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+  });
+  [1,2].forEach(i => {
+    const el = document.getElementById(`line${i}`);
+    el.className = 'step-line' + (i < n ? ' done' : '');
+  });
+}
+
+// ══════════════════════════════════════════════
+//  RESÚMENES
+// ══════════════════════════════════════════════
+function buildMiniSummary() {
+  const fmtDate = selectedDate.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  return `
+    <div class="summary-row"><span class="summary-icon">📅</span><span class="summary-label">Fecha</span><span class="summary-val">${cap(fmtDate)}</span></div>
+    <div class="summary-row"><span class="summary-icon">🕐</span><span class="summary-label">Hora</span><span class="summary-val">${selectedHour} – ${addHour(selectedHour)}</span></div>`;
+}
+
+function buildFullSummary() {
+  const fmtDate = selectedDate.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  const nombre = `${formData.nombre} ${formData.apellido}`;
+  return `
+    <div class="summary-row"><span class="summary-icon">👤</span><span class="summary-label">Paciente</span><span class="summary-val">${nombre}</span></div>
+    <div class="summary-row"><span class="summary-icon">📅</span><span class="summary-label">Fecha</span><span class="summary-val">${cap(fmtDate)}</span></div>
+    <div class="summary-row"><span class="summary-icon">🕐</span><span class="summary-label">Hora</span><span class="summary-val">${selectedHour} – ${addHour(selectedHour)}</span></div>
+    <div class="summary-row"><span class="summary-icon">📱</span><span class="summary-label">Teléfono</span><span class="summary-val">${formData.tel}</span></div>
+    ${formData.email ? `<div class="summary-row"><span class="summary-icon">✉️</span><span class="summary-label">Correo</span><span class="summary-val">${formData.email}</span></div>` : ''}
+    ${formData.motivo ? `<div class="summary-row"><span class="summary-icon">📝</span><span class="summary-label">Motivo</span><span class="summary-val">${formData.motivo}</span></div>` : ''}`;
+}
+
+// ══════════════════════════════════════════════
+//  CONFIRMAR CITA — Apps Script
+// ══════════════════════════════════════════════
+async function confirmarCita() {
+  const btn    = document.getElementById('btn-confirm');
+  const errDiv = document.getElementById('confirm-error');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Procesando…';
+  errDiv.innerHTML = '';
+
+  const dateStr  = toDateStr(selectedDate);
+  const startISO = `${dateStr}T${selectedHour}:00`;
+  const endISO   = `${dateStr}T${addHour(selectedHour)}:00`;
+  const nombre   = `${formData.nombre} ${formData.apellido}`;
+
+  const payload = {
+    nombre,
+    telefono: formData.tel,
+    email:    formData.email,
+    motivo:   formData.motivo || 'No especificado',
+    startDateTime: startISO,
+    endDateTime:   endISO,
+    fecha: selectedDate.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric' }),
+    hora:  `${selectedHour} – ${addHour(selectedHour)}`
   };
 
   try {
-    // Correo al CLIENTE con confirmación
-    await emailjs.send(
-      CONFIG.EMAILJS_SERVICE_ID,
-      CONFIG.EMAILJS_TEMPLATE_CLIENTE,
-      { ...params, to_email: email, to_name: name }
-    );
-    console.log('✓ Correo enviado al cliente');
-  } catch(e) {
-    console.error('Error enviando correo al cliente:', e);
-  }
+    const res  = await fetch(APPS_SCRIPT, {
+      method: 'POST',
+      body:   JSON.stringify(payload)
+    });
+    const data = await res.json();
 
-  try {
-    // Notificación a SANDRA
-    await emailjs.send(
-      CONFIG.EMAILJS_SERVICE_ID,
-      CONFIG.EMAILJS_TEMPLATE_SANDRA,
-      { ...params, to_email: CONFIG.OWNER_EMAIL, to_name: CONFIG.OWNER_NAME }
-    );
-    console.log('✓ Notificación enviada a Sandra');
+    if (data.status === 'ok' || data.result === 'success' || data.success) {
+      // Marcar slot como ocupado localmente
+      if (!busySlots[dateStr]) busySlots[dateStr] = [];
+      busySlots[dateStr].push(selectedHour);
+      mostrarExito(payload);
+    } else {
+      throw new Error(data.message || 'Error al crear la cita');
+    }
   } catch(e) {
-    console.error('Error enviando notificación a Sandra:', e);
+    errDiv.innerHTML = `<div class="alert alert-error">⚠️ ${e.message || 'Error de conexión. Intenta de nuevo.'}</div>`;
+    btn.disabled = false;
+    btn.innerHTML = '✅ Confirmar cita';
   }
 }
 
-// ══════════════════════════════════════════════
-//  CONFIRMACIÓN
-// ══════════════════════════════════════════════
-function showConfirmation({ event, name, email, phone, reason, mtype }) {
-  goStep(3);
+function mostrarExito(p) {
+  hide('booking-screen');
+  hide('steps-bar');
+  const ss = document.getElementById('success-screen');
+  ss.style.display = 'block';
 
-  document.getElementById('conf-msg').textContent = CONFIG.CONFIRM_MSG;
-
-  const start  = new Date(selSlot.start);
-  const end    = new Date(selSlot.end);
-  const fmtD   = start.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone: CONFIG.TIMEZONE });
-  const fmtSt  = start.toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit', timeZone: CONFIG.TIMEZONE });
-  const fmtEnd = end.toLocaleTimeString('es-CO',   { hour:'2-digit', minute:'2-digit', timeZone: CONFIG.TIMEZONE });
-
-  // Enviar correos automáticamente
-  const meetLink = event.conferenceData?.entryPoints?.find(e => e.entryPointType === 'video')?.uri;
-  sendEmails({ name, email, phone, reason, mtype, fmtDate: fmtD.charAt(0).toUpperCase()+fmtD.slice(1), fmtSt, fmtEnd, meetLink });
-
-  document.getElementById('conf-details').innerHTML = `
-    <div class="cd-row"><span class="cd-label">Cliente</span><span class="cd-val">${name}</span></div>
-    <div class="cd-row"><span class="cd-label">Email</span><span class="cd-val">${email}</span></div>
-    ${phone ? `<div class="cd-row"><span class="cd-label">Teléfono</span><span class="cd-val">${phone}</span></div>` : ''}
-    <div class="cd-row"><span class="cd-label">Fecha</span><span class="cd-val">${fmtD.charAt(0).toUpperCase()+fmtD.slice(1)}</span></div>
-    <div class="cd-row"><span class="cd-label">Hora</span><span class="cd-val">${fmtSt} – ${fmtEnd}</span></div>
-    <div class="cd-row"><span class="cd-label">Duración</span><span class="cd-val">${selDur} minutos</span></div>
-    ${reason ? `<div class="cd-row"><span class="cd-label">Motivo</span><span class="cd-val">${reason}</span></div>` : ''}
-    <div class="cd-row"><span class="cd-label">Modalidad</span><span class="cd-val">${mtype}</span></div>
-  `;
-
-  document.getElementById('conf-meet').innerHTML = meetLink
-    ? `<a href="${meetLink}" target="_blank" class="meet-link-btn">🎥 Unirse a Google Meet</a><br>`
-    : '';
-
-  // Recargar calendario con la nueva cita ya incluida
-  selDate = null;
-  selSlot = null;
-  loadCalendar();
+  document.getElementById('success-details').innerHTML = `
+    <div class="summary-row"><span class="summary-icon">👤</span><span class="summary-label">Paciente</span><span class="summary-val">${p.nombre}</span></div>
+    <div class="summary-row"><span class="summary-icon">📅</span><span class="summary-label">Fecha</span><span class="summary-val">${cap(p.fecha)}</span></div>
+    <div class="summary-row"><span class="summary-icon">🕐</span><span class="summary-label">Hora</span><span class="summary-val">${p.hora}</span></div>
+    ${p.email ? `<div class="summary-row"><span class="summary-icon">✉️</span><span class="summary-label">Correo</span><span class="summary-val">${p.email}</span></div>` : ''}`;
+  ss.scrollIntoView({ behavior:'smooth' });
 }
 
-function resetBooking() {
-  selDate = null;
-  selSlot = null;
-  document.getElementById('f-name').value   = '';
-  document.getElementById('f-email').value  = '';
-  document.getElementById('f-phone').value  = '';
-  document.getElementById('f-reason').value = '';
-  document.getElementById('f-type').value   = '';
-  document.getElementById('slots-area').style.display = 'none';
-  goStep(1);
+function reiniciar() {
+  selectedDate = null; selectedHour = null; formData = {};
+  document.getElementById('success-screen').style.display = 'none';
+  show('booking-screen'); show('steps-bar');
+  goStep1();
+  window.scrollTo({ top:0, behavior:'smooth' });
 }
 
 // ══════════════════════════════════════════════
-//  TOAST
+//  UTILIDADES
 // ══════════════════════════════════════════════
-function toast(msg, type = 'ok') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `toast show ${type}`;
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.className = 'toast', 3500);
+function toDateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-
-// ══════════════════════════════════════════════
-//  ARRANQUE DIRECTO — MODO CLIENTE SIN LOGIN
-// ══════════════════════════════════════════════
-window.addEventListener('load', () => {
-  initEmailJS();
-  userData = { name: CONFIG.OWNER_NAME, email: CONFIG.OWNER_EMAIL };
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  const header = document.getElementById('app-header');
-  if (header) header.style.display = 'none';
-  document.getElementById('owner-name-display').textContent = CONFIG.OWNER_NAME;
-  document.getElementById('owner-bio-display').textContent  = CONFIG.OWNER_BIO;
-  const emailEl = document.getElementById('owner-email-display');
-  if (emailEl) emailEl.style.display = 'none';
-  selDur = CONFIG.DEFAULT_DURATION;
-  document.getElementById('info-duration').textContent = selDur + ' minutos';
-  document.getElementById('f-dur-disp').value = selDur + ' minutos';
-  const hoursText = CONFIG.WORK_START2
-    ? CONFIG.WORK_START + ' – ' + CONFIG.WORK_END + '  |  ' + CONFIG.WORK_START2 + ' – ' + CONFIG.WORK_END2
-    : CONFIG.WORK_START + ' – ' + CONFIG.WORK_END;
-  document.getElementById('info-hours').textContent = hoursText;
-  const workdayNames = CONFIG.WORK_DAYS.map(d => ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][d]);
-  document.getElementById('info-workdays').textContent = workdayNames.join(', ');
-  document.getElementById('info-tz').textContent = CONFIG.TIMEZONE;
-  renderDurationChips();
-  const now = new Date();
-  viewYear  = now.getFullYear();
-  viewMonth = now.getMonth();
-  loadCalendar();
-});
+function addHour(h) {
+  const [hr, mn] = h.split(':').map(Number);
+  return `${String(hr+1).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;
+}
+function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+function show(id) { document.getElementById(id).style.display = ''; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
 </script>
 </body>
 </html>
