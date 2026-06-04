@@ -821,28 +821,35 @@ function renderSlots(date) {
 
   const fmtDate = date.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long' });
 
+  const horariosAM = getHorariosAM(sessionDur);
+  const horariosPM = getHorariosPM(sessionDur);
+  const disponibles = [...horariosAM, ...horariosPM].filter(h => !busy.includes(h)).length;
+
   let html = `<div class="slots-header">
     <h4>${fmtDate.charAt(0).toUpperCase() + fmtDate.slice(1)}</h4>
-    <span>${TODOS_HORARIOS.length - busy.length} disponibles</span>
+    <span>${disponibles} disponibles · ${sessionDur}h por sesión</span>
   </div>`;
 
   html += `<div class="slot-period">🌅 Mañana</div><div class="slots-grid">`;
-  HORARIOS_AM.forEach(h => {
+  horariosAM.forEach(h => {
     const taken = busy.includes(h);
     const sel   = h === selectedHour;
     html += `<button class="slot-btn${taken?' taken':''}${sel?' selected':''}"
-      onclick="${taken?'':'selectHour(\''+h+'\')'}">${h}</button>`;
+      onclick="${taken?'':'selectHour(''+h+'')'}">${h}</button>`;
   });
+  if (horariosAM.length === 0) html += `<p style="color:var(--text-muted);font-size:.85rem;padding:8px">Sin disponibilidad AM para ${sessionDur}h</p>`;
   html += `</div>`;
 
   html += `<div class="slot-period">🌤 Tarde</div><div class="slots-grid">`;
-  HORARIOS_PM.forEach(h => {
+  horariosPM.forEach(h => {
     const taken = busy.includes(h);
     const sel   = h === selectedHour;
     html += `<button class="slot-btn${taken?' taken':''}${sel?' selected':''}"
-      onclick="${taken?'':'selectHour(\''+h+'\')'}">${h}</button>`;
+      onclick="${taken?'':'selectHour(''+h+'')'}">${h}</button>`;
   });
+  if (horariosPM.length === 0) html += `<p style="color:var(--text-muted);font-size:.85rem;padding:8px">Sin disponibilidad PM para ${sessionDur}h</p>`;
   html += `</div>`;
+
 
   container.innerHTML = html;
 }
