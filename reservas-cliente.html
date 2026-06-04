@@ -915,11 +915,13 @@ function mostrarExito(p) {
   const ss = document.getElementById('success-screen');
   ss.style.display = 'block';
 
+  const fmtFecha = selectedDate.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  const horaStr  = `${selectedHour} – ${addHour(selectedHour)}`;
   document.getElementById('success-details').innerHTML = `
-    <div class="summary-row"><span class="summary-icon">👤</span><span class="summary-label">Paciente</span><span class="summary-val">${p.nombre}</span></div>
-    <div class="summary-row"><span class="summary-icon">📅</span><span class="summary-label">Fecha</span><span class="summary-val">${cap(p.fecha)}</span></div>
-    <div class="summary-row"><span class="summary-icon">🕐</span><span class="summary-label">Hora</span><span class="summary-val">${p.hora}</span></div>
-    ${p.email ? `<div class="summary-row"><span class="summary-icon">✉️</span><span class="summary-label">Correo</span><span class="summary-val">${p.email}</span></div>` : ''}`;
+    <div class="summary-row"><span class="summary-icon">👤</span><span class="summary-label">Paciente</span><span class="summary-val">${p.client_name}</span></div>
+    <div class="summary-row"><span class="summary-icon">📅</span><span class="summary-label">Fecha</span><span class="summary-val">${cap(fmtFecha)}</span></div>
+    <div class="summary-row"><span class="summary-icon">🕐</span><span class="summary-label">Hora</span><span class="summary-val">${horaStr}</span></div>
+    ${p.client_email ? `<div class="summary-row"><span class="summary-icon">✉️</span><span class="summary-label">Correo</span><span class="summary-val">${p.client_email}</span></div>` : ''}`;
   ss.scrollIntoView({ behavior:'smooth' });
 }
 
