@@ -462,6 +462,25 @@
   }
   .info-chip span { color: var(--primary); font-weight: 600; }
 
+  /* ── DURATION BTNS ──────────────────────── */
+  .dur-btn {
+    padding: 6px 12px;
+    border: none;
+    background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-muted);
+    border-left: 1px solid var(--border);
+    transition: all .2s;
+  }
+  .dur-btn.active {
+    background: var(--primary);
+    color: #fff;
+  }
+  .dur-btn:hover:not(.active) { background: var(--bg); color: var(--primary); }
+
   /* ── FOOTER ──────────────────────────────── */
   footer {
     text-align: center;
@@ -506,7 +525,12 @@
   <div class="info-bar">
     <div class="info-chip">🕐 <span>07:00–11:00</span> y <span>14:00–17:00</span></div>
     <div class="info-chip">📅 <span>Lunes a Viernes</span></div>
-    <div class="info-chip">⏱ Sesión de <span>1 hora</span></div>
+    <div class="info-chip" style="gap:0;padding:0;overflow:hidden">
+    <span style="padding:6px 12px;background:var(--bg);color:var(--text-muted)">⏱ Duración</span>
+    <button class="dur-btn active" onclick="setDuration(1)">1h</button>
+    <button class="dur-btn" onclick="setDuration(2)">2h</button>
+    <button class="dur-btn" onclick="setDuration(3)">3h</button>
+  </div>
   </div>
 
   <!-- ══ PANTALLA DE RESERVA ══ -->
@@ -628,9 +652,27 @@ const CALENDAR_ID  = 'estuval2022@gmail.com';
 const APPS_SCRIPT  = 'https://script.google.com/macros/s/AKfycbzcs6d1mgg7wdHGup1x4PFWV7MlDft0x3Sg_AmkXPOWjc_ksKlNvZcGgva1agi5akuH/exec';
 
 // Horarios disponibles (bloques de 1h)
-const HORARIOS_AM = ['07:00','08:00','09:00','10:00'];
-const HORARIOS_PM = ['14:00','15:00','16:00'];
-const TODOS_HORARIOS = [...HORARIOS_AM, ...HORARIOS_PM];
+// Horarios base — se filtran según duración elegida
+const HORARIOS_AM_BASE = ['07:00','08:00','09:00','10:00'];
+const HORARIOS_PM_BASE = ['14:00','15:00','16:00'];
+
+function getHorariosAM(dur) {
+  // AM termina a las 11:00 → último slot posible: 11:00 - dur horas
+  return HORARIOS_AM_BASE.filter(h => {
+    const [hr] = h.split(':').map(Number);
+    return hr + dur <= 11;
+  });
+}
+function getHorariosPM(dur) {
+  // PM termina a las 17:00 → último slot posible: 17:00 - dur horas
+  return HORARIOS_PM_BASE.filter(h => {
+    const [hr] = h.split(':').map(Number);
+    return hr + dur <= 17;
+  });
+}
+function getTodosHorarios(dur) {
+  return [...getHorariosAM(dur), ...getHorariosPM(dur)];
+}
 
 // ══════════════════════════════════════════════
 //  ESTADO
@@ -639,6 +681,7 @@ let currentDate  = new Date();
 let selectedDate = null;
 let selectedHour = null;
 let busySlots    = {};   // { 'YYYY-MM-DD': ['08:00', ...] }
+let sessionDur   = 1;    // duración en horas (1, 2 o 3)
 let formData     = {};
 
 // ══════════════════════════════════════════════
@@ -646,6 +689,20 @@ let formData     = {};
 // ══════════════════════════════════════════════
 renderCalendar();
 loadMonthBusy(currentDate.getFullYear(), currentDate.getMonth());
+
+// ══════════════════════════════════════════════
+//  DURACIÓN
+// ══════════════════════════════════════════════
+function setDuration(h) {
+  sessionDur = h;
+  document.querySelectorAll('.dur-btn').forEach((b,i) => {
+    b.classList.toggle('active', i+1 === h);
+  });
+  // Recalcular slots si hay fecha seleccionada
+  selectedHour = null;
+  document.getElementById('btn-next1').disabled = true;
+  if (selectedDate) renderSlots(selectedDate);
+}
 
 // ══════════════════════════════════════════════
 //  CALENDARIO
@@ -687,7 +744,7 @@ function renderCalendar() {
     const isPast = date < today;
     const dateStr = toDateStr(date);
     const busy = busySlots[dateStr] || [];
-    const allBusy = busy.length >= TODOS_HORARIOS.length;
+    const allBusy = busy.length >= getTodosHorarios(sessionDur).length;
     const isSelected = selectedDate && toDateStr(selectedDate) === dateStr;
     const isToday = date.getTime() === today.getTime();
     const hasSlots = !isWE && !isPast && !allBusy;
@@ -939,9 +996,10 @@ function reiniciar() {
 function toDateStr(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-function addHour(h) {
+function addHour(h, dur) {
+  dur = dur || sessionDur;
   const [hr, mn] = h.split(':').map(Number);
-  return `${String(hr+1).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;
+  return `${String(hr+dur).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;
 }
 function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 function show(id) { document.getElementById(id).style.display = ''; }
