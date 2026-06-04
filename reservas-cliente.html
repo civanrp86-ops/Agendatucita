@@ -447,11 +447,20 @@ async function loadMonthBusy(year, month) {
     var data = await res.json();
     if (!data.items) return;
     data.items.forEach(function(ev) {
-      var start   = new Date(ev.start.dateTime || ev.start.date);
-      var dateStr = toDateStr(start);
-      var hour    = start.toTimeString().slice(0, 5);
+      if (!ev.start.dateTime) return; // ignorar eventos de día completo
+      var evStart = new Date(ev.start.dateTime);
+      var evEnd   = new Date(ev.end.dateTime);
+      var dateStr = toDateStr(evStart);
       if (!busySlots[dateStr]) busySlots[dateStr] = [];
-      if (!busySlots[dateStr].includes(hour)) busySlots[dateStr].push(hour);
+      // Bloquear todos los slots que se solapan con este evento
+      getAllH(1).concat(getAllH(2)).concat(getAllH(3)).forEach(function(h) {
+        var slotStart = new Date(dateStr + 'T' + h + ':00');
+        var slotEnd1h = new Date(slotStart.getTime() + 60*60*1000);
+        // Un slot se solapa si el evento empieza antes de que termine el slot Y termina después de que empieza el slot
+        if (evStart < slotEnd1h && evEnd > slotStart) {
+          if (!busySlots[dateStr].includes(h)) busySlots[dateStr].push(h);
+        }
+      });
     });
     renderCalendar();
     if (selectedDate) renderSlots(selectedDate);
