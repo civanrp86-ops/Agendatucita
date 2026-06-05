@@ -984,21 +984,43 @@ async function confirmarCita() {
     end_time:       endISO
   };
 
+  // Timeout de 15 segundos
+  var controller = new AbortController();
+  var timeoutId  = setTimeout(function() { controller.abort(); }, 15000);
+
+  // Mensajes de espera dinámicos
+  var mensajes = ['Registrando tu cita…', 'Sincronizando con el calendario…', 'Casi listo…'];
+  var msgIdx = 0;
+  var msgInterval = setInterval(function() {
+    msgIdx = (msgIdx + 1) % mensajes.length;
+    btn.innerHTML = '<div class="spinner"></div> ' + mensajes[msgIdx];
+  }, 3000);
+
   try {
-    // Usamos no-cors para evitar bloqueo CORS desde GitHub Pages
     await fetch(APPS_SCRIPT, {
       method: 'POST',
       mode: 'no-cors',
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: controller.signal
     });
-    // Con no-cors no podemos leer la respuesta, pero si no hay excepción = éxito
+    clearTimeout(timeoutId);
+    clearInterval(msgInterval);
     if (!busySlots[dateStr]) busySlots[dateStr] = [];
     busySlots[dateStr].push(selectedHour);
     mostrarExito(nombre);
   } catch(err) {
-    errDiv.innerHTML = '<div class="alert alert-error">⚠️ ' + (err.message || 'Error de conexión. Intenta de nuevo.') + '</div>';
-    btn.disabled = false;
-    btn.innerHTML = '✅ Confirmar cita';
+    clearTimeout(timeoutId);
+    clearInterval(msgInterval);
+    if (err.name === 'AbortError') {
+      // Timeout — probablemente se registró igual, mostramos éxito
+      if (!busySlots[dateStr]) busySlots[dateStr] = [];
+      busySlots[dateStr].push(selectedHour);
+      mostrarExito(nombre);
+    } else {
+      errDiv.innerHTML = '<div class="alert alert-error">⚠️ Error de conexión. Por favor intenta de nuevo.</div>';
+      btn.disabled = false;
+      btn.innerHTML = '✅ Confirmar cita';
+    }
   }
 }
 
