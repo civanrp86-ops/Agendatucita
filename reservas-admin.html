@@ -220,10 +220,11 @@
   <div class="login-card">
     <div style="font-size:2.5rem;margin-bottom:12px">🔐</div>
     <h2>Acceso Admin</h2>
-    <p>Ingresa tu contraseña para acceder al panel de Sandra Estupiñán</p>
-    <input class="login-input" type="password" id="inp-pass" placeholder="Contraseña" onkeydown="if(event.key==='Enter') login()">
+    <p>Accede con la cuenta de Google de Sandra para ver y gestionar las citas</p>
     <div class="login-error" id="login-error"></div>
-    <button class="btn btn-primary" onclick="login()" style="width:100%">Ingresar →</button>
+    <button class="btn btn-primary" onclick="login()" style="width:100%;gap:10px">
+      <img src="https://www.google.com/favicon.ico" width="18" height="18"> Iniciar sesión con Google
+    </button>
   </div>
 </div>
 
@@ -313,27 +314,35 @@
 
 <script>
 // ══ CONFIG ══════════════════════════════
-const API_KEY     = 'AIzaSyAPocHbXxs17BKkavW0rKkCyc4avUCyRpM';
+const CLIENT_ID   = '264077603671-cghhf64qjlpnomo6t4ps39ulqpsdfts1.apps.googleusercontent.com';
 const CALENDAR_ID = 'estuval2022@gmail.com';
 const APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbzcs6d1mgg7wdHGup1x4PFWV7MlDft0x3Sg_AmkXPOWjc_ksKlNvZcGgva1agi5akuH/exec';
-const ADMIN_PASS  = 'sandra2026';
+const SCOPES      = 'https://www.googleapis.com/auth/calendar';
 
 // ══ ESTADO ══════════════════════════════
-var todasLasCitas = [];
-var filtroActual  = 'hoy';
+var todasLasCitas  = [];
+var filtroActual   = 'hoy';
 var eventoCancelar = null;
+var accessToken    = null;
 
-// ══ LOGIN ════════════════════════════════
+// ══ LOGIN CON GOOGLE ════════════════════
 function login() {
-  var pass = document.getElementById('inp-pass').value;
-  if (pass === ADMIN_PASS) {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-screen').style.display = 'block';
-    document.getElementById('admin-name').textContent = '👩‍⚕️ Sandra Estupiñán';
-    cargarCitas();
-  } else {
-    document.getElementById('login-error').textContent = 'Contraseña incorrecta.';
-  }
+  var client = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: function(response) {
+      if (response.access_token) {
+        accessToken = response.access_token;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-screen').style.display = 'block';
+        document.getElementById('admin-name').textContent = '👩‍⚕️ Sandra Estupiñán';
+        cargarCitas();
+      } else {
+        document.getElementById('login-error').textContent = 'Error al iniciar sesión con Google.';
+      }
+    }
+  });
+  client.requestAccessToken();
 }
 
 function cerrarSesion() {
@@ -351,11 +360,11 @@ async function cargarCitas() {
   var timeMax = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0, 23, 59).toISOString();
 
   var url = 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(CALENDAR_ID) + '/events'
-    + '?key=' + API_KEY + '&timeMin=' + timeMin + '&timeMax=' + timeMax
+    + '?timeMin=' + timeMin + '&timeMax=' + timeMax
     + '&singleEvents=true&orderBy=startTime&maxResults=500';
 
   try {
-    var res  = await fetch(url);
+    var res  = await fetch(url, { headers: { 'Authorization': 'Bearer ' + accessToken } });
     var data = await res.json();
     todasLasCitas = (data.items || []).filter(function(ev) {
       return ev.summary && ev.start && ev.start.dateTime;
@@ -548,5 +557,6 @@ function toDateStr(d) {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 </script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
 </html>
