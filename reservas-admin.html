@@ -4,200 +4,376 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin — AgendaTuCita</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
+
   :root {
-    --primary:    #1B4F72;
-    --primary-lt: #2E86C1;
-    --accent:     #1ABC9C;
-    --accent-dk:  #148F77;
-    --bg:         #F4F6F9;
-    --surface:    #FFFFFF;
-    --border:     #D5DCE8;
-    --text:       #1C2833;
-    --text-muted: #7F8C8D;
-    --danger:     #E74C3C;
-    --radius:     12px;
-    --shadow:     0 4px 24px rgba(27,79,114,.10);
+    --primary:     #0C2D48;
+    --primary-md:  #1B4F72;
+    --primary-lt:  #2980B9;
+    --accent:      #1ABC9C;
+    --accent-dk:   #148F77;
+    --gold:        #C9A84C;
+    --gold-lt:     #F0D080;
+    --danger:      #DC2626;
+    --bg:          #F0F4F8;
+    --surface:     #FFFFFF;
+    --surface-2:   #F8FAFC;
+    --border:      #DDE4EE;
+    --border-lt:   #EEF2F7;
+    --text:        #0A1628;
+    --text-muted:  #64748B;
+    --text-light:  #94A3B8;
+    --radius:      18px;
+    --shadow:      0 8px 40px rgba(12,45,72,.10);
+    --shadow-md:   0 16px 56px rgba(12,45,72,.14);
+    --shadow-sm:   0 2px 12px rgba(12,45,72,.06);
   }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-
-  /* HEADER */
-  header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-lt) 100%);
-    color: #fff; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(27,79,114,.2);
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; font-size: 15px;
+    line-height: 1.65; -webkit-font-smoothing: antialiased;
   }
-  .header-left { display: flex; align-items: center; gap: 14px; }
-  .header-logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; }
-  .header-sub  { font-size: .8rem; opacity: .8; margin-top: 2px; }
-  .badge-admin { background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.3); border-radius: 20px; padding: 4px 12px; font-size: .75rem; font-weight: 600; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 0%, rgba(26,188,156,.05) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(41,128,185,.06) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
 
-  /* LOGIN */
+  /* ══ HEADER ════════════════════════════════ */
+  header {
+    background: linear-gradient(150deg, #071828 0%, #0C2D48 40%, #1B4F72 80%, #2980B9 100%);
+    color: #fff; padding: 0 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 4px 24px rgba(12,45,72,.3);
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 50% 120% at 20% 50%, rgba(201,168,76,.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; position: relative; }
+  .header-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; font-weight: 600; letter-spacing: -.3px;
+  }
+  .header-sub { font-size: .72rem; opacity: .65; letter-spacing: .5px; text-transform: uppercase; font-weight: 600; }
+  .header-divider { width: 1px; height: 28px; background: rgba(255,255,255,.15); margin: 0 4px; }
+  .badge-admin {
+    background: rgba(201,168,76,.15); border: 1px solid rgba(201,168,76,.35);
+    border-radius: 20px; padding: 4px 12px; font-size: .72rem;
+    font-weight: 700; color: var(--gold-lt); letter-spacing: .5px;
+    position: relative;
+  }
+  .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
+  #admin-name {
+    font-size: .82rem; font-weight: 600; color: rgba(255,255,255,.85);
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+    border-radius: 20px; padding: 5px 14px;
+  }
+  .btn-salir {
+    padding: 6px 16px; border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.25);
+    background: transparent; color: rgba(255,255,255,.7);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .78rem; font-weight: 700; cursor: pointer;
+    transition: all .25s; letter-spacing: .3px;
+  }
+  .btn-salir:hover { background: rgba(255,255,255,.15); color: #fff; }
+
+  /* ══ LOGIN ════════════════════════════════ */
   #login-screen {
-    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+    min-height: 100vh; display: flex; align-items: center;
+    justify-content: center; padding: 20px; position: relative; z-index: 1;
   }
   .login-card {
-    background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
-    padding: 40px; width: 100%; max-width: 400px; border: 1px solid var(--border); text-align: center;
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow-md); padding: 48px 40px;
+    width: 100%; max-width: 420px;
+    border: 1px solid var(--border); text-align: center;
+    position: relative; overflow: hidden;
   }
-  .login-card h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--primary); margin-bottom: 8px; }
-  .login-card p  { color: var(--text-muted); font-size: .9rem; margin-bottom: 28px; }
-  .login-input {
-    width: 100%; padding: 12px 16px; border-radius: 8px; border: 1.5px solid var(--border);
-    font-family: 'DM Sans', sans-serif; font-size: .95rem; margin-bottom: 14px;
-    outline: none; transition: border-color .2s;
+  .login-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-lt), var(--accent));
   }
-  .login-input:focus { border-color: var(--primary-lt); }
-  .login-error { color: var(--danger); font-size: .85rem; margin-bottom: 12px; }
+  .login-icon {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+    border-radius: 20px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; margin: 0 auto 24px;
+    box-shadow: 0 8px 24px rgba(12,45,72,.25);
+  }
+  .login-card h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.9rem; font-weight: 700; color: var(--primary);
+    margin-bottom: 8px; letter-spacing: -.3px;
+  }
+  .login-card p { color: var(--text-muted); font-size: .9rem; margin-bottom: 32px; line-height: 1.6; }
+  .login-btn {
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-md), var(--primary-lt));
+    color: #fff; border: none; border-radius: 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .95rem; font-weight: 800; cursor: pointer;
+    box-shadow: 0 8px 24px rgba(12,45,72,.3);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: all .3s;
+  }
+  .login-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(12,45,72,.4); }
+  .login-error { color: var(--danger); font-size: .82rem; margin-bottom: 10px; font-weight: 600; }
 
-  /* LAYOUT ADMIN */
+  /* ══ ADMIN LAYOUT ══════════════════════════ */
   #admin-screen { display: none; }
-  .admin-container { max-width: 1100px; margin: 0 auto; padding: 28px 16px 60px; }
+  .admin-container { max-width: 1120px; margin: 0 auto; padding: 32px 16px 60px; position: relative; z-index: 1; }
 
-  /* STATS */
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  /* ══ STATS ════════════════════════════════ */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px; }
   .stat-card {
-    background: var(--surface); border-radius: var(--radius); padding: 20px;
-    border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; align-items: center; gap: 14px;
+    background: var(--surface); border-radius: var(--radius);
+    padding: 22px; border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    display: flex; align-items: center; gap: 16px;
+    transition: all .3s; position: relative; overflow: hidden;
   }
-  .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
-  .stat-icon.blue   { background: rgba(27,79,114,.1); }
-  .stat-icon.green  { background: rgba(26,188,156,.1); }
-  .stat-icon.orange { background: rgba(230,126,34,.1); }
-  .stat-icon.purple { background: rgba(155,89,182,.1); }
-  .stat-val   { font-size: 1.8rem; font-weight: 700; color: var(--primary); line-height: 1; }
-  .stat-label { font-size: .78rem; color: var(--text-muted); margin-top: 4px; }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; opacity: 0; transition: opacity .3s;
+  }
+  .stat-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .stat-card:hover::before { opacity: 1; }
+  .stat-card.blue::before   { background: linear-gradient(90deg, var(--primary), var(--primary-lt)); }
+  .stat-card.green::before  { background: linear-gradient(90deg, var(--accent-dk), var(--accent)); }
+  .stat-card.gold::before   { background: linear-gradient(90deg, #92702A, var(--gold)); }
+  .stat-card.purple::before { background: linear-gradient(90deg, #6D28D9, #8B5CF6); }
+  .stat-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; flex-shrink: 0;
+  }
+  .stat-icon.blue   { background: rgba(12,45,72,.08); }
+  .stat-icon.green  { background: rgba(26,188,156,.10); }
+  .stat-icon.gold   { background: rgba(201,168,76,.10); }
+  .stat-icon.purple { background: rgba(109,40,217,.08); }
+  .stat-val   { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; color: var(--primary); line-height: 1; }
+  .stat-label { font-size: .78rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; letter-spacing: .2px; }
 
-  /* FILTROS */
+  /* ══ FILTROS ══════════════════════════════ */
   .filters-bar {
-    background: var(--surface); border-radius: var(--radius); padding: 18px 20px;
-    border: 1px solid var(--border); margin-bottom: 20px;
-    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    background: var(--surface); border-radius: var(--radius);
+    padding: 16px 20px; border: 1px solid var(--border);
+    margin-bottom: 20px; box-shadow: var(--shadow-sm);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   }
   .filter-btn {
-    padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border);
-    background: var(--bg); font-family: 'DM Sans', sans-serif; font-size: .85rem;
-    font-weight: 500; cursor: pointer; color: var(--text-muted); transition: all .2s;
+    padding: 7px 18px; border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--surface-2);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .82rem; font-weight: 700; cursor: pointer;
+    color: var(--text-muted); transition: all .25s;
   }
-  .filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-  .filter-btn:hover:not(.active) { border-color: var(--primary-lt); color: var(--primary); }
-  .filter-sep { color: var(--border); }
+  .filter-btn.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+    color: #fff; border-color: transparent;
+    box-shadow: 0 4px 12px rgba(12,45,72,.25);
+  }
+  .filter-btn:hover:not(.active) { border-color: var(--primary-lt); color: var(--primary-md); }
+  .filter-sep { color: var(--border); font-size: 1.2rem; }
   input[type="date"] {
-    padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border);
-    font-family: 'DM Sans', sans-serif; font-size: .85rem; color: var(--text); outline: none;
-    background: var(--bg);
+    padding: 7px 14px; border-radius: 10px;
+    border: 1.5px solid var(--border);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .82rem; color: var(--text);
+    outline: none; background: var(--surface-2); font-weight: 500;
   }
   input[type="date"]:focus { border-color: var(--primary-lt); }
 
-  /* CITAS */
+  /* ══ CARD ══════════════════════════════════ */
   .card {
-    background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
-    border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden;
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 1px solid rgba(221,228,238,.8);
+    margin-bottom: 20px; overflow: hidden;
+    transition: box-shadow .3s;
+    position: relative;
   }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-md), var(--primary-lt), var(--accent));
+    opacity: 0; transition: opacity .35s;
+  }
+  .card:hover::before { opacity: 1; }
   .card-header {
-    padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
-    border-bottom: 1px solid var(--border);
+    padding: 18px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border-lt);
   }
-  .card-title { font-size: .7rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--primary-lt); }
-  .card-count { background: var(--primary); color: #fff; border-radius: 20px; padding: 2px 10px; font-size: .75rem; font-weight: 600; }
+  .card-title {
+    font-size: .68rem; font-weight: 800; letter-spacing: 1.8px;
+    text-transform: uppercase; color: var(--primary-lt);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-count {
+    background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+    color: #fff; border-radius: 20px; padding: 3px 12px;
+    font-size: .75rem; font-weight: 800;
+    box-shadow: 0 2px 8px rgba(12,45,72,.2);
+  }
 
+  /* ══ CITAS ════════════════════════════════ */
   .cita-item {
-    padding: 18px 20px; border-bottom: 1px solid var(--border); display: grid;
-    grid-template-columns: auto 1fr auto; gap: 16px; align-items: start;
-    transition: background .15s;
+    padding: 20px 24px; border-bottom: 1px solid var(--border-lt);
+    display: grid; grid-template-columns: 60px 1fr auto;
+    gap: 18px; align-items: start;
+    transition: background .2s;
   }
   .cita-item:last-child { border-bottom: none; }
-  .cita-item:hover { background: rgba(27,79,114,.02); }
+  .cita-item:hover { background: rgba(12,45,72,.02); }
 
-  .cita-fecha-col { text-align: center; min-width: 52px; }
-  .cita-dia  { font-size: 1.6rem; font-weight: 700; color: var(--primary); line-height: 1; }
-  .cita-mes  { font-size: .7rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: .5px; }
-  .cita-dow  { font-size: .7rem; color: var(--text-muted); }
+  .cita-fecha-col { text-align: center; }
+  .cita-dia  {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.9rem; font-weight: 700;
+    color: var(--primary); line-height: 1;
+  }
+  .cita-mes  { font-size: .65rem; text-transform: uppercase; color: var(--text-light); letter-spacing: .8px; font-weight: 700; }
+  .cita-dow  { font-size: .68rem; color: var(--text-light); font-weight: 600; }
 
-  .cita-info h4 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-  .cita-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+  .cita-info h4 { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .cita-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
   .cita-tag {
-    display: flex; align-items: center; gap: 4px; font-size: .78rem;
-    color: var(--text-muted); background: var(--bg); padding: 3px 8px;
-    border-radius: 6px; border: 1px solid var(--border);
+    display: flex; align-items: center; gap: 4px;
+    font-size: .75rem; color: var(--text-muted); font-weight: 600;
+    background: var(--surface-2); padding: 4px 10px;
+    border-radius: 8px; border: 1px solid var(--border);
   }
   .cita-tag.presencial { border-color: rgba(26,188,156,.3); color: var(--accent-dk); background: rgba(26,188,156,.06); }
-  .cita-tag.virtual    { border-color: rgba(46,134,193,.3); color: var(--primary-lt); background: rgba(46,134,193,.06); }
+  .cita-tag.virtual    { border-color: rgba(41,128,185,.3); color: var(--primary-lt); background: rgba(41,128,185,.06); }
+  .cita-tag.empresa    { border-color: rgba(201,168,76,.3); color: #92702A; background: rgba(201,168,76,.06); }
 
-  .cita-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
-  .btn-cancel {
-    padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(231,76,60,.3);
-    background: rgba(231,76,60,.06); color: var(--danger); font-family: 'DM Sans', sans-serif;
-    font-size: .78rem; font-weight: 600; cursor: pointer; transition: all .2s;
-  }
-  .btn-cancel:hover { background: var(--danger); color: #fff; }
+  .cita-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
   .hora-badge {
-    background: var(--primary); color: #fff; border-radius: 8px;
-    padding: 4px 10px; font-size: .82rem; font-weight: 600; white-space: nowrap;
+    background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+    color: #fff; border-radius: 10px;
+    padding: 5px 12px; font-size: .8rem; font-weight: 700;
+    white-space: nowrap; box-shadow: 0 2px 8px rgba(12,45,72,.2);
   }
   .dur-badge {
-    background: rgba(26,188,156,.1); color: var(--accent-dk); border-radius: 6px;
-    padding: 3px 8px; font-size: .75rem; font-weight: 600;
+    background: rgba(26,188,156,.1); color: var(--accent-dk);
+    border-radius: 8px; padding: 4px 10px;
+    font-size: .75rem; font-weight: 700;
+    border: 1px solid rgba(26,188,156,.2);
   }
+  .btn-cancel {
+    padding: 6px 14px; border-radius: 8px;
+    border: 1px solid rgba(220,38,38,.25);
+    background: rgba(220,38,38,.05); color: var(--danger);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .75rem; font-weight: 700; cursor: pointer;
+    transition: all .25s; letter-spacing: .2px;
+  }
+  .btn-cancel:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
 
-  .empty-state { padding: 40px; text-align: center; color: var(--text-muted); font-size: .9rem; }
-  .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .empty-state { padding: 48px; text-align: center; color: var(--text-light); }
+  .empty-state .empty-icon { font-size: 3rem; margin-bottom: 14px; opacity: .5; }
+  .empty-state p { font-size: .9rem; font-weight: 500; }
 
-  /* BLOQUEAR HORARIO */
-  .block-form { padding: 20px; display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
+  /* ══ BLOQUEAR ══════════════════════════════ */
+  .block-form {
+    padding: 24px;
+    display: grid; grid-template-columns: 1fr 1fr auto;
+    gap: 14px; align-items: end;
+  }
   @media(max-width:600px) { .block-form { grid-template-columns: 1fr; } }
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
-  label { font-size: .75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; }
-  select, input[type="text"] {
-    padding: 10px 12px; border-radius: 8px; border: 1.5px solid var(--border);
-    font-family: 'DM Sans', sans-serif; font-size: .9rem; color: var(--text);
-    background: var(--bg); outline: none; transition: border-color .2s;
+  .form-group { display: flex; flex-direction: column; gap: 7px; }
+  label { font-size: .72rem; font-weight: 800; color: var(--text-muted); letter-spacing: .8px; text-transform: uppercase; }
+  input[type="text"] {
+    padding: 12px 14px; border-radius: 12px;
+    border: 1.5px solid var(--border);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .9rem; color: var(--text);
+    background: var(--surface-2); outline: none;
+    transition: all .25s; font-weight: 500;
   }
-  select:focus, input[type="text"]:focus { border-color: var(--primary-lt); background: #fff; }
+  input[type="text"]:focus { border-color: var(--primary-lt); background: #fff; box-shadow: 0 0 0 4px rgba(41,128,185,.10); }
 
-  /* BUTTONS */
+  /* ══ BUTTONS ══════════════════════════════ */
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 10px 20px; border-radius: 10px; font-family: 'DM Sans', sans-serif;
-    font-size: .9rem; font-weight: 600; cursor: pointer; border: none; transition: all .25s;
+    padding: 12px 22px; border-radius: 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .88rem; font-weight: 800; cursor: pointer; border: none;
+    transition: all .3s cubic-bezier(.34,1.56,.64,1); letter-spacing: .3px;
   }
   .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-lt));
-    color: #fff; box-shadow: 0 4px 14px rgba(27,79,114,.3);
+    background: linear-gradient(135deg, var(--primary), var(--primary-md), var(--primary-lt));
+    color: #fff; box-shadow: 0 6px 20px rgba(12,45,72,.3);
+    position: relative; overflow: hidden;
   }
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(27,79,114,.4); }
+  .btn-primary::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+    transition: left .5s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(12,45,72,.4); }
+  .btn-primary:hover::before { left: 100%; }
   .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: var(--surface); color: var(--text-muted); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); }
+  .btn-ghost:hover { background: var(--bg); color: var(--text); border-color: var(--primary-lt); }
+  .btn-danger { background: var(--danger); color: #fff; box-shadow: 0 4px 16px rgba(220,38,38,.3); flex: 1; }
+  .btn-danger:hover { background: #B91C1C; transform: translateY(-1px); }
 
-  /* LOADER */
-  .loader { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 32px; color: var(--text-muted); }
-  .spinner { width: 22px; height: 22px; border: 2.5px solid var(--border); border-top-color: var(--primary-lt); border-radius: 50%; animation: spin .7s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* MODAL */
+  /* ══ MODAL ════════════════════════════════ */
   .modal-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4);
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,22,40,.5); backdrop-filter: blur(4px);
     z-index: 200; align-items: center; justify-content: center; padding: 20px;
   }
   .modal-overlay.open { display: flex; }
   .modal {
-    background: var(--surface); border-radius: var(--radius); padding: 28px;
-    max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    background: var(--surface); border-radius: var(--radius);
+    padding: 32px; max-width: 420px; width: 100%;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    animation: modalIn .3s cubic-bezier(.34,1.56,.64,1);
   }
-  .modal h3 { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
-  .modal p  { color: var(--text-muted); font-size: .9rem; line-height: 1.6; margin-bottom: 20px; }
+  @keyframes modalIn {
+    0%   { transform: scale(.9) translateY(10px); opacity: 0; }
+    100% { transform: scale(1)  translateY(0);    opacity: 1; }
+  }
+  .modal h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-bottom: 10px;
+  }
+  .modal p  { color: var(--text-muted); font-size: .9rem; line-height: 1.6; margin-bottom: 24px; }
   .modal-btns { display: flex; gap: 10px; }
-  .btn-danger { background: var(--danger); color: #fff; flex: 1; }
-  .btn-danger:hover { background: #c0392b; }
-  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); flex: 1; }
-  .btn-ghost:hover { background: var(--bg); }
 
-  .alert-success { background: #E8F8F5; color: var(--accent-dk); border: 1px solid #A9DFBF; border-radius: 8px; padding: 10px 14px; font-size: .85rem; margin-top: 10px; }
-  .alert-error   { background: #FDECEA; color: var(--danger); border: 1px solid #F5C6CB; border-radius: 8px; padding: 10px 14px; font-size: .85rem; margin-top: 10px; }
+  /* ══ ALERTS ═══════════════════════════════ */
+  .alert-success { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; border-radius: 10px; padding: 12px 16px; font-size: .85rem; font-weight: 600; }
+  .alert-error   { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; border-radius: 10px; padding: 12px 16px; font-size: .85rem; font-weight: 600; }
 
-  footer { text-align: center; padding: 20px; font-size: .78rem; color: var(--text-muted); border-top: 1px solid var(--border); }
-  footer strong { color: var(--primary); }
+  /* ══ LOADER ═══════════════════════════════ */
+  .loader { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 40px; color: var(--text-muted); font-size: .9rem; font-weight: 500; }
+  .spinner { width: 24px; height: 24px; border: 2.5px solid var(--border); border-top-color: var(--primary-lt); border-radius: 50%; animation: spin .75s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ══ FOOTER ═══════════════════════════════ */
+  footer {
+    text-align: center; padding: 24px;
+    font-size: .78rem; color: var(--text-light);
+    border-top: 1px solid var(--border-lt);
+    position: relative; z-index: 1; letter-spacing: .3px;
+  }
+  footer strong { color: var(--primary-md); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -208,22 +384,25 @@
       <div class="header-logo">📅 AgendaTuCita</div>
       <div class="header-sub">Panel de administración</div>
     </div>
+    <div class="header-divider"></div>
+    <span class="badge-admin">✦ Admin</span>
   </div>
-  <div style="display:flex;align-items:center;gap:12px">
-    <span class="badge-admin" id="admin-name"></span>
-    <button class="btn btn-ghost" onclick="cerrarSesion()" style="padding:6px 14px;font-size:.8rem">Salir</button>
+  <div class="header-right">
+    <span id="admin-name"></span>
+    <button class="btn-salir" onclick="cerrarSesion()">Salir →</button>
   </div>
 </header>
 
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
-    <div style="font-size:2.5rem;margin-bottom:12px">🔐</div>
+    <div class="login-icon">🔐</div>
     <h2>Acceso Admin</h2>
-    <p>Accede con la cuenta de Google de Sandra para ver y gestionar las citas</p>
+    <p>Inicia sesión con tu cuenta de Google para acceder al panel de administración</p>
     <div class="login-error" id="login-error"></div>
-    <button class="btn btn-primary" onclick="login()" style="width:100%;gap:10px">
-      <img src="https://www.google.com/favicon.ico" width="18" height="18"> Iniciar sesión con Google
+    <button class="login-btn" onclick="login()">
+      <img src="https://www.google.com/favicon.ico" width="18" height="18">
+      Continuar con Google
     </button>
   </div>
 </div>
@@ -233,20 +412,20 @@
   <div class="admin-container">
 
     <!-- STATS -->
-    <div class="stats-grid" id="stats-grid">
-      <div class="stat-card">
+    <div class="stats-grid">
+      <div class="stat-card blue">
         <div class="stat-icon blue">📅</div>
         <div><div class="stat-val" id="stat-hoy">—</div><div class="stat-label">Citas hoy</div></div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card green">
         <div class="stat-icon green">📆</div>
         <div><div class="stat-val" id="stat-semana">—</div><div class="stat-label">Esta semana</div></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon orange">🗓</div>
+      <div class="stat-card gold">
+        <div class="stat-icon gold">🗓</div>
         <div><div class="stat-val" id="stat-mes">—</div><div class="stat-label">Este mes</div></div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card purple">
         <div class="stat-icon purple">⏳</div>
         <div><div class="stat-val" id="stat-pendientes">—</div><div class="stat-label">Próximas 7 días</div></div>
       </div>
@@ -259,11 +438,11 @@
       <button class="filter-btn" onclick="setFiltro('mes',this)">Este mes</button>
       <button class="filter-btn" onclick="setFiltro('todos',this)">Todos</button>
       <span class="filter-sep">|</span>
-      <input type="date" id="filtro-fecha" onchange="setFiltro('fecha',null)" title="Filtrar por fecha específica">
-      <button class="btn btn-primary" onclick="cargarCitas()" style="padding:7px 16px;font-size:.85rem;margin-left:auto">🔄 Actualizar</button>
+      <input type="date" id="filtro-fecha" onchange="setFiltro('fecha',null)">
+      <button class="btn btn-primary" onclick="cargarCitas()" style="margin-left:auto;padding:8px 18px;font-size:.82rem">🔄 Actualizar</button>
     </div>
 
-    <!-- LISTA CITAS -->
+    <!-- CITAS -->
     <div class="card">
       <div class="card-header">
         <span class="card-title">Citas agendadas</span>
@@ -274,10 +453,10 @@
       </div>
     </div>
 
-    <!-- BLOQUEAR HORARIO -->
+    <!-- BLOQUEAR -->
     <div class="card">
       <div class="card-header">
-        <span class="card-title">🚫 Bloquear horario</span>
+        <span class="card-title">🚫 Bloquear día</span>
       </div>
       <div class="block-form">
         <div class="form-group">
@@ -286,11 +465,11 @@
         </div>
         <div class="form-group">
           <label>Motivo</label>
-          <input type="text" id="block-motivo" placeholder="Ej: Vacaciones, Reunión…">
+          <input type="text" id="block-motivo" placeholder="Ej: Vacaciones, Festivo…">
         </div>
-        <button class="btn btn-primary" onclick="bloquearHorario()">🚫 Bloquear día</button>
+        <button class="btn btn-primary" onclick="bloquearHorario()">🚫 Bloquear</button>
       </div>
-      <div id="block-result" style="padding:0 20px 16px"></div>
+      <div id="block-result" style="padding:0 24px 18px"></div>
     </div>
 
   </div>
@@ -300,32 +479,30 @@
 <div class="modal-overlay" id="modal-cancelar">
   <div class="modal">
     <h3>⚠️ Cancelar cita</h3>
-    <p id="modal-texto">¿Estás segura de que deseas cancelar esta cita? Esta acción eliminará el evento del calendario.</p>
+    <p id="modal-texto">¿Estás segura de que deseas cancelar esta cita?</p>
     <div class="modal-btns">
-      <button class="btn btn-ghost" onclick="cerrarModal()">No, volver</button>
+      <button class="btn btn-ghost" onclick="cerrarModal()">Volver</button>
       <button class="btn btn-danger" id="btn-confirmar-cancelar" onclick="ejecutarCancelacion()">Sí, cancelar</button>
     </div>
   </div>
 </div>
 
 <footer>
-  <strong>AgendaTuCita</strong> · Panel Admin · Dra. Sandra Estupiñán
+  <strong>AgendaTuCita</strong> · Panel Admin · Dra. Sandra Estupiñán · Fisioterapia &amp; Especialista en SST
 </footer>
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
-// ══ CONFIG ══════════════════════════════
 const CLIENT_ID   = '264077603671-cghhf64qjlpnomo6t4ps39ulqpsdfts1.apps.googleusercontent.com';
 const CALENDAR_ID = 'estuval2022@gmail.com';
 const APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbzcs6d1mgg7wdHGup1x4PFWV7MlDft0x3Sg_AmkXPOWjc_ksKlNvZcGgva1agi5akuH/exec';
 const SCOPES      = 'https://www.googleapis.com/auth/calendar';
 
-// ══ ESTADO ══════════════════════════════
 var todasLasCitas  = [];
 var filtroActual   = 'hoy';
 var eventoCancelar = null;
 var accessToken    = null;
 
-// ══ LOGIN CON GOOGLE ════════════════════
 function login() {
   var client = google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
@@ -348,57 +525,46 @@ function login() {
 function cerrarSesion() {
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('admin-screen').style.display = 'none';
-  document.getElementById('inp-pass').value = '';
-  document.getElementById('login-error').textContent = '';
+  accessToken = null;
 }
 
-// ══ CARGAR CITAS ════════════════════════
 async function cargarCitas() {
   document.getElementById('citas-list').innerHTML = '<div class="loader"><div class="spinner"></div> Cargando citas…</div>';
   var hoy    = new Date(); hoy.setHours(0,0,0,0);
   var timeMin = new Date(hoy.getFullYear(), hoy.getMonth(), 1).toISOString();
   var timeMax = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0, 23, 59).toISOString();
-
   var url = 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(CALENDAR_ID) + '/events'
-    + '?timeMin=' + timeMin + '&timeMax=' + timeMax
-    + '&singleEvents=true&orderBy=startTime&maxResults=500';
-
+    + '?timeMin=' + timeMin + '&timeMax=' + timeMax + '&singleEvents=true&orderBy=startTime&maxResults=500';
   try {
     var res  = await fetch(url, { headers: { 'Authorization': 'Bearer ' + accessToken } });
     var data = await res.json();
-    todasLasCitas = (data.items || []).filter(function(ev) {
-      return ev.summary && ev.start && ev.start.dateTime;
-    });
+    todasLasCitas = (data.items || []).filter(function(ev) { return ev.start && ev.start.dateTime; });
     calcularStats();
     renderCitas();
   } catch(err) {
-    document.getElementById('citas-list').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Error al cargar las citas.</div>';
+    document.getElementById('citas-list').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Error al cargar las citas.</p></div>';
   }
 }
 
-// ══ STATS ════════════════════════════════
 function calcularStats() {
   var hoy    = new Date(); hoy.setHours(0,0,0,0);
   var fin_hoy = new Date(hoy); fin_hoy.setHours(23,59,59);
   var fin_sem = new Date(hoy); fin_sem.setDate(hoy.getDate() + 7);
   var ini_mes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
   var fin_mes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0, 23, 59);
-
-  var statHoy  = 0, statSem = 0, statMes = 0, statPend = 0;
+  var s1=0,s2=0,s3=0,s4=0;
   todasLasCitas.forEach(function(ev) {
-    var start = new Date(ev.start.dateTime || ev.start.date);
-    if (start >= hoy && start <= fin_hoy) statHoy++;
-    if (start >= hoy && start <= fin_sem) { statSem++; statPend++; }
-    if (start >= ini_mes && start <= fin_mes) statMes++;
+    var start = new Date(ev.start.dateTime);
+    if (start >= hoy && start <= fin_hoy) s1++;
+    if (start >= hoy && start <= fin_sem) { s2++; s4++; }
+    if (start >= ini_mes && start <= fin_mes) s3++;
   });
-
-  document.getElementById('stat-hoy').textContent       = statHoy;
-  document.getElementById('stat-semana').textContent     = statSem;
-  document.getElementById('stat-mes').textContent        = statMes;
-  document.getElementById('stat-pendientes').textContent = statPend;
+  document.getElementById('stat-hoy').textContent       = s1;
+  document.getElementById('stat-semana').textContent     = s2;
+  document.getElementById('stat-mes').textContent        = s3;
+  document.getElementById('stat-pendientes').textContent = s4;
 }
 
-// ══ FILTROS ══════════════════════════════
 function setFiltro(filtro, btn) {
   filtroActual = filtro;
   if (btn) {
@@ -412,15 +578,13 @@ function setFiltro(filtro, btn) {
 function getCitasFiltradas() {
   var hoy   = new Date(); hoy.setHours(0,0,0,0);
   var fin_hoy = new Date(hoy); fin_hoy.setHours(23,59,59);
-  var ini_sem = new Date(hoy);
   var fin_sem = new Date(hoy); fin_sem.setDate(hoy.getDate() + 6); fin_sem.setHours(23,59,59);
   var ini_mes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
   var fin_mes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0, 23, 59);
-
   return todasLasCitas.filter(function(ev) {
-    var start = new Date(ev.start.dateTime || ev.start.date);
+    var start = new Date(ev.start.dateTime);
     if (filtroActual === 'hoy')    return start >= hoy && start <= fin_hoy;
-    if (filtroActual === 'semana') return start >= ini_sem && start <= fin_sem;
+    if (filtroActual === 'semana') return start >= hoy && start <= fin_sem;
     if (filtroActual === 'mes')    return start >= ini_mes && start <= fin_mes;
     if (filtroActual === 'fecha') {
       var val = document.getElementById('filtro-fecha').value;
@@ -431,132 +595,96 @@ function getCitasFiltradas() {
   });
 }
 
-// ══ RENDER CITAS ════════════════════════
 function renderCitas() {
-  var citas    = getCitasFiltradas();
-  var list     = document.getElementById('citas-list');
+  var citas = getCitasFiltradas();
+  var list  = document.getElementById('citas-list');
   document.getElementById('citas-count').textContent = citas.length;
-
   if (citas.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>No hay citas para este período.</div>';
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>No hay citas para este período.</p></div>';
     return;
   }
-
   var html = '';
   citas.forEach(function(ev) {
-    var start    = new Date(ev.start.dateTime);
-    var end      = new Date(ev.end.dateTime);
-    var dia      = start.getDate();
-    var mes      = start.toLocaleDateString('es-CO', { month: 'short' }).toUpperCase();
-    var dow      = start.toLocaleDateString('es-CO', { weekday: 'short' });
-    var horaIni  = start.toTimeString().slice(0,5);
-    var horaFin  = end.toTimeString().slice(0,5);
-    var durMin   = (end - start) / 60000;
-    var durH     = durMin / 60;
-    var nombre   = ev.summary.replace('Cita: ', '');
-    var desc     = ev.description || '';
-    var tel      = (desc.match(/Teléfono: (.+)/) || [])[1] || '—';
-    var motivo   = (desc.match(/Motivo: (.+)/) || [])[1] || '—';
-    var modalidad = (desc.match(/Modalidad: (.+)/) || [])[1] || 'Presencial';
-    var email    = (desc.match(/Email: (.+)/) || [])[1] || '';
-    var modClass = modalidad.toLowerCase().includes('virtual') ? 'virtual' : 'presencial';
+    var start   = new Date(ev.start.dateTime);
+    var end     = new Date(ev.end.dateTime);
+    var dia     = start.getDate();
+    var mes     = start.toLocaleDateString('es-CO', { month: 'short' }).toUpperCase();
+    var dow     = start.toLocaleDateString('es-CO', { weekday: 'short' });
+    var horaIni = start.toTimeString().slice(0,5);
+    var horaFin = end.toTimeString().slice(0,5);
+    var durH    = (end - start) / 3600000;
+    var nombre  = (ev.summary || '').replace('Cita: ', '');
+    var desc    = ev.description || '';
+    var tel     = (desc.match(/Teléfono: (.+)/) || [])[1] || '—';
+    var motivo  = (desc.match(/Motivo: (.+)/) || [])[1] || '—';
+    var empresa = (desc.match(/Empresa: (.+)/) || [])[1] || '';
+    var email   = (desc.match(/Email: (.+)/) || [])[1] || '';
+    var modal   = (desc.match(/Modalidad: (.+)/) || [])[1] || 'Presencial';
+    var modClass = modal.toLowerCase().includes('virtual') ? 'virtual' : 'presencial';
 
     html += '<div class="cita-item">'
-      + '<div class="cita-fecha-col">'
-      + '<div class="cita-dia">' + dia + '</div>'
-      + '<div class="cita-mes">' + mes + '</div>'
-      + '<div class="cita-dow">' + dow + '</div>'
-      + '</div>'
-      + '<div class="cita-info">'
-      + '<h4>👤 ' + nombre + '</h4>'
+      + '<div class="cita-fecha-col"><div class="cita-dia">' + dia + '</div><div class="cita-mes">' + mes + '</div><div class="cita-dow">' + dow + '</div></div>'
+      + '<div class="cita-info"><h4>👤 ' + nombre + '</h4>'
       + '<div class="cita-meta">'
       + '<span class="cita-tag">📱 ' + tel + '</span>'
+      + (empresa ? '<span class="cita-tag empresa">🏢 ' + empresa + '</span>' : '')
       + (email ? '<span class="cita-tag">✉️ ' + email + '</span>' : '')
       + '<span class="cita-tag">📝 ' + motivo + '</span>'
-      + '<span class="cita-tag ' + modClass + '">' + (modClass === 'virtual' ? '💻' : '🏥') + ' ' + modalidad + '</span>'
-      + '</div>'
-      + '</div>'
+      + '<span class="cita-tag ' + modClass + '">' + (modClass==='virtual'?'💻':'🏥') + ' ' + modal + '</span>'
+      + '</div></div>'
       + '<div class="cita-actions">'
       + '<span class="hora-badge">🕐 ' + horaIni + ' – ' + horaFin + '</span>'
       + '<span class="dur-badge">⏱ ' + durH + 'h</span>'
       + '<button class="btn-cancel" onclick="pedirCancelacion(\'' + ev.id + '\',\'' + nombre + '\',\'' + horaIni + '\')">✕ Cancelar</button>'
-      + '</div>'
-      + '</div>';
+      + '</div></div>';
   });
-
   list.innerHTML = html;
 }
 
-// ══ CANCELAR CITA ════════════════════════
 function pedirCancelacion(eventId, nombre, hora) {
   eventoCancelar = eventId;
-  document.getElementById('modal-texto').textContent =
-    '¿Cancelar la cita de ' + nombre + ' a las ' + hora + '? Se eliminará del calendario de Sandra.';
+  document.getElementById('modal-texto').textContent = '¿Cancelar la cita de ' + nombre + ' a las ' + hora + '? Se eliminará del calendario.';
   document.getElementById('modal-cancelar').classList.add('open');
 }
-
-function cerrarModal() {
-  document.getElementById('modal-cancelar').classList.remove('open');
-  eventoCancelar = null;
-}
+function cerrarModal() { document.getElementById('modal-cancelar').classList.remove('open'); eventoCancelar = null; }
 
 async function ejecutarCancelacion() {
   if (!eventoCancelar) return;
   var btn = document.getElementById('btn-confirmar-cancelar');
   btn.disabled = true; btn.textContent = 'Cancelando…';
-
-  var url = 'https://www.googleapis.com/calendar/v3/calendars/'
-    + encodeURIComponent(CALENDAR_ID) + '/events/' + eventoCancelar
-    + '?key=' + API_KEY;
-
   try {
-    // Usamos Apps Script para cancelar (evitar CORS con DELETE)
-    await fetch(APPS_SCRIPT + '?action=cancel&eventId=' + eventoCancelar, { mode: 'no-cors' });
-    // Remover localmente
+    var url = 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(CALENDAR_ID) + '/events/' + eventoCancelar;
+    await fetch(url, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + accessToken } });
     todasLasCitas = todasLasCitas.filter(function(ev) { return ev.id !== eventoCancelar; });
-    calcularStats();
-    renderCitas();
-    cerrarModal();
-  } catch(err) {
-    alert('Error al cancelar. Intenta de nuevo.');
-  }
+    calcularStats(); renderCitas(); cerrarModal();
+  } catch(err) { alert('Error al cancelar. Intenta de nuevo.'); }
   btn.disabled = false; btn.textContent = 'Sí, cancelar';
 }
 
-// ══ BLOQUEAR DÍA ════════════════════════
 async function bloquearHorario() {
   var fecha  = document.getElementById('block-fecha').value;
   var motivo = document.getElementById('block-motivo').value.trim();
   var result = document.getElementById('block-result');
-
   if (!fecha) { result.innerHTML = '<div class="alert-error">⚠️ Selecciona una fecha.</div>'; return; }
-
   var payload = {
-    client_name:    'BLOQUEADO',
-    client_email:   '',
-    client_phone:   '',
-    meeting_reason: motivo || 'Día bloqueado',
-    meeting_type:   'Bloqueo',
-    start_time:     fecha + 'T07:00:00',
-    end_time:       fecha + 'T17:00:00'
+    client_name: 'BLOQUEADO', client_email: '', client_phone: '',
+    meeting_reason: motivo || 'Día bloqueado', meeting_type: 'Bloqueo',
+    start_time: fecha + 'T07:00:00', end_time: fecha + 'T17:00:00'
   };
-
   try {
     await fetch(APPS_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-    result.innerHTML = '<div class="alert-success">✅ Día bloqueado correctamente en el calendario.</div>';
-    document.getElementById('block-fecha').value  = '';
+    result.innerHTML = '<div class="alert-success">✅ Día bloqueado correctamente.</div>';
+    document.getElementById('block-fecha').value = '';
     document.getElementById('block-motivo').value = '';
-    setTimeout(function() { cargarCitas(); }, 1500);
+    setTimeout(cargarCitas, 1500);
   } catch(err) {
-    result.innerHTML = '<div class="alert-error">⚠️ Error al bloquear. Intenta de nuevo.</div>';
+    result.innerHTML = '<div class="alert-error">⚠️ Error al bloquear.</div>';
   }
 }
 
-// ══ UTILS ════════════════════════════════
 function toDateStr(d) {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 </script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
 </html>
