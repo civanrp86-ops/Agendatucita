@@ -640,6 +640,61 @@
   .cita-tag.empresa-clickable { cursor: pointer; transition: all .2s; }
   .cita-tag.empresa-clickable:hover { background: rgba(201,168,76,.15); border-color: var(--gold); color: #7A5C20; transform: translateY(-1px); }
 
+  /* ══ ANIMACIONES DE ENTRADA ══════════════ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse-gold {
+    0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,.4); }
+    50%      { box-shadow: 0 0 0 7px rgba(201,168,76,.0); }
+  }
+  @keyframes countUp {
+    from { opacity: 0; transform: scale(.7); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .stats-grid .stat-card { animation: fadeUp .5s ease both; }
+  .stats-grid .stat-card:nth-child(1) { animation-delay: .05s; }
+  .stats-grid .stat-card:nth-child(2) { animation-delay: .12s; }
+  .stats-grid .stat-card:nth-child(3) { animation-delay: .19s; }
+  .stats-grid .stat-card:nth-child(4) { animation-delay: .26s; }
+
+  .stat-val { animation: countUp .6s cubic-bezier(.34,1.56,.64,1) both; animation-delay: .4s; }
+
+  /* Stat-cards más vividas */
+  .stat-card.blue  { border-left: 4px solid var(--primary-lt); }
+  .stat-card.green { border-left: 4px solid var(--accent); }
+  .stat-card.gold  { border-left: 4px solid var(--gold); }
+  .stat-card.purple{ border-left: 4px solid #8B5CF6; }
+
+  /* Calendario — día de hoy pulsa */
+  .cal-cell.hoy { animation: pulse-gold 2.5s ease-in-out infinite; }
+
+  /* Analytics cards entrada */
+  .chart-card { animation: fadeUp .5s ease both; }
+  .analytics-grid .chart-card:nth-child(1) { animation-delay: .1s; }
+  .analytics-grid .chart-card:nth-child(2) { animation-delay: .2s; }
+  .analytics-grid .chart-card:nth-child(3) { animation-delay: .3s; }
+  .analytics-grid .chart-card:nth-child(4) { animation-delay: .4s; }
+
+  /* Línea de tendencia */
+  .trend-dot {
+    transition: r .2s, fill .2s;
+    cursor: pointer;
+  }
+  .trend-dot:hover { r: 7; }
+
+  /* Top empresas — filas con hover más vivo */
+  .empresa-row:hover .empresa-name { color: var(--primary-lt); }
+  .empresa-row:hover .empresa-rank { transform: scale(1.15); }
+  .empresa-rank { transition: transform .2s; }
+
+  /* Citas card — borde izquierdo de color por estado */
+  .cita-item.estado-pendiente { border-left: 3px solid #EAB308; }
+  .cita-item.estado-novedad   { border-left: 3px solid var(--danger); }
+  .cita-item.estado-normal    { border-left: 3px solid var(--accent); }
+
   /* ══ FOOTER ═══════════════════════════════ */
   footer {
     text-align: center; padding: 24px;
@@ -705,8 +760,8 @@
       </div>
     </div>
 
-    <!-- ANALYTICS DASHBOARD -->
-    <div class="analytics-section" id="analytics-section" style="display:none">
+    <!-- ANALYTICS DASHBOARD — siempre visible -->
+    <div class="analytics-section" id="analytics-section">
       <div class="analytics-grid">
 
         <!-- CALENDARIO MENSUAL INTERACTIVO -->
@@ -729,13 +784,14 @@
           </div>
         </div>
 
-        <!-- GRÁFICA SEMANAL -->
+        <!-- LÍNEA DE TENDENCIA -->
         <div class="chart-card">
           <div class="chart-header">
-            <span class="chart-title">📊 Citas por semana (últimas 8)</span>
+            <span class="chart-title">📈 Tendencia semanal (últimas 8 semanas)</span>
           </div>
-          <div class="chart-body">
-            <div class="bar-chart" id="bar-semanal"></div>
+          <div class="chart-body" style="padding:16px 20px 12px">
+            <svg id="trend-svg" width="100%" height="130" viewBox="0 0 400 130" preserveAspectRatio="none" style="overflow:visible"></svg>
+            <div id="trend-labels" style="display:flex;justify-content:space-between;margin-top:6px"></div>
           </div>
         </div>
 
@@ -799,7 +855,6 @@
       <span class="filter-sep">|</span>
       <input type="date" id="filtro-fecha" onchange="setFiltro('fecha',null)">
       <button class="btn btn-primary" onclick="cargarCitas()" style="margin-left:auto;padding:8px 18px;font-size:.82rem">🔄 Actualizar</button>
-      <button class="btn btn-ghost" onclick="toggleAnalytics()" id="btn-analytics" style="padding:8px 18px;font-size:.82rem">📊 Ver estadísticas</button>
     </div>
 
     <!-- CITAS -->
@@ -940,6 +995,7 @@ async function cargarCitas() {
     todasLasCitas = (data.items || []).filter(function(ev) { return ev.start && ev.start.dateTime; });
     calcularStats();
     renderCitas();
+    renderAnalytics();
   } catch(err) {
     document.getElementById('citas-list').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Error al cargar las citas.</p></div>';
   }
@@ -1021,7 +1077,8 @@ function renderCitas() {
     var modal   = (desc.match(/Modalidad: (.+)/) || [])[1] || 'Presencial';
     var modClass = modal.toLowerCase().includes('virtual') ? 'virtual' : 'presencial';
 
-    html += '<div class="cita-item">'
+    var estadoCita = empresa ? getEstadoEmpresa(empresa) : 'normal';
+    html += '<div class="cita-item estado-' + estadoCita + '">'
       + '<div class="cita-fecha-col"><div class="cita-dia">' + dia + '</div><div class="cita-mes">' + mes + '</div><div class="cita-dow">' + dow + '</div></div>'
       + '<div class="cita-info"><h4>👤 ' + nombre + '</h4>'
       + '<div class="cita-meta">'
@@ -1085,23 +1142,13 @@ async function bloquearHorario() {
 
 
 // ══ ANALYTICS ══════════════════════════════════════════
-var analyticsVisible = false;
 var calYear, calMonth, calDiaSeleccionado = null;
-
-function toggleAnalytics() {
-  analyticsVisible = !analyticsVisible;
-  var sec = document.getElementById('analytics-section');
-  var btn = document.getElementById('btn-analytics');
-  sec.style.display = analyticsVisible ? 'block' : 'none';
-  btn.textContent = analyticsVisible ? '📊 Ocultar estadísticas' : '📊 Ver estadísticas';
-  if (analyticsVisible) renderAnalytics();
-}
 
 function renderAnalytics() {
   var hoy = new Date();
   if (!calYear) { calYear = hoy.getFullYear(); calMonth = hoy.getMonth(); }
   renderCalendario();
-  renderBarSemanal();
+  renderTendencia();
   renderDonut();
   renderTopEmpresas();
 }
@@ -1209,8 +1256,8 @@ function seleccionarDia(dia) {
   panel.classList.add('open');
 }
 
-// ══ BARRAS SEMANALES ══════════════════════════════════
-function renderBarSemanal() {
+// ══ LÍNEA DE TENDENCIA SVG ════════════════════════════
+function renderTendencia() {
   var hoy = new Date(); hoy.setHours(23,59,59);
   var semanas = [];
   for (var w = 7; w >= 0; w--) {
@@ -1221,12 +1268,61 @@ function renderBarSemanal() {
     }).length;
     semanas.push({ label: ini.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'}), count: count });
   }
+
   var max = Math.max.apply(null, semanas.map(function(s){ return s.count; })) || 1;
-  document.getElementById('bar-semanal').innerHTML = semanas.map(function(s) {
-    var pct = Math.round((s.count / max) * 100);
-    return '<div class="bar-col"><div class="bar-val">' + (s.count||'') + '</div>'
-      + '<div class="bar-fill" style="height:' + Math.max(pct,4) + '%"></div>'
-      + '<div class="bar-label">' + s.label + '</div></div>';
+  var W = 400, H = 110, padL = 10, padR = 10, padT = 14, padB = 10;
+  var n = semanas.length;
+  var xs = semanas.map(function(_, i){ return padL + (i/(n-1)) * (W - padL - padR); });
+  var ys = semanas.map(function(s){ return padT + (1 - s.count/max) * (H - padT - padB); });
+
+  // Área rellena bajo la línea
+  var areaPath = 'M ' + xs[0] + ' ' + (H - padB);
+  xs.forEach(function(x,i){ areaPath += ' L ' + x + ' ' + ys[i]; });
+  areaPath += ' L ' + xs[n-1] + ' ' + (H - padB) + ' Z';
+
+  // Línea suavizada (cubic bezier)
+  var linePath = 'M ' + xs[0] + ' ' + ys[0];
+  for (var i = 1; i < n; i++) {
+    var cpx1 = xs[i-1] + (xs[i] - xs[i-1]) * 0.5;
+    var cpx2 = xs[i]   - (xs[i] - xs[i-1]) * 0.5;
+    linePath += ' C ' + cpx1 + ' ' + ys[i-1] + ' ' + cpx2 + ' ' + ys[i] + ' ' + xs[i] + ' ' + ys[i];
+  }
+
+  // Líneas horizontales de guía
+  var guides = '';
+  for (var g = 0; g <= max; g++) {
+    var gy = padT + (1 - g/max) * (H - padT - padB);
+    guides += '<line x1="' + padL + '" y1="' + gy + '" x2="' + (W-padR) + '" y2="' + gy
+      + '" stroke="#DDE4EE" stroke-width="1" stroke-dasharray="3,4"/>';
+    if (g > 0) guides += '<text x="' + (padL-4) + '" y="' + (gy+4) + '" font-size="8" fill="#94A3B8" text-anchor="end">' + g + '</text>';
+  }
+
+  // Puntos con tooltip
+  var dots = xs.map(function(x, i) {
+    var isLast = i === n-1;
+    var col = isLast ? '#C9A84C' : '#1ABC9C';
+    return '<circle class="trend-dot" cx="' + x + '" cy="' + ys[i] + '" r="' + (isLast?6:4) + '"'
+      + ' fill="' + col + '" stroke="#fff" stroke-width="2">'
+      + '<title>' + semanas[i].label + ': ' + semanas[i].count + ' cita(s)</title></circle>'
+      + (semanas[i].count > 0 ? '<text x="' + x + '" y="' + (ys[i]-9) + '" text-anchor="middle" font-size="9" font-weight="700" fill="' + col + '">' + semanas[i].count + '</text>' : '');
+  }).join('');
+
+  // Gradiente
+  var defs = '<defs>'
+    + '<linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">'
+    + '<stop offset="0%" stop-color="#1ABC9C" stop-opacity="0.25"/>'
+    + '<stop offset="100%" stop-color="#1ABC9C" stop-opacity="0.02"/>'
+    + '</linearGradient></defs>';
+
+  document.getElementById('trend-svg').innerHTML = defs + guides
+    + '<path d="' + areaPath + '" fill="url(#trendGrad)"/>'
+    + '<path d="' + linePath + '" fill="none" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linecap="round" style="stroke:#1ABC9C"/>'
+    + dots;
+
+  // Labels debajo
+  document.getElementById('trend-labels').innerHTML = semanas.map(function(s, i) {
+    var isLast = i === n-1;
+    return '<span style="font-size:.58rem;font-weight:' + (isLast?'800':'600') + ';color:' + (isLast?'var(--gold)':'var(--text-light)') + ';text-align:center;flex:1">' + s.label + '</span>';
   }).join('');
 }
 
