@@ -1496,30 +1496,21 @@ function cerrarSesion() {
 
 async function cargarCitas() {
   document.getElementById('citas-list').innerHTML = '<div class="loader"><div class="spinner"></div> Cargando citas…</div>';
+  if (!accessToken) {
+    document.getElementById('citas-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🔑</div><p>Sin sesión activa.</p></div>';
+    return;
+  }
   var hoy     = new Date(); hoy.setHours(0,0,0,0);
   var timeMin = new Date(hoy.getFullYear(), hoy.getMonth() - 2, 1).toISOString();
   var timeMax = new Date(hoy.getFullYear(), hoy.getMonth() + 3, 0, 23, 59).toISOString();
-  // Usar API Key para leer — no depende del token OAuth
   var url = 'https://www.googleapis.com/calendar/v3/calendars/'
     + encodeURIComponent(CALENDAR_ID)
-    + '/events?key=' + API_KEY
-    + '&timeMin=' + encodeURIComponent(timeMin)
+    + '/events?timeMin=' + encodeURIComponent(timeMin)
     + '&timeMax=' + encodeURIComponent(timeMax)
     + '&singleEvents=true&orderBy=startTime&maxResults=500';
   try {
-    var res  = await fetch(url);
-    if (!res.ok) {
-      // Fallback con OAuth token si API Key falla
-      if (accessToken) {
-        var url2 = 'https://www.googleapis.com/calendar/v3/calendars/'
-          + encodeURIComponent(CALENDAR_ID)
-          + '/events?timeMin=' + encodeURIComponent(timeMin)
-          + '&timeMax=' + encodeURIComponent(timeMax)
-          + '&singleEvents=true&orderBy=startTime&maxResults=500';
-        res = await fetch(url2, { headers: { 'Authorization': 'Bearer ' + accessToken } });
-      }
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-    }
+    var res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + accessToken } });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     var data = await res.json();
     todasLasCitas = (data.items || []).filter(function(ev) { return ev.start && ev.start.dateTime; });
     calcularStats();
@@ -1682,8 +1673,6 @@ function renderAnalytics() {
   var hoy = new Date();
   if (!calYear) { calYear = hoy.getFullYear(); calMonth = hoy.getMonth(); }
   renderCalendario();
-  renderTendencia();
-  renderDonut();
   renderTopEmpresas();
 }
 
