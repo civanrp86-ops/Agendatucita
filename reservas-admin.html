@@ -1780,6 +1780,7 @@ function seleccionarDia(dia) {
 
 // ══ LÍNEA DE TENDENCIA SVG ════════════════════════════
 function renderTendencia() {
+  if (!document.getElementById('trend-svg')) return;
   var hoy = new Date(); hoy.setHours(23,59,59);
   var semanas = [];
   for (var w = 7; w >= 0; w--) {
@@ -1850,6 +1851,7 @@ function renderTendencia() {
 
 // ══ DONA MODALIDAD ════════════════════════════════════
 function renderDonut() {
+  if (!document.getElementById('donut-total-text')) return;
   var presencial = 0, virtual = 0;
   todasLasCitas.forEach(function(ev) {
     var modal = ((ev.description||'').match(/Modalidad: (.+)/) || [])[1] || 'Presencial';
@@ -1868,6 +1870,8 @@ function renderDonut() {
 
 // ══ TOP EMPRESAS ═════════════════════════════════════
 function renderTopEmpresas() {
+  var el = document.getElementById('empresa-list');
+  if (!el) return;
   var conteo = {};
   todasLasCitas.forEach(function(ev) {
     var empresa = ((ev.description||'').match(/Empresa: (.+)/) || [])[1];
