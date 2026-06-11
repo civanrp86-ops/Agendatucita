@@ -1020,8 +1020,47 @@
     .est-card.wide { grid-column:span 1; }
   }
 
+  /* ══ PANEL FLOTANTE SEGUIMIENTO ══════════ */
+  .seg-float-btn {
+    display: flex; align-items: center; gap: 7px;
+    padding: 8px 16px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+    color: #fff; border: none; font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .75rem; font-weight: 700; cursor: pointer;
+    box-shadow: var(--shadow-sm); transition: all .2s;
+  }
+  .seg-float-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+  .seg-float-badge {
+    background: var(--danger); color: #fff; font-size: .62rem;
+    font-weight: 800; padding: 1px 6px; border-radius: 20px;
+  }
+  .seg-float-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,22,40,.35); backdrop-filter: blur(2px); z-index: 200;
+  }
+  .seg-float-overlay.open { display: block; }
+  .seg-float-panel {
+    position: fixed; top: 64px; right: -420px; width: 400px; max-width: 95vw;
+    height: calc(100vh - 64px); background: var(--surface);
+    box-shadow: -4px 0 32px rgba(12,45,72,.15);
+    z-index: 201; display: flex; flex-direction: column;
+    transition: right .3s cubic-bezier(.4,0,.2,1);
+    overflow: hidden; border-left: 1px solid var(--border);
+  }
+  .seg-float-panel.open { right: 0; }
+  .seg-float-hdr {
+    background: linear-gradient(135deg, #071828, #0C2D48, #1B4F72);
+    color: #fff; padding: 16px 20px; flex-shrink: 0;
+  }
+  .seg-float-body {
+    flex: 1; overflow-y: auto; padding: 16px 18px;
+  }
+  .sfp-section-ttl {
+    font-size: .62rem; font-weight: 800; color: var(--primary-lt);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block;
+  }
+
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -1059,13 +1098,15 @@
   <div class="admin-container">
 
     <!-- TABS -->
-    <div class="tabs-bar">
-      <button class="tab-btn active" onclick="setTab('agenda', this)">📅 Agenda</button>
-      <button class="tab-btn" onclick="setTab('seguimiento', this)">
+    <div class="tabs-bar" style="display:flex;align-items:center;justify-content:space-between;width:100%">
+      <div style="display:flex;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:4px;box-shadow:var(--shadow-sm)">
+        <button class="tab-btn active" onclick="setTab('agenda', this)">📅 Agenda</button>
+        <button class="tab-btn" onclick="setTab('estadisticas', this)">📈 Estadísticas</button>
+      </div>
+      <button class="seg-float-btn" onclick="toggleSegPanel()" id="seg-float-btn">
         📊 Seguimiento
-        <span class="tab-badge alerta" id="badge-alertas-admin">0</span>
+        <span class="seg-float-badge" id="badge-alertas-admin" style="display:none">0</span>
       </button>
-      <button class="tab-btn" onclick="setTab('estadisticas', this)">📈 Estadísticas</button>
     </div>
 
     <!-- ══ TAB AGENDA ══════════════════════════ -->
@@ -1117,65 +1158,6 @@
             <div class="day-detail-panel" id="day-detail-panel">
               <div class="day-detail-title" id="day-detail-title">📋 Citas del día</div>
               <div id="day-detail-list"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- LÍNEA DE TENDENCIA -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <span class="chart-title">📈 Tendencia semanal (últimas 8 semanas)</span>
-          </div>
-          <div class="chart-body" style="padding:16px 20px 12px">
-            <svg id="trend-svg" width="100%" height="130" viewBox="0 0 400 130" preserveAspectRatio="none" style="overflow:visible"></svg>
-            <div id="trend-labels" style="display:flex;justify-content:space-between;margin-top:6px"></div>
-          </div>
-        </div>
-
-        <!-- DONA MODALIDAD -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <span class="chart-title">💻 Presencial vs Virtual</span>
-          </div>
-          <div class="chart-body">
-            <div class="donut-wrap">
-              <svg class="donut-svg" width="110" height="110" viewBox="0 0 110 110" id="donut-svg">
-                <circle cx="55" cy="55" r="40" fill="none" stroke="var(--border)" stroke-width="18"/>
-                <circle id="donut-presencial" cx="55" cy="55" r="40" fill="none"
-                  stroke="#1ABC9C" stroke-width="18"
-                  stroke-dasharray="0 251.2" stroke-linecap="round"
-                  transform="rotate(-90 55 55)" style="transition:stroke-dasharray .6s ease"/>
-                <circle id="donut-virtual" cx="55" cy="55" r="40" fill="none"
-                  stroke="#2980B9" stroke-width="18"
-                  stroke-dasharray="0 251.2" stroke-linecap="round"
-                  transform="rotate(-90 55 55)" style="transition:stroke-dasharray .6s ease"/>
-                <text x="55" y="52" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="18" font-weight="700" fill="#0C2D48" id="donut-total-text">0</text>
-                <text x="55" y="65" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="7.5" font-weight="700" fill="#94A3B8" letter-spacing="0.5">TOTAL</text>
-              </svg>
-              <div class="donut-legend">
-                <div class="donut-item">
-                  <div class="donut-dot" style="background:#1ABC9C"></div>
-                  <span class="donut-item-label">Presencial</span>
-                  <span class="donut-item-val" id="donut-n-presencial">0</span>
-                </div>
-                <div class="donut-item">
-                  <div class="donut-dot" style="background:#2980B9"></div>
-                  <span class="donut-item-label">Virtual</span>
-                  <span class="donut-item-val" id="donut-n-virtual">0</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- TOP EMPRESAS -->
-        <div class="chart-card full-width">
-          <div class="chart-header">
-            <span class="chart-title">🏢 Top empresas del mes</span>
-          </div>
-          <div class="chart-body">
-            <div class="empresa-list" id="empresa-list">
-              <p style="color:var(--text-light);font-size:.85rem;font-weight:500">Sin datos todavía.</p>
             </div>
           </div>
         </div>
@@ -1288,51 +1270,7 @@
 
     </div><!-- fin tab-agenda -->
 
-    <!-- ══ TAB SEGUIMIENTO ══════════════════════ -->
-    <div class="tab-panel" id="tab-seguimiento">
-
-      <!-- ALERTAS -->
-      <div class="seg-card" style="margin-bottom:14px">
-        <div class="seg-card-hdr">
-          <span class="seg-card-ttl">🔔 Alertas activas</span>
-          <span class="last-update-lbl" id="seg-last-update">Actualizado ahora</span>
-        </div>
-        <div class="seg-card-body">
-          <div class="alert-list" id="seg-alert-list">
-            <div class="loader"><div class="spinner"></div> Calculando alertas…</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="seg-grid">
-        <!-- VISITAS -->
-        <div class="seg-card">
-          <div class="seg-card-hdr">
-            <span class="seg-card-ttl">🏢 Estado de visitas / empresas</span>
-            <button class="seg-add-btn" onclick="abrirModalVisita()">+ Nueva</button>
-          </div>
-          <div class="seg-card-body">
-            <div class="visit-list" id="seg-visit-list">
-              <div style="color:var(--text-light);font-size:.78rem">Sin empresas registradas. Agrega una.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PROCESOS -->
-        <div class="seg-card">
-          <div class="seg-card-hdr">
-            <span class="seg-card-ttl">⚙️ Procesos en curso</span>
-            <button class="seg-add-btn" onclick="abrirModalProceso()">+ Nuevo</button>
-          </div>
-          <div class="seg-card-body">
-            <div class="proc-list" id="seg-proc-list">
-              <div style="color:var(--text-light);font-size:.78rem">Sin procesos registrados. Agrega uno.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- fin tab-seguimiento -->
+    </div><!-- fin tab-agenda -->
 
     <!-- ══ TAB ESTADÍSTICAS ══════════════════════ -->
     <div class="tab-panel" id="tab-estadisticas">
@@ -1385,6 +1323,41 @@
 
     </div><!-- fin tab-estadisticas -->
 
+  </div>
+</div>
+
+<!-- PANEL FLOTANTE SEGUIMIENTO -->
+<div class="seg-float-overlay" id="seg-float-overlay" onclick="toggleSegPanel()"></div>
+<div class="seg-float-panel" id="seg-float-panel">
+  <div class="seg-float-hdr">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700">📊 Seguimiento</span>
+      <button onclick="toggleSegPanel()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:50%;width:28px;height:28px;color:#fff;cursor:pointer;font-size:.85rem">✕</button>
+    </div>
+    <div style="font-size:.65rem;color:rgba(255,255,255,.4);margin-top:4px" id="seg-last-update">Actualizado ahora</div>
+  </div>
+  <div class="seg-float-body">
+    <!-- ALERTAS -->
+    <div class="sfp-section-ttl">🔔 Alertas</div>
+    <div id="seg-alert-list" style="margin-bottom:16px">
+      <div class="loader"><div class="spinner"></div></div>
+    </div>
+    <!-- VISITAS -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="sfp-section-ttl" style="margin-bottom:0">🏢 Visitas / Empresas</div>
+      <button class="seg-add-btn" onclick="abrirModalVisita()">+ Nueva</button>
+    </div>
+    <div class="visit-list" id="seg-visit-list" style="margin-bottom:16px">
+      <div style="color:var(--text-light);font-size:.75rem">Sin empresas.</div>
+    </div>
+    <!-- PROCESOS -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="sfp-section-ttl" style="margin-bottom:0">⚙️ Procesos</div>
+      <button class="seg-add-btn" onclick="abrirModalProceso()">+ Nuevo</button>
+    </div>
+    <div class="proc-list" id="seg-proc-list">
+      <div style="color:var(--text-light);font-size:.75rem">Sin procesos.</div>
+    </div>
   </div>
 </div>
 
@@ -2026,8 +1999,16 @@ function setTab(tab, btn) {
   document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
   btn.classList.add('active');
   document.getElementById('tab-' + tab).classList.add('active');
-  if (tab === 'seguimiento') { renderSegAlertas(); renderSegVisitas(); renderSegProcesos(); }
   if (tab === 'estadisticas') setTimeout(renderEstadisticas, 80);
+}
+
+// ══ PANEL FLOTANTE SEGUIMIENTO ════════════════════
+var segPanelOpen = false;
+function toggleSegPanel() {
+  segPanelOpen = !segPanelOpen;
+  document.getElementById('seg-float-panel').classList.toggle('open', segPanelOpen);
+  document.getElementById('seg-float-overlay').classList.toggle('open', segPanelOpen);
+  if (segPanelOpen) { renderSegAlertas(); renderSegVisitas(); renderSegProcesos(); }
 }
 
 // ══ NOTA DEL DÍA ADMIN ════════════════════════════
@@ -2146,6 +2127,7 @@ function renderEstadisticas() {
   document.getElementById('est-virt').textContent=virt;
   document.getElementById('est-virt-lbl').textContent=total>0?Math.round(virt/total*100)+'% virtual':'Virtual';
   document.getElementById('est-emps').textContent=Object.keys(empC).length;
+
   var semanas=[],semLbls=[],hoy=new Date();
   for(var w=11;w>=0;w--){
     var ini=new Date(hoy); ini.setDate(hoy.getDate()-(w*7+6)); ini.setHours(0,0,0,0);
@@ -2153,46 +2135,73 @@ function renderEstadisticas() {
     semanas.push(todasLasCitas.filter(function(ev){ var s=new Date(ev.start.dateTime); return s>=ini&&s<=fin; }).length);
     semLbls.push(ini.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'}));
   }
+
+  var yAxis = {
+    grid:{color:'rgba(200,211,222,.3)'},
+    ticks:{color:'#94A3B8',font:{size:10},stepSize:1,
+      callback:function(v){ return Number.isInteger(v)?v:''; }},
+    beginAtZero:true
+  };
+  var xAxis = { grid:{display:false}, ticks:{color:'#94A3B8',font:{size:10}} };
   var defs={responsive:true,plugins:{legend:{labels:{font:{family:'Plus Jakarta Sans',size:11},color:'#94A3B8'}}}};
+
   if(chTend) chTend.destroy();
-  chTend=new Chart(document.getElementById('ch-tendencia'),{ type:'line', data:{ labels:semLbls,
-    datasets:[{label:'Citas',data:semanas,borderColor:'#1ABC9C',backgroundColor:'rgba(26,188,156,.08)',
+  chTend=new Chart(document.getElementById('ch-tendencia'),{ type:'line',
+    data:{ labels:semLbls, datasets:[{label:'Citas',data:semanas,
+      borderColor:'#1ABC9C',backgroundColor:'rgba(26,188,156,.08)',
       borderWidth:2,pointBackgroundColor:'#1ABC9C',pointRadius:4,fill:true,tension:.4}]},
-    options:{...defs,scales:{x:{grid:{color:'rgba(200,211,222,.3)'},ticks:{color:'#94A3B8',font:{size:10}}},
-      y:{grid:{color:'rgba(200,211,222,.3)'},ticks:{color:'#94A3B8',font:{size:10},stepSize:1},beginAtZero:true}}}});
+    options:{...defs,scales:{x:{...xAxis},y:{...yAxis}}}});
+
   if(chMod) chMod.destroy();
   chMod=new Chart(document.getElementById('ch-modalidad'),{ type:'doughnut',
-    data:{labels:['Presencial','Virtual'],datasets:[{data:[pres,virt],backgroundColor:['#1ABC9C','#2980B9'],borderWidth:0,hoverOffset:6}]},
-    options:{...defs,cutout:'65%',plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:11},color:'#64748B'}}}}});
-  var empLista=Object.entries(empC).sort(function(a,b){return b[1]-a[1];}).slice(0,7);
+    data:{labels:['Presencial','Virtual'],
+      datasets:[{data:[pres,virt],backgroundColor:['#1ABC9C','#2980B9'],borderWidth:0,hoverOffset:6}]},
+    options:{...defs,cutout:'65%',
+      plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:11},color:'#64748B'}}}}});
+
+  // Top empresas — nombres abreviados con tooltip completo
+  var empLista=Object.entries(empC).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
+  var empLabels=empLista.map(function(e){
+    var n=e[0]; return n.length>14 ? n.substring(0,13)+'…' : n;
+  });
+  var empFull=empLista.map(function(e){ return e[0]; });
   if(chEmp) chEmp.destroy();
   chEmp=new Chart(document.getElementById('ch-empresas'),{ type:'bar',
-    data:{labels:empLista.map(function(e){return e[0].length>20?e[0].substring(0,20)+'…':e[0];}),
-      datasets:[{label:'Citas',data:empLista.map(function(e){return e[1];}),backgroundColor:'rgba(41,128,185,.75)',borderRadius:5,borderSkipped:false}]},
-    options:{...defs,scales:{x:{grid:{display:false},ticks:{color:'#94A3B8',font:{size:9}}},
-      y:{grid:{color:'rgba(200,211,222,.3)'},ticks:{color:'#94A3B8',font:{size:10},stepSize:1},beginAtZero:true}}}});
+    data:{labels:empLabels,
+      datasets:[{label:'Citas',data:empLista.map(function(e){return e[1];}),
+        backgroundColor:'rgba(41,128,185,.75)',borderRadius:5,borderSkipped:false}]},
+    options:{...defs,
+      plugins:{...defs.plugins,
+        tooltip:{callbacks:{title:function(items){ return empFull[items[0].dataIndex]; }}}},
+      scales:{
+        x:{grid:{display:false},ticks:{color:'#94A3B8',font:{size:9},maxRotation:35,minRotation:25}},
+        y:{...yAxis}}}});
+
   var diasN=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   if(chDia) chDia.destroy();
   chDia=new Chart(document.getElementById('ch-diasem'),{ type:'bar',
     data:{labels:diasN,datasets:[{label:'Citas',data:diasN.map(function(_,i){return diaC[i]||0;}),
       backgroundColor:['rgba(201,168,76,.6)','rgba(41,128,185,.8)','rgba(41,128,185,.8)','rgba(41,128,185,.8)','rgba(41,128,185,.8)','rgba(41,128,185,.8)','rgba(201,168,76,.6)'],
       borderRadius:5,borderSkipped:false}]},
-    options:{...defs,scales:{x:{grid:{display:false},ticks:{color:'#94A3B8',font:{size:11}}},
-      y:{grid:{color:'rgba(200,211,222,.3)'},ticks:{color:'#94A3B8',font:{size:10},stepSize:1},beginAtZero:true}}}});
+    options:{...defs,scales:{x:{...xAxis,ticks:{...xAxis.ticks,font:{size:11}}},y:{...yAxis}}}});
+
   var horas=[7,8,9,10,11,12,13,14,15,16,17,18];
   if(chHora) chHora.destroy();
   chHora=new Chart(document.getElementById('ch-hora'),{ type:'bar',
-    data:{labels:horas.map(function(h){return h+':00';}),datasets:[{label:'Citas',data:horas.map(function(h){return horaC[h]||0;}),
-      backgroundColor:'rgba(26,188,156,.75)',borderRadius:5,borderSkipped:false}]},
-    options:{...defs,scales:{x:{grid:{display:false},ticks:{color:'#94A3B8',font:{size:9}}},
-      y:{grid:{color:'rgba(200,211,222,.3)'},ticks:{color:'#94A3B8',font:{size:10},stepSize:1},beginAtZero:true}}}});
+    data:{labels:horas.map(function(h){return h+':00';}),
+      datasets:[{label:'Citas',data:horas.map(function(h){return horaC[h]||0;}),
+        backgroundColor:'rgba(26,188,156,.75)',borderRadius:5,borderSkipped:false}]},
+    options:{...defs,scales:{x:{...xAxis,ticks:{...xAxis.ticks,font:{size:9}}},y:{...yAxis}}}});
+
   var procs=getSegProcesos(),pC={alta:0,media:0,baja:0};
   procs.forEach(function(p){pC[p.prio]=(pC[p.prio]||0)+1;});
   if(chProc) chProc.destroy();
   chProc=new Chart(document.getElementById('ch-procesos'),{ type:'doughnut',
-    data:{labels:['Alta','Media','Baja'],datasets:[{data:[pC.alta,pC.media,pC.baja],
-      backgroundColor:['#DC2626','#C9A84C','#1ABC9C'],borderWidth:0,hoverOffset:6}]},
-    options:{...defs,cutout:'60%',plugins:{legend:{position:'bottom',labels:{padding:12,font:{size:11},color:'#64748B'}}}}});
+    data:{labels:['Alta','Media','Baja'],
+      datasets:[{data:[pC.alta,pC.media,pC.baja],
+        backgroundColor:['#DC2626','#C9A84C','#1ABC9C'],borderWidth:0,hoverOffset:6}]},
+    options:{...defs,cutout:'60%',
+      plugins:{legend:{position:'bottom',labels:{padding:12,font:{size:11},color:'#64748B'}}}}});
 }
 
 // ══ SEGUIMIENTO — STORAGE ═════════════════════════
@@ -2250,8 +2259,8 @@ function generarSegAlertas() {
 function renderSegAlertas() {
   var alertas = generarSegAlertas();
   var criticas = alertas.filter(function(a){ return a.tipo !== 'ok'; }).length;
-  document.getElementById('badge-alertas-admin').textContent = criticas;
-  document.getElementById('badge-alertas-admin').style.display = criticas > 0 ? 'inline' : 'none';
+  var badge = document.getElementById('badge-alertas-admin');
+  if (badge) { badge.textContent = criticas; badge.style.display = criticas > 0 ? 'inline' : 'none'; }
 
   if (alertas.length === 0) {
     document.getElementById('seg-alert-list').innerHTML = '<div class="alert-row ok"><span>✅</span><div class="alert-txt">Sin alertas activas. Todo al día.</div></div>';
