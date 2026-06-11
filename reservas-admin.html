@@ -366,6 +366,114 @@
   .spinner { width: 24px; height: 24px; border: 2.5px solid var(--border); border-top-color: var(--primary-lt); border-radius: 50%; animation: spin .75s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  /* ══ ANALYTICS DASHBOARD ══════════════════ */
+  .analytics-section {
+    margin-bottom: 20px;
+  }
+  .analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  @media(max-width: 700px) { .analytics-grid { grid-template-columns: 1fr; } }
+
+  .chart-card {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 1px solid rgba(221,228,238,.8);
+    overflow: hidden; position: relative;
+  }
+  .chart-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-md), var(--primary-lt), var(--accent));
+    opacity: 0; transition: opacity .35s;
+  }
+  .chart-card:hover::before { opacity: 1; }
+  .chart-card.full-width { grid-column: 1 / -1; }
+  .chart-header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border-lt);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .chart-title {
+    font-size: .68rem; font-weight: 800; letter-spacing: 1.8px;
+    text-transform: uppercase; color: var(--primary-lt);
+  }
+  .chart-body { padding: 20px; }
+
+  /* Heatmap */
+  .heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+  }
+  .heatmap-day-label {
+    text-align: center; font-size: .62rem; font-weight: 700;
+    color: var(--text-light); letter-spacing: .5px; padding-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .heatmap-cell {
+    aspect-ratio: 1; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .68rem; font-weight: 700;
+    cursor: default; transition: transform .15s;
+    position: relative;
+  }
+  .heatmap-cell:hover { transform: scale(1.15); z-index: 2; }
+  .heatmap-cell.empty { background: transparent; }
+  .heatmap-cell.no-citas { background: var(--surface-2); color: var(--text-light); border: 1px solid var(--border); }
+  .heatmap-cell.citas-1  { background: rgba(26,188,156,.18); color: #0E7A6C; border: 1px solid rgba(26,188,156,.3); }
+  .heatmap-cell.citas-2  { background: rgba(26,188,156,.35); color: #0A6054; border: 1px solid rgba(26,188,156,.45); }
+  .heatmap-cell.citas-3  { background: rgba(26,188,156,.55); color: #fff; border: 1px solid rgba(26,188,156,.6); }
+  .heatmap-cell.citas-4  { background: rgba(26,188,156,.75); color: #fff; border: 1px solid rgba(26,188,156,.8); }
+  .heatmap-cell.citas-5  { background: var(--accent); color: #fff; border: 1px solid var(--accent-dk); }
+  .heatmap-cell.hoy-cell { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .heatmap-legend {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 12px; font-size: .7rem; color: var(--text-muted); font-weight: 600;
+  }
+  .legend-block {
+    width: 14px; height: 14px; border-radius: 4px;
+  }
+
+  /* Barras semanales */
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  .bar-fill {
+    width: 100%; border-radius: 6px 6px 0 0;
+    background: linear-gradient(180deg, var(--primary-lt), var(--primary));
+    min-height: 4px; transition: height .4s cubic-bezier(.34,1.56,.64,1);
+    position: relative;
+  }
+  .bar-fill:hover { background: linear-gradient(180deg, var(--accent), var(--accent-dk)); }
+  .bar-val { font-size: .68rem; font-weight: 800; color: var(--primary); }
+  .bar-label { font-size: .6rem; color: var(--text-light); font-weight: 600; text-align: center; white-space: nowrap; }
+
+  /* Dona presencial/virtual */
+  .donut-wrap { display: flex; align-items: center; gap: 20px; }
+  .donut-svg { flex-shrink: 0; }
+  .donut-legend { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .donut-item { display: flex; align-items: center; gap: 8px; }
+  .donut-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .donut-item-label { font-size: .78rem; color: var(--text-muted); font-weight: 600; }
+  .donut-item-val { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-left: auto; }
+
+  /* Top empresas */
+  .empresa-list { display: flex; flex-direction: column; gap: 10px; }
+  .empresa-row { display: flex; align-items: center; gap: 10px; }
+  .empresa-rank {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+    color: #fff; font-size: .7rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .empresa-bar-wrap { flex: 1; }
+  .empresa-name { font-size: .78rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .empresa-bar-bg { background: var(--surface-2); border-radius: 4px; height: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .empresa-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--accent-dk), var(--accent)); transition: width .6s cubic-bezier(.34,1.56,.64,1); }
+  .empresa-count { font-size: .82rem; font-weight: 800; color: var(--primary); min-width: 24px; text-align: right; }
+
   /* ══ FOOTER ═══════════════════════════════ */
   footer {
     text-align: center; padding: 24px;
@@ -431,6 +539,92 @@
       </div>
     </div>
 
+    <!-- ANALYTICS DASHBOARD -->
+    <div class="analytics-section" id="analytics-section" style="display:none">
+      <div class="analytics-grid">
+
+        <!-- HEATMAP -->
+        <div class="chart-card full-width">
+          <div class="chart-header">
+            <span class="chart-title">🔥 Mapa de calor — citas del mes</span>
+          </div>
+          <div class="chart-body">
+            <div class="heatmap-grid" id="heatmap-labels"></div>
+            <div class="heatmap-grid" id="heatmap-grid" style="margin-top:4px"></div>
+            <div class="heatmap-legend">
+              <span>Menos</span>
+              <div class="legend-block" style="background:var(--surface-2);border:1px solid var(--border)"></div>
+              <div class="legend-block" style="background:rgba(26,188,156,.18)"></div>
+              <div class="legend-block" style="background:rgba(26,188,156,.35)"></div>
+              <div class="legend-block" style="background:rgba(26,188,156,.55)"></div>
+              <div class="legend-block" style="background:rgba(26,188,156,.75)"></div>
+              <div class="legend-block" style="background:var(--accent)"></div>
+              <span>Más</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- GRÁFICA SEMANAL -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">📊 Citas por semana (últimas 8)</span>
+          </div>
+          <div class="chart-body">
+            <div class="bar-chart" id="bar-semanal"></div>
+          </div>
+        </div>
+
+        <!-- DONA MODALIDAD -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">💻 Presencial vs Virtual</span>
+          </div>
+          <div class="chart-body">
+            <div class="donut-wrap">
+              <svg class="donut-svg" width="110" height="110" viewBox="0 0 110 110" id="donut-svg">
+                <circle cx="55" cy="55" r="40" fill="none" stroke="var(--border)" stroke-width="18"/>
+                <circle id="donut-presencial" cx="55" cy="55" r="40" fill="none"
+                  stroke="#1ABC9C" stroke-width="18"
+                  stroke-dasharray="0 251.2" stroke-linecap="round"
+                  transform="rotate(-90 55 55)" style="transition:stroke-dasharray .6s ease"/>
+                <circle id="donut-virtual" cx="55" cy="55" r="40" fill="none"
+                  stroke="#2980B9" stroke-width="18"
+                  stroke-dasharray="0 251.2" stroke-linecap="round"
+                  transform="rotate(-90 55 55)" style="transition:stroke-dasharray .6s ease"/>
+                <text x="55" y="52" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="18" font-weight="700" fill="#0C2D48" id="donut-total-text">0</text>
+                <text x="55" y="65" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="7.5" font-weight="700" fill="#94A3B8" letter-spacing="0.5">TOTAL</text>
+              </svg>
+              <div class="donut-legend">
+                <div class="donut-item">
+                  <div class="donut-dot" style="background:#1ABC9C"></div>
+                  <span class="donut-item-label">Presencial</span>
+                  <span class="donut-item-val" id="donut-n-presencial">0</span>
+                </div>
+                <div class="donut-item">
+                  <div class="donut-dot" style="background:#2980B9"></div>
+                  <span class="donut-item-label">Virtual</span>
+                  <span class="donut-item-val" id="donut-n-virtual">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TOP EMPRESAS -->
+        <div class="chart-card full-width">
+          <div class="chart-header">
+            <span class="chart-title">🏢 Top empresas del mes</span>
+          </div>
+          <div class="chart-body">
+            <div class="empresa-list" id="empresa-list">
+              <p style="color:var(--text-light);font-size:.85rem;font-weight:500">Sin datos todavía.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- FILTROS -->
     <div class="filters-bar">
       <button class="filter-btn active" onclick="setFiltro('hoy',this)">Hoy</button>
@@ -440,6 +634,7 @@
       <span class="filter-sep">|</span>
       <input type="date" id="filtro-fecha" onchange="setFiltro('fecha',null)">
       <button class="btn btn-primary" onclick="cargarCitas()" style="margin-left:auto;padding:8px 18px;font-size:.82rem">🔄 Actualizar</button>
+      <button class="btn btn-ghost" onclick="toggleAnalytics()" id="btn-analytics" style="padding:8px 18px;font-size:.82rem">📊 Ver estadísticas</button>
     </div>
 
     <!-- CITAS -->
@@ -680,6 +875,150 @@ async function bloquearHorario() {
   } catch(err) {
     result.innerHTML = '<div class="alert-error">⚠️ Error al bloquear.</div>';
   }
+}
+
+
+// ══ ANALYTICS ══════════════════════════════════════════
+
+var analyticsVisible = false;
+
+function toggleAnalytics() {
+  analyticsVisible = !analyticsVisible;
+  var sec = document.getElementById('analytics-section');
+  var btn = document.getElementById('btn-analytics');
+  sec.style.display = analyticsVisible ? 'block' : 'none';
+  btn.textContent = analyticsVisible ? '📊 Ocultar estadísticas' : '📊 Ver estadísticas';
+  if (analyticsVisible) renderAnalytics();
+}
+
+function renderAnalytics() {
+  renderHeatmap();
+  renderBarSemanal();
+  renderDonut();
+  renderTopEmpresas();
+}
+
+// === HEATMAP ===
+function renderHeatmap() {
+  var hoy = new Date();
+  var year = hoy.getFullYear(), month = hoy.getMonth();
+  var primerDia = new Date(year, month, 1).getDay(); // 0=dom
+  var diasMes = new Date(year, month + 1, 0).getDate();
+
+  // Contar citas por día del mes actual
+  var conteo = {};
+  todasLasCitas.forEach(function(ev) {
+    var d = new Date(ev.start.dateTime);
+    if (d.getFullYear() === year && d.getMonth() === month) {
+      var key = d.getDate();
+      conteo[key] = (conteo[key] || 0) + 1;
+    }
+  });
+
+  var labels = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  var labHtml = labels.map(function(l) {
+    return '<div class="heatmap-day-label">' + l + '</div>';
+  }).join('');
+  document.getElementById('heatmap-labels').innerHTML = labHtml;
+
+  var cells = '';
+  // Celdas vacías antes del primer día
+  for (var i = 0; i < primerDia; i++) cells += '<div class="heatmap-cell empty"></div>';
+
+  for (var d = 1; d <= diasMes; d++) {
+    var n = conteo[d] || 0;
+    var cls = n === 0 ? 'no-citas' : n === 1 ? 'citas-1' : n === 2 ? 'citas-2' : n === 3 ? 'citas-3' : n === 4 ? 'citas-4' : 'citas-5';
+    var esHoy = (d === hoy.getDate()) ? ' hoy-cell' : '';
+    var label = n > 0 ? n : d;
+    cells += '<div class="heatmap-cell ' + cls + esHoy + '" title="' + d + '/' + (month+1) + ': ' + n + ' cita(s)">' + label + '</div>';
+  }
+  document.getElementById('heatmap-grid').innerHTML = cells;
+}
+
+// === BARRAS SEMANALES ===
+function renderBarSemanal() {
+  var hoy = new Date(); hoy.setHours(23,59,59);
+  var semanas = [];
+  for (var w = 7; w >= 0; w--) {
+    var ini = new Date(hoy); ini.setDate(hoy.getDate() - (w*7 + 6)); ini.setHours(0,0,0,0);
+    var fin = new Date(hoy); fin.setDate(hoy.getDate() - w*7); fin.setHours(23,59,59);
+    var count = todasLasCitas.filter(function(ev) {
+      var s = new Date(ev.start.dateTime);
+      return s >= ini && s <= fin;
+    }).length;
+    var label = ini.toLocaleDateString('es-CO', {day:'2-digit', month:'2-digit'});
+    semanas.push({ label: label, count: count });
+  }
+
+  var max = Math.max.apply(null, semanas.map(function(s){ return s.count; })) || 1;
+  var html = semanas.map(function(s) {
+    var pct = Math.round((s.count / max) * 100);
+    return '<div class="bar-col">'
+      + '<div class="bar-val">' + (s.count > 0 ? s.count : '') + '</div>'
+      + '<div class="bar-fill" style="height:' + Math.max(pct, 4) + '%"></div>'
+      + '<div class="bar-label">' + s.label + '</div>'
+      + '</div>';
+  }).join('');
+  document.getElementById('bar-semanal').innerHTML = html;
+}
+
+// === DONA MODALIDAD ===
+function renderDonut() {
+  var presencial = 0, virtual = 0;
+  todasLasCitas.forEach(function(ev) {
+    var desc = ev.description || '';
+    var modal = (desc.match(/Modalidad: (.+)/) || [])[1] || 'Presencial';
+    if (modal.toLowerCase().includes('virtual')) virtual++;
+    else presencial++;
+  });
+  var total = presencial + virtual;
+  var circum = 251.2;
+  var pPres = total > 0 ? (presencial / total) * circum : 0;
+  var pVirt = total > 0 ? (virtual / total) * circum : 0;
+  var offset = total > 0 ? (presencial / total) * circum : 0;
+
+  document.getElementById('donut-presencial').setAttribute('stroke-dasharray', pPres + ' ' + (circum - pPres));
+  // Offset para virtual: empieza donde termina presencial
+  document.getElementById('donut-virtual').setAttribute('stroke-dasharray', pVirt + ' ' + (circum - pVirt));
+  document.getElementById('donut-virtual').setAttribute('transform', 'rotate(' + (-90 + (presencial/Math.max(total,1)*360)) + ' 55 55)');
+
+  document.getElementById('donut-total-text').textContent = total;
+  document.getElementById('donut-n-presencial').textContent = presencial;
+  document.getElementById('donut-n-virtual').textContent = virtual;
+}
+
+// === TOP EMPRESAS ===
+function renderTopEmpresas() {
+  var conteo = {};
+  todasLasCitas.forEach(function(ev) {
+    var desc = ev.description || '';
+    var empresa = (desc.match(/Empresa: (.+)/) || [])[1];
+    if (empresa && empresa.trim() && empresa.trim() !== '—') {
+      var key = empresa.trim();
+      conteo[key] = (conteo[key] || 0) + 1;
+    }
+  });
+  var lista = Object.keys(conteo).map(function(k) { return { nombre: k, n: conteo[k] }; });
+  lista.sort(function(a,b) { return b.n - a.n; });
+  lista = lista.slice(0, 6);
+
+  if (lista.length === 0) {
+    document.getElementById('empresa-list').innerHTML = '<p style="color:var(--text-light);font-size:.85rem;font-weight:500">Sin empresas registradas este período.</p>';
+    return;
+  }
+  var max = lista[0].n;
+  var html = lista.map(function(item, i) {
+    var pct = Math.round((item.n / max) * 100);
+    return '<div class="empresa-row">'
+      + '<div class="empresa-rank">' + (i+1) + '</div>'
+      + '<div class="empresa-bar-wrap">'
+        + '<div class="empresa-name">' + item.nombre + '</div>'
+        + '<div class="empresa-bar-bg"><div class="empresa-bar-fill" style="width:' + pct + '%"></div></div>'
+      + '</div>'
+      + '<div class="empresa-count">' + item.n + '</div>'
+    + '</div>';
+  }).join('');
+  document.getElementById('empresa-list').innerHTML = html;
 }
 
 function toDateStr(d) {
