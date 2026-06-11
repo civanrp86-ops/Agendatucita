@@ -703,6 +703,161 @@
     position: relative; z-index: 1; letter-spacing: .3px;
   }
   footer strong { color: var(--primary-md); font-weight: 700; }
+  /* ══ TABS ══════════════════════════════════ */
+  .tabs-bar {
+    display: flex; gap: 3px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 14px;
+    padding: 4px; width: fit-content; margin-bottom: 22px;
+    box-shadow: var(--shadow-sm); position: relative; z-index: 1;
+  }
+  .tab-btn {
+    font-size: .75rem; font-weight: 700; padding: 8px 18px;
+    border-radius: 10px; color: var(--text-muted); cursor: pointer;
+    display: flex; align-items: center; gap: 6px; border: none;
+    background: transparent; font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: all .2s; letter-spacing: .2px;
+  }
+  .tab-btn.active { background: var(--primary); color: #fff; }
+  .tab-btn:not(.active):hover { background: var(--surface-2); color: var(--text); }
+  .tab-badge {
+    font-size: .62rem; padding: 1px 7px; border-radius: 20px;
+    background: rgba(255,255,255,.15); color: rgba(255,255,255,.8);
+  }
+  .tab-badge.alerta { background: rgba(220,38,38,.12); color: var(--danger); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ══ SEGUIMIENTO ══════════════════════════ */
+  .seg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media(max-width:700px) { .seg-grid { grid-template-columns: 1fr; } }
+
+  .seg-card {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .seg-card-hdr {
+    padding: 14px 18px; border-bottom: 1px solid var(--border-lt);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .seg-card-ttl {
+    font-size: .68rem; font-weight: 800; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: .9px;
+  }
+  .seg-card-body { padding: 14px 18px; }
+  .seg-add-btn {
+    font-size: .68rem; font-weight: 700; color: var(--primary-lt);
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 3px 10px; cursor: pointer;
+    font-family: 'Plus Jakarta Sans',sans-serif; transition: all .2s;
+  }
+  .seg-add-btn:hover { background: var(--primary-lt); color: #fff; border-color: var(--primary-lt); }
+
+  /* Alertas */
+  .alert-list { display: flex; flex-direction: column; gap: 7px; }
+  .alert-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px; border: 1px solid transparent;
+  }
+  .alert-row.crit { background: rgba(220,38,38,.06); border-color: rgba(220,38,38,.2); }
+  .alert-row.warn { background: rgba(201,168,76,.06); border-color: rgba(201,168,76,.2); }
+  .alert-row.ok   { background: rgba(26,188,156,.06); border-color: rgba(26,188,156,.2); }
+  .alert-txt { flex: 1; font-size: .78rem; color: var(--text); line-height: 1.4; }
+  .alert-txt strong { font-weight: 700; }
+  .alert-pill {
+    font-size: .62rem; padding: 3px 9px; border-radius: 20px;
+    font-weight: 700; white-space: nowrap;
+  }
+  .ap-c { background: rgba(220,38,38,.1); color: var(--danger); border: 1px solid rgba(220,38,38,.2); }
+  .ap-w { background: rgba(201,168,76,.1); color: #92702A; border: 1px solid rgba(201,168,76,.25); }
+  .ap-o { background: rgba(26,188,156,.1); color: var(--accent-dk); border: 1px solid rgba(26,188,156,.2); }
+  .alert-time { font-size: .62rem; color: var(--text-light); white-space: nowrap; }
+
+  /* Visitas */
+  .visit-list { display: flex; flex-direction: column; gap: 7px; }
+  .visit-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: 10px;
+    background: var(--surface-2); border: 1px solid var(--border-lt);
+    cursor: pointer; transition: all .2s;
+  }
+  .visit-row:hover { border-color: var(--primary-lt); background: rgba(41,128,185,.04); }
+  .vdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .vd-ok { background: var(--accent); }
+  .vd-w  { background: var(--gold); }
+  .vd-c  { background: var(--danger); }
+  .vname { font-size: .78rem; font-weight: 700; color: var(--text); flex: 1; }
+  .vmeta { font-size: .65rem; color: var(--text-light); margin-top: 1px; }
+  .vbadge {
+    font-size: .62rem; padding: 2px 8px; border-radius: 20px;
+    font-weight: 700; display: inline-block;
+  }
+  .vb-ok { background: rgba(26,188,156,.1); color: var(--accent-dk); }
+  .vb-w  { background: rgba(201,168,76,.1); color: #92702A; }
+  .vb-c  { background: rgba(220,38,38,.1); color: var(--danger); }
+  .vnext { font-size: .68rem; font-weight: 700; text-align: right; margin-bottom: 3px; }
+  .vn-ok { color: var(--accent-dk); } .vn-w { color: #92702A; } .vn-c { color: var(--danger); }
+
+  /* Procesos */
+  .proc-list { display: flex; flex-direction: column; gap: 8px; }
+  .proc-row {
+    padding: 10px 12px; border-radius: 10px;
+    background: var(--surface-2); border: 1px solid var(--border-lt);
+  }
+  .proc-top { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+  .pname { font-size: .78rem; font-weight: 700; color: var(--text); }
+  .pemp  { font-size: .65rem; color: var(--text-light); margin-top: 1px; }
+  .pvence { font-size: .68rem; font-weight: 700; white-space: nowrap; }
+  .pv-ok { color: var(--accent-dk); } .pv-w { color: #92702A; } .pv-c { color: var(--danger); }
+  .prog-bg { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 3px; transition: width .5s ease; }
+  .pf-blue { background: var(--primary-lt); }
+  .pf-gold { background: var(--gold); }
+  .pf-green { background: var(--accent); }
+  .pf-red { background: var(--danger); }
+  .prog-meta { display: flex; justify-content: space-between; margin-top: 4px; }
+  .pmeta-lbl { font-size: .62rem; color: var(--text-light); }
+  .pmeta-pct { font-size: .65rem; font-weight: 700; color: var(--text-muted); }
+
+  /* Modales seguimiento */
+  .seg-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,22,40,.5); z-index: 400;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .seg-modal-overlay.open { display: flex; }
+  .seg-modal {
+    background: var(--surface); border-radius: var(--radius);
+    padding: 28px; max-width: 400px; width: 100%;
+    box-shadow: var(--shadow-md); animation: fadeUp .2s ease;
+  }
+  .seg-modal h3 {
+    font-family: 'Cormorant Garamond',serif; font-size: 1.3rem;
+    font-weight: 700; color: var(--primary); margin-bottom: 16px;
+  }
+  .seg-input {
+    width: 100%; padding: 10px 13px; border-radius: 10px;
+    border: 1.5px solid var(--border); background: var(--surface-2);
+    font-family: 'Plus Jakarta Sans',sans-serif; font-size: .82rem;
+    color: var(--text); outline: none; transition: all .2s; margin-bottom: 10px;
+  }
+  .seg-input:focus { border-color: var(--primary-lt); background: #fff; }
+  .seg-modal-btns { display: flex; gap: 8px; margin-top: 16px; }
+  .seg-btn-cancel {
+    flex: 1; padding: 9px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--surface-2);
+    color: var(--text-muted); font-family: 'Plus Jakarta Sans',sans-serif;
+    font-size: .78rem; font-weight: 700; cursor: pointer;
+  }
+  .seg-btn-save {
+    flex: 2; padding: 9px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+    color: #fff; font-family: 'Plus Jakarta Sans',sans-serif;
+    font-size: .78rem; font-weight: 700; cursor: pointer; transition: all .2s;
+  }
+  .seg-btn-save:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+  .last-update-lbl { font-size: .68rem; color: var(--text-light); }
+
 </style>
 </head>
 <body>
@@ -739,6 +894,18 @@
 <!-- ADMIN -->
 <div id="admin-screen">
   <div class="admin-container">
+
+    <!-- TABS -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" onclick="setTab('agenda', this)">📅 Agenda</button>
+      <button class="tab-btn" onclick="setTab('seguimiento', this)">
+        📊 Seguimiento
+        <span class="tab-badge alerta" id="badge-alertas-admin">0</span>
+      </button>
+    </div>
+
+    <!-- ══ TAB AGENDA ══════════════════════════ -->
+    <div class="tab-panel active" id="tab-agenda">
 
     <!-- STATS -->
     <div class="stats-grid">
@@ -887,6 +1054,93 @@
       <div id="block-result" style="padding:0 24px 18px"></div>
     </div>
 
+    </div><!-- fin tab-agenda -->
+
+    <!-- ══ TAB SEGUIMIENTO ══════════════════════ -->
+    <div class="tab-panel" id="tab-seguimiento">
+
+      <!-- ALERTAS -->
+      <div class="seg-card" style="margin-bottom:14px">
+        <div class="seg-card-hdr">
+          <span class="seg-card-ttl">🔔 Alertas activas</span>
+          <span class="last-update-lbl" id="seg-last-update">Actualizado ahora</span>
+        </div>
+        <div class="seg-card-body">
+          <div class="alert-list" id="seg-alert-list">
+            <div class="loader"><div class="spinner"></div> Calculando alertas…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="seg-grid">
+        <!-- VISITAS -->
+        <div class="seg-card">
+          <div class="seg-card-hdr">
+            <span class="seg-card-ttl">🏢 Estado de visitas / empresas</span>
+            <button class="seg-add-btn" onclick="abrirModalVisita()">+ Nueva</button>
+          </div>
+          <div class="seg-card-body">
+            <div class="visit-list" id="seg-visit-list">
+              <div style="color:var(--text-light);font-size:.78rem">Sin empresas registradas. Agrega una.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROCESOS -->
+        <div class="seg-card">
+          <div class="seg-card-hdr">
+            <span class="seg-card-ttl">⚙️ Procesos en curso</span>
+            <button class="seg-add-btn" onclick="abrirModalProceso()">+ Nuevo</button>
+          </div>
+          <div class="seg-card-body">
+            <div class="proc-list" id="seg-proc-list">
+              <div style="color:var(--text-light);font-size:.78rem">Sin procesos registrados. Agrega uno.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- fin tab-seguimiento -->
+
+  </div>
+</div>
+
+<!-- MODAL NUEVA VISITA -->
+<div class="seg-modal-overlay" id="modal-visita-overlay">
+  <div class="seg-modal">
+    <h3>🏢 Nueva empresa / visita</h3>
+    <input class="seg-input" type="text" id="nv-nombre" placeholder="Nombre de la empresa">
+    <input class="seg-input" type="number" id="nv-ciclo" placeholder="Ciclo máximo de visita (días)" value="15">
+    <label style="font-size:.72rem;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">Última visita realizada</label>
+    <input class="seg-input" type="date" id="nv-ultima">
+    <div class="seg-modal-btns">
+      <button class="seg-btn-cancel" onclick="cerrarModaleseg()">Cancelar</button>
+      <button class="seg-btn-save" onclick="guardarVisitaSeg()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVO PROCESO -->
+<div class="seg-modal-overlay" id="modal-proceso-overlay">
+  <div class="seg-modal">
+    <h3>⚙️ Nuevo proceso</h3>
+    <input class="seg-input" type="text" id="np-nombre" placeholder="Nombre del proceso">
+    <input class="seg-input" type="text" id="np-empresa" placeholder="Empresa asociada">
+    <label style="font-size:.72rem;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">Fecha de vencimiento</label>
+    <input class="seg-input" type="date" id="np-vence">
+    <label style="font-size:.72rem;color:var(--text-muted);font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px">
+      Avance actual <span id="np-pct-lbl">50%</span>
+    </label>
+    <input type="range" min="0" max="100" value="50" id="np-avance" style="width:100%;margin-bottom:10px" oninput="document.getElementById('np-pct-lbl').textContent=this.value+'%'">
+    <select class="seg-input" id="np-prio" style="margin-bottom:0">
+      <option value="alta">Alta prioridad</option>
+      <option value="media" selected>Media prioridad</option>
+      <option value="baja">Baja prioridad</option>
+    </select>
+    <div class="seg-modal-btns">
+      <button class="seg-btn-cancel" onclick="cerrarModaleseg()">Cancelar</button>
+      <button class="seg-btn-save" onclick="guardarProcesoSeg()">Guardar</button>
+    </div>
   </div>
 </div>
 
@@ -1480,6 +1734,207 @@ function getEstadoEmpresa(nombre) { return getEmpresaDatos(nombre).estado || 'no
 function toDateStr(d) {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
+// ══ TABS ══════════════════════════════════════════
+function setTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'seguimiento') {
+    renderSegAlertas();
+    renderSegVisitas();
+    renderSegProcesos();
+  }
+}
+
+// ══ SEGUIMIENTO — STORAGE ═════════════════════════
+function getSegVisitas()  { try { return JSON.parse(localStorage.getItem('seg_visitas'))  || []; } catch(e){ return []; } }
+function getSegProcesos() { try { return JSON.parse(localStorage.getItem('seg_procesos')) || []; } catch(e){ return []; } }
+function saveSegVisitas(v)  { localStorage.setItem('seg_visitas',  JSON.stringify(v)); }
+function saveSegProcesos(p) { localStorage.setItem('seg_procesos', JSON.stringify(p)); }
+
+// ══ ALERTAS ═══════════════════════════════════════
+function generarSegAlertas() {
+  var alertas = [];
+  var hoy = new Date(); hoy.setHours(0,0,0,0);
+
+  // Visitas vencidas o próximas a vencer
+  getSegVisitas().forEach(function(v) {
+    var ciclo  = parseInt(v.ciclo) || 15;
+    var ultima = v.ultimaVisita ? new Date(v.ultimaVisita) : null;
+    if (ultima) {
+      var dias = Math.floor((hoy - ultima) / 86400000);
+      if (dias > ciclo) {
+        alertas.push({ tipo:'crit', texto:'<strong>' + v.nombre + '</strong> — sin visita hace ' + dias + ' días. Ciclo máximo: ' + ciclo + ' días.', etiqueta:'Vencida', tiempo:'hoy' });
+      } else if (dias > ciclo - 3) {
+        alertas.push({ tipo:'warn', texto:'<strong>' + v.nombre + '</strong> — visita vence en ' + (ciclo - dias) + ' días.', etiqueta:(ciclo-dias)+' días', tiempo:'hoy' });
+      }
+    } else {
+      alertas.push({ tipo:'warn', texto:'<strong>' + v.nombre + '</strong> — sin visitas registradas aún.', etiqueta:'Sin visita', tiempo:'hoy' });
+    }
+  });
+
+  // Procesos vencidos o por vencer
+  getSegProcesos().forEach(function(p) {
+    if (!p.vence) return;
+    var vence = new Date(p.vence); vence.setHours(23,59,59);
+    var dias  = Math.floor((vence - hoy) / 86400000);
+    if (dias < 0) {
+      alertas.push({ tipo:'crit', texto:'<strong>' + p.nombre + '</strong> (' + p.empresa + ') — proceso vencido hace ' + Math.abs(dias) + ' día(s). Avance: ' + p.avance + '%.', etiqueta:'Vencido', tiempo:'hoy' });
+    } else if (dias === 0) {
+      alertas.push({ tipo:'crit', texto:'<strong>' + p.nombre + '</strong> (' + p.empresa + ') — vence hoy. Avance: ' + p.avance + '%.', etiqueta:'Hoy', tiempo:'hoy' });
+    } else if (dias <= 3) {
+      alertas.push({ tipo:'warn', texto:'<strong>' + p.nombre + '</strong> (' + p.empresa + ') — vence en ' + dias + ' día(s). Avance: ' + p.avance + '%.', etiqueta:dias+' días', tiempo:'hoy' });
+    }
+  });
+
+  // Citas del día como info
+  var fin_hoy = new Date(hoy); fin_hoy.setHours(23,59,59);
+  var citasHoy = todasLasCitas.filter(function(ev){ var s=new Date(ev.start.dateTime); return s>=hoy && s<=fin_hoy; });
+  if (citasHoy.length > 0) {
+    alertas.push({ tipo:'ok', texto:'Tienes <strong>' + citasHoy.length + ' cita(s)</strong> agendadas para hoy en el calendario.', etiqueta:'Hoy', tiempo:'ahora' });
+  }
+
+  alertas.sort(function(a,b){ var o={crit:0,warn:1,ok:2}; return o[a.tipo]-o[b.tipo]; });
+  return alertas;
+}
+
+function renderSegAlertas() {
+  var alertas = generarSegAlertas();
+  var criticas = alertas.filter(function(a){ return a.tipo !== 'ok'; }).length;
+  document.getElementById('badge-alertas-admin').textContent = criticas;
+  document.getElementById('badge-alertas-admin').style.display = criticas > 0 ? 'inline' : 'none';
+
+  if (alertas.length === 0) {
+    document.getElementById('seg-alert-list').innerHTML = '<div class="alert-row ok"><span>✅</span><div class="alert-txt">Sin alertas activas. Todo al día.</div></div>';
+    return;
+  }
+  document.getElementById('seg-alert-list').innerHTML = alertas.map(function(a) {
+    var ico = a.tipo==='crit' ? '🔴' : a.tipo==='warn' ? '🟡' : '🟢';
+    var pill = a.tipo==='crit' ? 'ap-c' : a.tipo==='warn' ? 'ap-w' : 'ap-o';
+    return '<div class="alert-row ' + a.tipo + '">'
+      + '<span style="font-size:.95rem">' + ico + '</span>'
+      + '<div class="alert-txt">' + a.texto + '</div>'
+      + '<span class="alert-pill ' + pill + '">' + a.etiqueta + '</span>'
+      + '<span class="alert-time">' + a.tiempo + '</span>'
+      + '</div>';
+  }).join('');
+  document.getElementById('seg-last-update').textContent = 'Actualizado ahora';
+}
+
+// ══ VISITAS ═══════════════════════════════════════
+function renderSegVisitas() {
+  var visitas = getSegVisitas();
+  if (visitas.length === 0) {
+    document.getElementById('seg-visit-list').innerHTML = '<div style="color:var(--text-light);font-size:.78rem">Sin empresas registradas. Usa + Nueva.</div>';
+    return;
+  }
+  var hoy = new Date(); hoy.setHours(0,0,0,0);
+  document.getElementById('seg-visit-list').innerHTML = visitas.map(function(v, i) {
+    var ciclo  = parseInt(v.ciclo) || 15;
+    var ultima = v.ultimaVisita ? new Date(v.ultimaVisita) : null;
+    var dias   = ultima ? Math.floor((hoy - ultima) / 86400000) : 999;
+    var estado = dias > ciclo ? 'crit' : dias > ciclo - 3 ? 'warn' : 'ok';
+    var dotCls   = estado==='crit' ? 'vd-c' : estado==='warn' ? 'vd-w' : 'vd-ok';
+    var badgeCls = estado==='crit' ? 'vb-c' : estado==='warn' ? 'vb-w' : 'vb-ok';
+    var badgeTxt = estado==='crit' ? 'Vencida' : estado==='warn' ? 'Próxima' : 'Al día';
+    var metaTxt  = ultima ? 'Última: hace ' + dias + ' días' : 'Sin visitas registradas';
+    // Próxima cita de esta empresa en calendario
+    var proxCita = todasLasCitas.filter(function(ev) {
+      var desc = ev.description || '';
+      var emp  = ((desc.match(/Empresa: (.+)/) || [])[1] || '');
+      return emp === v.nombre && new Date(ev.start.dateTime) >= hoy;
+    }).sort(function(a,b){ return new Date(a.start.dateTime)-new Date(b.start.dateTime); })[0];
+    var proxTxt = proxCita ? new Date(proxCita.start.dateTime).toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'}) : 'Sin agendar';
+    var proxCol = proxCita ? 'vn-ok' : 'vn-c';
+    return '<div class="visit-row" onclick="abrirEmpresaPanel(\'' + v.nombre.replace(/'/g,"\\'") + '\')">'
+      + '<span class="vdot ' + dotCls + '"></span>'
+      + '<div style="flex:1"><div class="vname">' + v.nombre + '</div><div class="vmeta">' + metaTxt + '</div></div>'
+      + '<div style="text-align:right">'
+        + '<div class="vnext ' + proxCol + '">Próx: ' + proxTxt + '</div>'
+        + '<span class="vbadge ' + badgeCls + '">' + badgeTxt + '</span>'
+      + '</div>'
+      + '<button onclick="event.stopPropagation();eliminarVisita(' + i + ')" style="background:none;border:none;cursor:pointer;color:var(--text-light);font-size:.8rem;margin-left:8px;padding:2px">✕</button>'
+      + '</div>';
+  }).join('');
+}
+
+// ══ PROCESOS ══════════════════════════════════════
+function renderSegProcesos() {
+  var procs = getSegProcesos();
+  if (procs.length === 0) {
+    document.getElementById('seg-proc-list').innerHTML = '<div style="color:var(--text-light);font-size:.78rem">Sin procesos registrados. Usa + Nuevo.</div>';
+    return;
+  }
+  var hoy = new Date(); hoy.setHours(0,0,0,0);
+  document.getElementById('seg-proc-list').innerHTML = procs.map(function(p, i) {
+    var vence = p.vence ? new Date(p.vence) : null;
+    var dias  = vence ? Math.floor((vence - hoy) / 86400000) : 999;
+    var pCol  = dias < 0 ? 'pv-c' : dias <= 3 ? 'pv-w' : 'pv-ok';
+    var pTxt  = dias < 0 ? 'Vencido' : dias === 0 ? 'Vence hoy' : 'Vence en ' + dias + ' días';
+    var pFill = p.avance >= 80 ? 'pf-green' : p.avance >= 50 ? 'pf-blue' : p.avance >= 25 ? 'pf-gold' : 'pf-red';
+    return '<div class="proc-row">'
+      + '<div class="proc-top">'
+        + '<div style="flex:1"><div class="pname">' + p.nombre + '</div><div class="pemp">' + p.empresa + '</div></div>'
+        + '<span class="pvence ' + pCol + '">' + pTxt + '</span>'
+        + '<button onclick="eliminarProceso(' + i + ')" style="background:none;border:none;cursor:pointer;color:var(--text-light);font-size:.8rem;margin-left:8px">✕</button>'
+      + '</div>'
+      + '<div class="prog-bg"><div class="prog-fill ' + pFill + '" style="width:' + p.avance + '%"></div></div>'
+      + '<div class="prog-meta"><span class="pmeta-lbl">Avance</span><span class="pmeta-pct">' + p.avance + '%</span></div>'
+      + '</div>';
+  }).join('');
+}
+
+// ══ MODALES ═══════════════════════════════════════
+function abrirModalVisita()  { document.getElementById('modal-visita-overlay').classList.add('open'); }
+function abrirModalProceso() { document.getElementById('modal-proceso-overlay').classList.add('open'); }
+function cerrarModaleseg() {
+  document.getElementById('modal-visita-overlay').classList.remove('open');
+  document.getElementById('modal-proceso-overlay').classList.remove('open');
+}
+
+function guardarVisitaSeg() {
+  var nombre = document.getElementById('nv-nombre').value.trim();
+  var ciclo  = document.getElementById('nv-ciclo').value || '15';
+  var ultima = document.getElementById('nv-ultima').value;
+  if (!nombre) { document.getElementById('nv-nombre').focus(); return; }
+  var vs = getSegVisitas();
+  vs.push({ nombre: nombre, ciclo: ciclo, ultimaVisita: ultima });
+  saveSegVisitas(vs);
+  cerrarModaleseg();
+  renderSegVisitas();
+  renderSegAlertas();
+  document.getElementById('nv-nombre').value = '';
+  document.getElementById('nv-ultima').value = '';
+}
+
+function eliminarVisita(i) {
+  var vs = getSegVisitas(); vs.splice(i,1); saveSegVisitas(vs);
+  renderSegVisitas(); renderSegAlertas();
+}
+
+function guardarProcesoSeg() {
+  var nombre  = document.getElementById('np-nombre').value.trim();
+  var empresa = document.getElementById('np-empresa').value.trim();
+  var vence   = document.getElementById('np-vence').value;
+  var avance  = parseInt(document.getElementById('np-avance').value) || 50;
+  var prio    = document.getElementById('np-prio').value;
+  if (!nombre) { document.getElementById('np-nombre').focus(); return; }
+  var ps = getSegProcesos();
+  ps.push({ nombre: nombre, empresa: empresa, vence: vence, avance: avance, prio: prio });
+  saveSegProcesos(ps);
+  cerrarModaleseg();
+  renderSegProcesos();
+  renderSegAlertas();
+  document.getElementById('np-nombre').value = '';
+  document.getElementById('np-empresa').value = '';
+}
+
+function eliminarProceso(i) {
+  var ps = getSegProcesos(); ps.splice(i,1); saveSegProcesos(ps);
+  renderSegProcesos(); renderSegAlertas();
+}
+
 </script>
 </body>
 </html>
