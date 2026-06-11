@@ -402,40 +402,94 @@
   }
   .chart-body { padding: 20px; }
 
-  /* Heatmap */
-  .heatmap-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
+  /* ══ CALENDARIO MENSUAL INTERACTIVO ══════ */
+  .cal-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
   }
-  .heatmap-day-label {
-    text-align: center; font-size: .62rem; font-weight: 700;
-    color: var(--text-light); letter-spacing: .5px; padding-bottom: 4px;
-    text-transform: uppercase;
-  }
-  .heatmap-cell {
-    aspect-ratio: 1; border-radius: 6px;
+  .cal-nav-btn {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 1.5px solid var(--border); background: var(--surface-2);
+    font-size: 1rem; cursor: pointer; color: var(--primary-md);
     display: flex; align-items: center; justify-content: center;
-    font-size: .68rem; font-weight: 700;
-    cursor: default; transition: transform .15s;
-    position: relative;
+    transition: all .2s; font-weight: 700;
   }
-  .heatmap-cell:hover { transform: scale(1.15); z-index: 2; }
-  .heatmap-cell.empty { background: transparent; }
-  .heatmap-cell.no-citas { background: var(--surface-2); color: var(--text-light); border: 1px solid var(--border); }
-  .heatmap-cell.citas-1  { background: rgba(26,188,156,.18); color: #0E7A6C; border: 1px solid rgba(26,188,156,.3); }
-  .heatmap-cell.citas-2  { background: rgba(26,188,156,.35); color: #0A6054; border: 1px solid rgba(26,188,156,.45); }
-  .heatmap-cell.citas-3  { background: rgba(26,188,156,.55); color: #fff; border: 1px solid rgba(26,188,156,.6); }
-  .heatmap-cell.citas-4  { background: rgba(26,188,156,.75); color: #fff; border: 1px solid rgba(26,188,156,.8); }
-  .heatmap-cell.citas-5  { background: var(--accent); color: #fff; border: 1px solid var(--accent-dk); }
-  .heatmap-cell.hoy-cell { outline: 2px solid var(--gold); outline-offset: 1px; }
-  .heatmap-legend {
-    display: flex; align-items: center; gap: 6px;
-    margin-top: 12px; font-size: .7rem; color: var(--text-muted); font-weight: 600;
+  .cal-nav-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .cal-month-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem; font-weight: 700; color: var(--primary);
+    letter-spacing: -.3px;
   }
-  .legend-block {
-    width: 14px; height: 14px; border-radius: 4px;
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
   }
+  .cal-dow {
+    text-align: center; font-size: .62rem; font-weight: 800;
+    color: var(--text-light); letter-spacing: .8px;
+    text-transform: uppercase; padding: 4px 0 8px;
+  }
+  .cal-cell {
+    border-radius: 10px; min-height: 62px; padding: 6px;
+    border: 1.5px solid transparent;
+    background: var(--surface-2);
+    cursor: pointer; transition: all .2s;
+    position: relative; overflow: hidden;
+  }
+  .cal-cell.empty { background: transparent; cursor: default; border-color: transparent; }
+  .cal-cell:not(.empty):hover { border-color: var(--primary-lt); background: #fff; transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+  .cal-cell.hoy { border-color: var(--gold) !important; background: rgba(201,168,76,.06); }
+  .cal-cell.selected { border-color: var(--primary-lt) !important; background: rgba(41,128,185,.07); box-shadow: 0 0 0 3px rgba(41,128,185,.15); }
+  .cal-cell.tiene-citas { background: #fff; border-color: rgba(26,188,156,.25); }
+  .cal-cell-num {
+    font-size: .75rem; font-weight: 800; color: var(--text-muted);
+    line-height: 1; margin-bottom: 4px;
+  }
+  .cal-cell.hoy .cal-cell-num { color: var(--gold); }
+  .cal-cell.tiene-citas .cal-cell-num { color: var(--primary); }
+  .cal-dot-wrap { display: flex; flex-wrap: wrap; gap: 2px; }
+  .cal-dot {
+    height: 6px; border-radius: 3px;
+    background: var(--accent); flex-shrink: 0;
+    transition: width .3s;
+  }
+  .cal-dot.presencial { background: var(--accent); }
+  .cal-dot.virtual    { background: var(--primary-lt); }
+  .cal-count-badge {
+    position: absolute; bottom: 5px; right: 6px;
+    font-size: .6rem; font-weight: 800; color: var(--accent-dk);
+    background: rgba(26,188,156,.12); border-radius: 6px; padding: 1px 5px;
+    border: 1px solid rgba(26,188,156,.2);
+  }
+
+  /* Panel detalle día */
+  .day-detail-panel {
+    background: linear-gradient(135deg, rgba(12,45,72,.03), rgba(41,128,185,.04));
+    border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 16px 18px;
+    margin-top: 14px; display: none;
+    animation: slideDown .25s ease;
+  }
+  .day-detail-panel.open { display: block; }
+  @keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+  .day-detail-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem; font-weight: 700; color: var(--primary);
+    margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .day-cita-pill {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; border-radius: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    margin-bottom: 6px; cursor: pointer; transition: all .2s;
+  }
+  .day-cita-pill:hover { border-color: var(--primary-lt); background: rgba(41,128,185,.04); }
+  .day-cita-hora { font-size: .78rem; font-weight: 800; color: var(--primary); min-width: 48px; }
+  .day-cita-nombre { font-size: .82rem; font-weight: 700; color: var(--text); flex: 1; }
+  .day-cita-empresa { font-size: .72rem; color: #92702A; background: rgba(201,168,76,.1); border-radius: 6px; padding: 2px 8px; font-weight: 700; }
+  .day-cita-modal { font-size: .68rem; font-weight: 700; border-radius: 6px; padding: 2px 8px; }
+  .day-cita-modal.presencial { background: rgba(26,188,156,.1); color: var(--accent-dk); }
+  .day-cita-modal.virtual    { background: rgba(41,128,185,.1); color: var(--primary-lt); }
 
   /* Barras semanales */
   .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; }
@@ -473,6 +527,118 @@
   .empresa-bar-bg { background: var(--surface-2); border-radius: 4px; height: 8px; overflow: hidden; border: 1px solid var(--border); }
   .empresa-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--accent-dk), var(--accent)); transition: width .6s cubic-bezier(.34,1.56,.64,1); }
   .empresa-count { font-size: .82rem; font-weight: 800; color: var(--primary); min-width: 24px; text-align: right; }
+
+  /* ══ PANEL LATERAL EMPRESA ════════════════ */
+  .empresa-panel-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,22,40,.45); backdrop-filter: blur(3px);
+    z-index: 300;
+  }
+  .empresa-panel-overlay.open { display: block; }
+  .empresa-panel {
+    position: fixed; top: 0; right: -480px; width: 460px; max-width: 95vw;
+    height: 100vh; background: var(--surface);
+    box-shadow: -8px 0 48px rgba(12,45,72,.18);
+    z-index: 301; display: flex; flex-direction: column;
+    transition: right .35s cubic-bezier(.4,0,.2,1);
+    overflow: hidden;
+  }
+  .empresa-panel.open { right: 0; }
+  .ep-header {
+    padding: 22px 24px 18px;
+    background: linear-gradient(135deg, #071828, #0C2D48, #1B4F72);
+    color: #fff; flex-shrink: 0;
+  }
+  .ep-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .ep-nombre {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; font-weight: 700; letter-spacing: -.3px;
+  }
+  .ep-close {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.1);
+    color: #fff; font-size: 1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s;
+  }
+  .ep-close:hover { background: rgba(255,255,255,.25); }
+  .ep-stats-row { display: flex; gap: 16px; margin-top: 10px; }
+  .ep-stat { text-align: center; }
+  .ep-stat-val { font-family: 'Cormorant Garamond',serif; font-size: 1.4rem; font-weight: 700; line-height:1; }
+  .ep-stat-lbl { font-size: .62rem; opacity: .65; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+
+  /* Estado selector */
+  .ep-estado-row { display: flex; gap: 8px; padding: 14px 24px; border-bottom: 1px solid var(--border-lt); flex-shrink: 0; }
+  .ep-estado-btn {
+    flex: 1; padding: 8px 4px; border-radius: 10px; border: 2px solid transparent;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: .72rem; font-weight: 800;
+    cursor: pointer; transition: all .2s; text-align: center;
+  }
+  .ep-estado-btn.normal   { background: rgba(26,188,156,.08);  color: #065F46; border-color: rgba(26,188,156,.2); }
+  .ep-estado-btn.pendiente{ background: rgba(234,179,8,.08);   color: #854D0E; border-color: rgba(234,179,8,.2); }
+  .ep-estado-btn.novedad  { background: rgba(220,38,38,.08);   color: #991B1B; border-color: rgba(220,38,38,.2); }
+  .ep-estado-btn.normal.active   { background: rgba(26,188,156,.2);  border-color: #1ABC9C; }
+  .ep-estado-btn.pendiente.active{ background: rgba(234,179,8,.2);   border-color: #EAB308; }
+  .ep-estado-btn.novedad.active  { background: rgba(220,38,38,.2);   border-color: #DC2626; }
+
+  .ep-body { flex: 1; overflow-y: auto; padding: 18px 24px; display: flex; flex-direction: column; gap: 18px; }
+
+  /* Notas */
+  .ep-section-title { font-size: .65rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--primary-lt); margin-bottom: 8px; }
+  .ep-nota-area {
+    width: 100%; min-height: 90px; border-radius: 12px;
+    border: 1.5px solid var(--border); padding: 12px 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: .88rem;
+    color: var(--text); background: var(--surface-2); resize: vertical;
+    outline: none; line-height: 1.6; transition: all .25s;
+  }
+  .ep-nota-area:focus { border-color: var(--primary-lt); background: #fff; box-shadow: 0 0 0 4px rgba(41,128,185,.08); }
+  .ep-nota-actions { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+  .ep-save-btn {
+    padding: 8px 18px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+    color: #fff; font-family: 'Plus Jakarta Sans',sans-serif;
+    font-size: .78rem; font-weight: 800; cursor: pointer;
+    transition: all .25s; box-shadow: 0 3px 10px rgba(12,45,72,.2);
+  }
+  .ep-save-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(12,45,72,.3); }
+  .ep-saved-lbl { font-size: .72rem; color: var(--accent-dk); font-weight: 700; opacity: 0; transition: opacity .3s; }
+  .ep-saved-lbl.show { opacity: 1; }
+
+  /* Contacto */
+  .ep-contacto-input {
+    width: 100%; padding: 10px 14px; border-radius: 10px;
+    border: 1.5px solid var(--border); background: var(--surface-2);
+    font-family: 'Plus Jakarta Sans',sans-serif; font-size: .88rem; color: var(--text);
+    outline: none; transition: all .25s; font-weight: 500;
+  }
+  .ep-contacto-input:focus { border-color: var(--primary-lt); background: #fff; }
+
+  /* Historial en panel */
+  .ep-hist-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; border-radius: 10px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    margin-bottom: 6px; font-size: .78rem;
+  }
+  .ep-hist-fecha { font-weight: 800; color: var(--primary); min-width: 70px; }
+  .ep-hist-detalle { flex: 1; color: var(--text-muted); }
+  .ep-hist-modal { font-size: .68rem; font-weight: 700; border-radius: 6px; padding: 2px 8px; }
+  .ep-hist-modal.presencial { background: rgba(26,188,156,.1); color: var(--accent-dk); }
+  .ep-hist-modal.virtual    { background: rgba(41,128,185,.1); color: var(--primary-lt); }
+
+  /* ══ ESTADO BADGE en cita ══════════════════ */
+  .estado-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: .7rem; font-weight: 800; border-radius: 20px;
+    padding: 3px 10px; cursor: pointer; border: 1.5px solid transparent;
+    transition: all .2s; flex-shrink: 0;
+  }
+  .estado-badge.normal    { background: rgba(26,188,156,.1);  color: #065F46; border-color: rgba(26,188,156,.25); }
+  .estado-badge.pendiente { background: rgba(234,179,8,.1);   color: #854D0E; border-color: rgba(234,179,8,.3); }
+  .estado-badge.novedad   { background: rgba(220,38,38,.1);   color: #991B1B; border-color: rgba(220,38,38,.25); }
+  .cita-tag.empresa-clickable { cursor: pointer; transition: all .2s; }
+  .cita-tag.empresa-clickable:hover { background: rgba(201,168,76,.15); border-color: var(--gold); color: #7A5C20; transform: translateY(-1px); }
 
   /* ══ FOOTER ═══════════════════════════════ */
   footer {
@@ -543,23 +709,22 @@
     <div class="analytics-section" id="analytics-section" style="display:none">
       <div class="analytics-grid">
 
-        <!-- HEATMAP -->
+        <!-- CALENDARIO MENSUAL INTERACTIVO -->
         <div class="chart-card full-width">
           <div class="chart-header">
-            <span class="chart-title">🔥 Mapa de calor — citas del mes</span>
+            <span class="chart-title">📅 Calendario de agendamiento</span>
           </div>
           <div class="chart-body">
-            <div class="heatmap-grid" id="heatmap-labels"></div>
-            <div class="heatmap-grid" id="heatmap-grid" style="margin-top:4px"></div>
-            <div class="heatmap-legend">
-              <span>Menos</span>
-              <div class="legend-block" style="background:var(--surface-2);border:1px solid var(--border)"></div>
-              <div class="legend-block" style="background:rgba(26,188,156,.18)"></div>
-              <div class="legend-block" style="background:rgba(26,188,156,.35)"></div>
-              <div class="legend-block" style="background:rgba(26,188,156,.55)"></div>
-              <div class="legend-block" style="background:rgba(26,188,156,.75)"></div>
-              <div class="legend-block" style="background:var(--accent)"></div>
-              <span>Más</span>
+            <div class="cal-nav">
+              <button class="cal-nav-btn" onclick="calCambiarMes(-1)">‹</button>
+              <span class="cal-month-label" id="cal-month-label">—</span>
+              <button class="cal-nav-btn" onclick="calCambiarMes(1)">›</button>
+            </div>
+            <div class="cal-grid" id="cal-dow-row"></div>
+            <div class="cal-grid" id="cal-body" style="margin-top:2px"></div>
+            <div class="day-detail-panel" id="day-detail-panel">
+              <div class="day-detail-title" id="day-detail-title">📋 Citas del día</div>
+              <div id="day-detail-list"></div>
             </div>
           </div>
         </div>
@@ -667,6 +832,45 @@
       <div id="block-result" style="padding:0 24px 18px"></div>
     </div>
 
+  </div>
+</div>
+
+<!-- PANEL LATERAL EMPRESA -->
+<div class="empresa-panel-overlay" id="ep-overlay" onclick="cerrarEmpresaPanel()"></div>
+<div class="empresa-panel" id="empresa-panel">
+  <div class="ep-header">
+    <div class="ep-header-top">
+      <div class="ep-nombre" id="ep-nombre">—</div>
+      <button class="ep-close" onclick="cerrarEmpresaPanel()">✕</button>
+    </div>
+    <div class="ep-stats-row">
+      <div class="ep-stat"><div class="ep-stat-val" id="ep-total">0</div><div class="ep-stat-lbl">Citas totales</div></div>
+      <div class="ep-stat"><div class="ep-stat-val" id="ep-mes">0</div><div class="ep-stat-lbl">Este mes</div></div>
+      <div class="ep-stat"><div class="ep-stat-val" id="ep-ultima">—</div><div class="ep-stat-lbl">Última cita</div></div>
+    </div>
+  </div>
+  <div class="ep-estado-row">
+    <button class="ep-estado-btn normal active" id="ep-btn-normal" onclick="setEstadoEmpresa('normal')">🟢 Normal</button>
+    <button class="ep-estado-btn pendiente" id="ep-btn-pendiente" onclick="setEstadoEmpresa('pendiente')">🟡 Pendiente</button>
+    <button class="ep-estado-btn novedad" id="ep-btn-novedad" onclick="setEstadoEmpresa('novedad')">🔴 Novedad</button>
+  </div>
+  <div class="ep-body">
+    <div>
+      <div class="ep-section-title">📝 Notas</div>
+      <textarea class="ep-nota-area" id="ep-nota" placeholder="Ej: Reagendar para la próxima semana, no se realizó por ausencia del coordinador…"></textarea>
+      <div class="ep-nota-actions">
+        <button class="ep-save-btn" onclick="guardarDatosEmpresa()">💾 Guardar</button>
+        <span class="ep-saved-lbl" id="ep-saved-lbl">✓ Guardado</span>
+      </div>
+    </div>
+    <div>
+      <div class="ep-section-title">📞 Contacto principal</div>
+      <input class="ep-contacto-input" type="text" id="ep-contacto" placeholder="Nombre y teléfono del contacto…" oninput="clearSavedLbl()">
+    </div>
+    <div>
+      <div class="ep-section-title">🗓 Historial de citas</div>
+      <div id="ep-historial"></div>
+    </div>
   </div>
 </div>
 
@@ -822,10 +1026,11 @@ function renderCitas() {
       + '<div class="cita-info"><h4>👤 ' + nombre + '</h4>'
       + '<div class="cita-meta">'
       + '<span class="cita-tag">📱 ' + tel + '</span>'
-      + (empresa ? '<span class="cita-tag empresa">🏢 ' + empresa + '</span>' : '')
+      + (empresa ? '<span class="cita-tag empresa empresa-clickable" onclick="abrirEmpresaPanel(\'' + empresa.replace(/'/g,"\\'") + '\')">🏢 ' + empresa + '</span>' : '')
       + (email ? '<span class="cita-tag">✉️ ' + email + '</span>' : '')
       + '<span class="cita-tag">📝 ' + motivo + '</span>'
       + '<span class="cita-tag ' + modClass + '">' + (modClass==='virtual'?'💻':'🏥') + ' ' + modal + '</span>'
+      + (empresa ? '<span class="estado-badge ' + getEstadoEmpresa(empresa) + '" onclick="abrirEmpresaPanel(\'' + empresa.replace(/'/g,"\\'") + '\')">' + (getEstadoEmpresa(empresa)==='pendiente'?'🟡 Pendiente':getEstadoEmpresa(empresa)==='novedad'?'🔴 Novedad':'🟢 Normal') + '</span>' : '')
       + '</div></div>'
       + '<div class="cita-actions">'
       + '<span class="hora-badge">🕐 ' + horaIni + ' – ' + horaFin + '</span>'
@@ -878,9 +1083,10 @@ async function bloquearHorario() {
 }
 
 
-// ══ ANALYTICS ══════════════════════════════════════════
 
+// ══ ANALYTICS ══════════════════════════════════════════
 var analyticsVisible = false;
+var calYear, calMonth, calDiaSeleccionado = null;
 
 function toggleAnalytics() {
   analyticsVisible = !analyticsVisible;
@@ -892,50 +1098,118 @@ function toggleAnalytics() {
 }
 
 function renderAnalytics() {
-  renderHeatmap();
+  var hoy = new Date();
+  if (!calYear) { calYear = hoy.getFullYear(); calMonth = hoy.getMonth(); }
+  renderCalendario();
   renderBarSemanal();
   renderDonut();
   renderTopEmpresas();
 }
 
-// === HEATMAP ===
-function renderHeatmap() {
-  var hoy = new Date();
-  var year = hoy.getFullYear(), month = hoy.getMonth();
-  var primerDia = new Date(year, month, 1).getDay(); // 0=dom
-  var diasMes = new Date(year, month + 1, 0).getDate();
+// ══ CALENDARIO MENSUAL INTERACTIVO ══════════════════════
+function calCambiarMes(delta) {
+  calMonth += delta;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  calDiaSeleccionado = null;
+  document.getElementById('day-detail-panel').classList.remove('open');
+  renderCalendario();
+}
 
-  // Contar citas por día del mes actual
-  var conteo = {};
+function renderCalendario() {
+  var hoy = new Date();
+  var meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('cal-month-label').textContent = meses[calMonth] + ' ' + calYear;
+
+  // Días de la semana
+  var dows = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  document.getElementById('cal-dow-row').innerHTML = dows.map(function(d) {
+    return '<div class="cal-dow">' + d + '</div>';
+  }).join('');
+
+  // Conteo de citas por día
+  var conteo = {}, citasPorDia = {};
   todasLasCitas.forEach(function(ev) {
     var d = new Date(ev.start.dateTime);
-    if (d.getFullYear() === year && d.getMonth() === month) {
+    if (d.getFullYear() === calYear && d.getMonth() === calMonth) {
       var key = d.getDate();
       conteo[key] = (conteo[key] || 0) + 1;
+      if (!citasPorDia[key]) citasPorDia[key] = [];
+      citasPorDia[key].push(ev);
     }
   });
 
-  var labels = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  var labHtml = labels.map(function(l) {
-    return '<div class="heatmap-day-label">' + l + '</div>';
-  }).join('');
-  document.getElementById('heatmap-labels').innerHTML = labHtml;
+  var primerDia = new Date(calYear, calMonth, 1).getDay();
+  var diasMes   = new Date(calYear, calMonth + 1, 0).getDate();
+  var esHoyMes  = (hoy.getFullYear() === calYear && hoy.getMonth() === calMonth);
 
   var cells = '';
-  // Celdas vacías antes del primer día
-  for (var i = 0; i < primerDia; i++) cells += '<div class="heatmap-cell empty"></div>';
+  for (var i = 0; i < primerDia; i++) cells += '<div class="cal-cell empty"></div>';
 
   for (var d = 1; d <= diasMes; d++) {
     var n = conteo[d] || 0;
-    var cls = n === 0 ? 'no-citas' : n === 1 ? 'citas-1' : n === 2 ? 'citas-2' : n === 3 ? 'citas-3' : n === 4 ? 'citas-4' : 'citas-5';
-    var esHoy = (d === hoy.getDate()) ? ' hoy-cell' : '';
-    var label = n > 0 ? n : d;
-    cells += '<div class="heatmap-cell ' + cls + esHoy + '" title="' + d + '/' + (month+1) + ': ' + n + ' cita(s)">' + label + '</div>';
+    var esHoy = esHoyMes && d === hoy.getDate();
+    var selec = calDiaSeleccionado === d;
+    var cls = 'cal-cell' + (esHoy?' hoy':'') + (n>0?' tiene-citas':'') + (selec?' selected':'');
+
+    var dots = '';
+    if (n > 0 && citasPorDia[d]) {
+      citasPorDia[d].slice(0,5).forEach(function(ev) {
+        var desc = ev.description || '';
+        var modal = (desc.match(/Modalidad: (.+)/) || [])[1] || 'Presencial';
+        var mc = modal.toLowerCase().includes('virtual') ? 'virtual' : 'presencial';
+        var w = n <= 3 ? 16 : n <= 5 ? 10 : 6;
+        dots += '<div class="cal-dot ' + mc + '" style="width:' + w + 'px"></div>';
+      });
+    }
+
+    cells += '<div class="' + cls + '" onclick="seleccionarDia(' + d + ')">'
+      + '<div class="cal-cell-num">' + d + '</div>'
+      + (n > 0 ? '<div class="cal-dot-wrap">' + dots + '</div><div class="cal-count-badge">' + n + '</div>' : '')
+      + '</div>';
   }
-  document.getElementById('heatmap-grid').innerHTML = cells;
+  document.getElementById('cal-body').innerHTML = cells;
 }
 
-// === BARRAS SEMANALES ===
+function seleccionarDia(dia) {
+  calDiaSeleccionado = dia;
+  renderCalendario();
+
+  var citas = todasLasCitas.filter(function(ev) {
+    var d = new Date(ev.start.dateTime);
+    return d.getFullYear() === calYear && d.getMonth() === calMonth && d.getDate() === dia;
+  });
+
+  var meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  var panel = document.getElementById('day-detail-panel');
+  var titulo = document.getElementById('day-detail-title');
+  titulo.textContent = '📋 ' + dia + ' de ' + meses[calMonth] + ' — ' + (citas.length === 0 ? 'Sin citas' : citas.length + ' cita(s)');
+
+  if (citas.length === 0) {
+    document.getElementById('day-detail-list').innerHTML = '<p style="color:var(--text-light);font-size:.82rem;font-weight:500;padding:4px 0">No hay citas agendadas para este día.</p>';
+  } else {
+    citas.sort(function(a,b){ return new Date(a.start.dateTime) - new Date(b.start.dateTime); });
+    document.getElementById('day-detail-list').innerHTML = citas.map(function(ev) {
+      var start   = new Date(ev.start.dateTime);
+      var end     = new Date(ev.end.dateTime);
+      var hora    = start.toTimeString().slice(0,5) + '–' + end.toTimeString().slice(0,5);
+      var nombre  = (ev.summary || '').replace('Cita: ', '');
+      var desc    = ev.description || '';
+      var empresa = (desc.match(/Empresa: (.+)/) || [])[1] || '';
+      var modal   = (desc.match(/Modalidad: (.+)/) || [])[1] || 'Presencial';
+      var mc      = modal.toLowerCase().includes('virtual') ? 'virtual' : 'presencial';
+      return '<div class="day-cita-pill" onclick="abrirEmpresaPanel(\'' + empresa.replace(/'/g,"\\'") + '\')">'
+        + '<span class="day-cita-hora">' + hora + '</span>'
+        + '<span class="day-cita-nombre">👤 ' + nombre + '</span>'
+        + (empresa ? '<span class="day-cita-empresa">🏢 ' + empresa + '</span>' : '')
+        + '<span class="day-cita-modal ' + mc + '">' + (mc==='virtual'?'💻':'🏥') + ' ' + modal + '</span>'
+        + '</div>';
+    }).join('');
+  }
+  panel.classList.add('open');
+}
+
+// ══ BARRAS SEMANALES ══════════════════════════════════
 function renderBarSemanal() {
   var hoy = new Date(); hoy.setHours(23,59,59);
   var semanas = [];
@@ -943,83 +1217,169 @@ function renderBarSemanal() {
     var ini = new Date(hoy); ini.setDate(hoy.getDate() - (w*7 + 6)); ini.setHours(0,0,0,0);
     var fin = new Date(hoy); fin.setDate(hoy.getDate() - w*7); fin.setHours(23,59,59);
     var count = todasLasCitas.filter(function(ev) {
-      var s = new Date(ev.start.dateTime);
-      return s >= ini && s <= fin;
+      var s = new Date(ev.start.dateTime); return s >= ini && s <= fin;
     }).length;
-    var label = ini.toLocaleDateString('es-CO', {day:'2-digit', month:'2-digit'});
-    semanas.push({ label: label, count: count });
+    semanas.push({ label: ini.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'}), count: count });
   }
-
   var max = Math.max.apply(null, semanas.map(function(s){ return s.count; })) || 1;
-  var html = semanas.map(function(s) {
+  document.getElementById('bar-semanal').innerHTML = semanas.map(function(s) {
     var pct = Math.round((s.count / max) * 100);
-    return '<div class="bar-col">'
-      + '<div class="bar-val">' + (s.count > 0 ? s.count : '') + '</div>'
-      + '<div class="bar-fill" style="height:' + Math.max(pct, 4) + '%"></div>'
-      + '<div class="bar-label">' + s.label + '</div>'
-      + '</div>';
+    return '<div class="bar-col"><div class="bar-val">' + (s.count||'') + '</div>'
+      + '<div class="bar-fill" style="height:' + Math.max(pct,4) + '%"></div>'
+      + '<div class="bar-label">' + s.label + '</div></div>';
   }).join('');
-  document.getElementById('bar-semanal').innerHTML = html;
 }
 
-// === DONA MODALIDAD ===
+// ══ DONA MODALIDAD ════════════════════════════════════
 function renderDonut() {
   var presencial = 0, virtual = 0;
   todasLasCitas.forEach(function(ev) {
-    var desc = ev.description || '';
-    var modal = (desc.match(/Modalidad: (.+)/) || [])[1] || 'Presencial';
-    if (modal.toLowerCase().includes('virtual')) virtual++;
-    else presencial++;
+    var modal = ((ev.description||'').match(/Modalidad: (.+)/) || [])[1] || 'Presencial';
+    if (modal.toLowerCase().includes('virtual')) virtual++; else presencial++;
   });
-  var total = presencial + virtual;
-  var circum = 251.2;
-  var pPres = total > 0 ? (presencial / total) * circum : 0;
-  var pVirt = total > 0 ? (virtual / total) * circum : 0;
-  var offset = total > 0 ? (presencial / total) * circum : 0;
-
-  document.getElementById('donut-presencial').setAttribute('stroke-dasharray', pPres + ' ' + (circum - pPres));
-  // Offset para virtual: empieza donde termina presencial
-  document.getElementById('donut-virtual').setAttribute('stroke-dasharray', pVirt + ' ' + (circum - pVirt));
-  document.getElementById('donut-virtual').setAttribute('transform', 'rotate(' + (-90 + (presencial/Math.max(total,1)*360)) + ' 55 55)');
-
+  var total = presencial + virtual, circum = 251.2;
+  var pPres = total > 0 ? (presencial/total)*circum : 0;
+  var pVirt = total > 0 ? (virtual/total)*circum : 0;
+  document.getElementById('donut-presencial').setAttribute('stroke-dasharray', pPres + ' ' + (circum-pPres));
+  document.getElementById('donut-virtual').setAttribute('stroke-dasharray', pVirt + ' ' + (circum-pVirt));
+  document.getElementById('donut-virtual').setAttribute('transform','rotate('+(-90+(presencial/Math.max(total,1)*360))+' 55 55)');
   document.getElementById('donut-total-text').textContent = total;
   document.getElementById('donut-n-presencial').textContent = presencial;
   document.getElementById('donut-n-virtual').textContent = virtual;
 }
 
-// === TOP EMPRESAS ===
+// ══ TOP EMPRESAS ═════════════════════════════════════
 function renderTopEmpresas() {
   var conteo = {};
   todasLasCitas.forEach(function(ev) {
-    var desc = ev.description || '';
-    var empresa = (desc.match(/Empresa: (.+)/) || [])[1];
+    var empresa = ((ev.description||'').match(/Empresa: (.+)/) || [])[1];
     if (empresa && empresa.trim() && empresa.trim() !== '—') {
-      var key = empresa.trim();
-      conteo[key] = (conteo[key] || 0) + 1;
+      var k = empresa.trim(); conteo[k] = (conteo[k]||0) + 1;
     }
   });
-  var lista = Object.keys(conteo).map(function(k) { return { nombre: k, n: conteo[k] }; });
-  lista.sort(function(a,b) { return b.n - a.n; });
-  lista = lista.slice(0, 6);
-
+  var lista = Object.keys(conteo).map(function(k){ return {nombre:k, n:conteo[k]}; });
+  lista.sort(function(a,b){ return b.n - a.n; });
+  lista = lista.slice(0,6);
   if (lista.length === 0) {
-    document.getElementById('empresa-list').innerHTML = '<p style="color:var(--text-light);font-size:.85rem;font-weight:500">Sin empresas registradas este período.</p>';
+    document.getElementById('empresa-list').innerHTML = '<p style="color:var(--text-light);font-size:.85rem;font-weight:500">Sin empresas registradas.</p>';
     return;
   }
   var max = lista[0].n;
-  var html = lista.map(function(item, i) {
-    var pct = Math.round((item.n / max) * 100);
-    return '<div class="empresa-row">'
+  document.getElementById('empresa-list').innerHTML = lista.map(function(item, i) {
+    var pct = Math.round((item.n/max)*100);
+    var estado = getEstadoEmpresa(item.nombre);
+    var eBadge = estado === 'pendiente' ? '🟡' : estado === 'novedad' ? '🔴' : '🟢';
+    return '<div class="empresa-row" style="cursor:pointer" onclick="abrirEmpresaPanel(\'' + item.nombre.replace(/'/g,"\\'") + '\')">'
       + '<div class="empresa-rank">' + (i+1) + '</div>'
       + '<div class="empresa-bar-wrap">'
-        + '<div class="empresa-name">' + item.nombre + '</div>'
+        + '<div class="empresa-name">' + eBadge + ' ' + item.nombre + '</div>'
         + '<div class="empresa-bar-bg"><div class="empresa-bar-fill" style="width:' + pct + '%"></div></div>'
       + '</div>'
       + '<div class="empresa-count">' + item.n + '</div>'
     + '</div>';
   }).join('');
-  document.getElementById('empresa-list').innerHTML = html;
 }
+
+// ══ PANEL LATERAL EMPRESA ════════════════════════════
+var epEmpresaActual = null;
+
+function abrirEmpresaPanel(nombre) {
+  if (!nombre || nombre === '—') return;
+  epEmpresaActual = nombre;
+  document.getElementById('ep-nombre').textContent = '🏢 ' + nombre;
+
+  // Stats
+  var citasEmpresa = todasLasCitas.filter(function(ev) {
+    return ((ev.description||'').match(/Empresa: (.+)/) || [])[1] === nombre;
+  });
+  var hoy = new Date();
+  var ini_mes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  var fin_mes = new Date(hoy.getFullYear(), hoy.getMonth()+1, 0, 23, 59);
+  var estesMes = citasEmpresa.filter(function(ev){ var s=new Date(ev.start.dateTime); return s>=ini_mes&&s<=fin_mes; }).length;
+  document.getElementById('ep-total').textContent = citasEmpresa.length;
+  document.getElementById('ep-mes').textContent   = estesMes;
+
+  var ultima = citasEmpresa.length > 0
+    ? new Date(Math.max.apply(null, citasEmpresa.map(function(ev){ return new Date(ev.start.dateTime); })))
+    : null;
+  document.getElementById('ep-ultima').textContent = ultima
+    ? ultima.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'}) : '—';
+
+  // Estado guardado
+  var estado = getEstadoEmpresa(nombre);
+  ['normal','pendiente','novedad'].forEach(function(e) {
+    document.getElementById('ep-btn-'+e).classList.toggle('active', e === estado);
+  });
+
+  // Nota y contacto
+  var datos = getEmpresaDatos(nombre);
+  document.getElementById('ep-nota').value     = datos.nota || '';
+  document.getElementById('ep-contacto').value = datos.contacto || '';
+
+  // Historial
+  var hist = citasEmpresa.slice().sort(function(a,b){ return new Date(b.start.dateTime)-new Date(a.start.dateTime); }).slice(0,8);
+  document.getElementById('ep-historial').innerHTML = hist.length === 0
+    ? '<p style="color:var(--text-light);font-size:.82rem">Sin historial.</p>'
+    : hist.map(function(ev) {
+        var s = new Date(ev.start.dateTime);
+        var fecha = s.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'2-digit'});
+        var hora  = s.toTimeString().slice(0,5);
+        var desc  = ev.description||'';
+        var modal = (desc.match(/Modalidad: (.+)/)||[])[1]||'Presencial';
+        var mc    = modal.toLowerCase().includes('virtual')?'virtual':'presencial';
+        var motivo= (desc.match(/Motivo: (.+)/)||[])[1]||'—';
+        return '<div class="ep-hist-item">'
+          + '<span class="ep-hist-fecha">' + fecha + ' ' + hora + '</span>'
+          + '<span class="ep-hist-detalle">' + motivo + '</span>'
+          + '<span class="ep-hist-modal ' + mc + '">' + (mc==='virtual'?'💻':'🏥') + '</span>'
+        + '</div>';
+      }).join('');
+
+  document.getElementById('ep-overlay').classList.add('open');
+  document.getElementById('empresa-panel').classList.add('open');
+}
+
+function cerrarEmpresaPanel() {
+  document.getElementById('ep-overlay').classList.remove('open');
+  document.getElementById('empresa-panel').classList.remove('open');
+  epEmpresaActual = null;
+}
+
+function setEstadoEmpresa(estado) {
+  if (!epEmpresaActual) return;
+  var datos = getEmpresaDatos(epEmpresaActual);
+  datos.estado = estado;
+  saveEmpresaDatos(epEmpresaActual, datos);
+  ['normal','pendiente','novedad'].forEach(function(e) {
+    document.getElementById('ep-btn-'+e).classList.toggle('active', e === estado);
+  });
+  // Actualizar badge en tarjetas de cita
+  renderCitas();
+  if (analyticsVisible) renderTopEmpresas();
+}
+
+function guardarDatosEmpresa() {
+  if (!epEmpresaActual) return;
+  var datos = getEmpresaDatos(epEmpresaActual);
+  datos.nota     = document.getElementById('ep-nota').value;
+  datos.contacto = document.getElementById('ep-contacto').value;
+  saveEmpresaDatos(epEmpresaActual, datos);
+  var lbl = document.getElementById('ep-saved-lbl');
+  lbl.classList.add('show');
+  setTimeout(function(){ lbl.classList.remove('show'); }, 2000);
+}
+
+function clearSavedLbl() { document.getElementById('ep-saved-lbl').classList.remove('show'); }
+
+// ══ STORAGE EMPRESAS (localStorage) ══════════════════
+function _storageKey(nombre) { return 'emp_' + nombre.toLowerCase().replace(/\s+/g,'_'); }
+function getEmpresaDatos(nombre) {
+  try { return JSON.parse(localStorage.getItem(_storageKey(nombre))) || {}; } catch(e){ return {}; }
+}
+function saveEmpresaDatos(nombre, datos) {
+  try { localStorage.setItem(_storageKey(nombre), JSON.stringify(datos)); } catch(e){}
+}
+function getEstadoEmpresa(nombre) { return getEmpresaDatos(nombre).estado || 'normal'; }
 
 function toDateStr(d) {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
