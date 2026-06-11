@@ -1466,41 +1466,90 @@ var todasLasCitas  = [];
 var filtroActual   = 'hoy';
 var eventoCancelar = null;
 var accessToken    = null;
+var tokenClient    = null;
+var tokenExpiry    = null;
 
 function login() {
-  var client = google.accounts.oauth2.initTokenClient({
+  tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
     scope: SCOPES,
+    prompt: '',
     callback: function(response) {
       if (response.access_token) {
         accessToken = response.access_token;
+        tokenExpiry = Date.now() + ((response.expires_in || 3599) * 1000) - 60000; // 1min antes
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('admin-screen').style.display = 'block';
         document.getElementById('admin-name').textContent = '👩‍⚕️ Sandra Estupiñán';
         cargarCitas();
+        // Refresco automático cada 55 minutos
+        setInterval(refrescarToken, 55 * 60 * 1000);
       } else {
         document.getElementById('login-error').textContent = 'Error al iniciar sesión con Google.';
       }
     }
   });
-  client.requestAccessToken();
+  tokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+function refrescarToken() {
+  if (!tokenClient) return;
+  tokenClient.requestAccessToken({ prompt: '' });
+}
+
+async function getValidToken() {
+  if (!accessToken) return null;
+  if (tokenExpiry && Date.now() > tokenExpiry) {
+    // Token expirado — refrescar silenciosamente
+    await new Promise(function(resolve) {
+      tokenClient.callback = function(r) {
+        if (r.access_token) {
+          accessToken = r.access_token;
+          tokenExpiry = Date.now() + ((r.expires_in || 3599) * 1000) - 60000;
+        }
+        resolve();
+      };
+      tokenClient.requestAccessToken({ prompt: '' });
+    });
+  }
+  return accessToken;
 }
 
 function cerrarSesion() {
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('admin-screen').style.display = 'none';
-  accessToken = null;
+  accessToken = null; tokenExpiry = null;
 }
 
 async function cargarCitas() {
   document.getElementById('citas-list').innerHTML = '<div class="loader"><div class="spinner"></div> Cargando citas…</div>';
+  var token = await getValidToken();
+  if (!token) {
+    document.getElementById('citas-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🔑</div><p>Sesión expirada. <a href="#" onclick="cerrarSesion()" style="color:var(--primary-lt)">Volver a ingresar</a></p></div>';
+    return;
+  }
   var hoy    = new Date(); hoy.setHours(0,0,0,0);
-  var timeMin = new Date(hoy.getFullYear(), hoy.getMonth(), 1).toISOString();
-  var timeMax = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0, 23, 59).toISOString();
+  var timeMin = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1).toISOString();
+  var timeMax = new Date(hoy.getFullYear(), hoy.getMonth() + 3, 0, 23, 59).toISOString();
   var url = 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(CALENDAR_ID) + '/events'
     + '?timeMin=' + timeMin + '&timeMax=' + timeMax + '&singleEvents=true&orderBy=startTime&maxResults=500';
   try {
-    var res  = await fetch(url, { headers: { 'Authorization': 'Bearer ' + accessToken } });
+    var res  = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
+    // Token expirado en el servidor — intentar refrescar una vez
+    if (res.status === 401) {
+      await new Promise(function(resolve) {
+        tokenClient.callback = function(r) {
+          if (r.access_token) {
+            accessToken = r.access_token;
+            tokenExpiry = Date.now() + ((r.expires_in||3599)*1000) - 60000;
+          }
+          resolve();
+        };
+        tokenClient.requestAccessToken({ prompt: '' });
+      });
+      res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + accessToken } });
+    }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     var data = await res.json();
     todasLasCitas = (data.items || []).filter(function(ev) { return ev.start && ev.start.dateTime; });
     calcularStats();
@@ -1509,8 +1558,10 @@ async function cargarCitas() {
     iniciarNotaAdmin();
     renderProximasAdmin();
     renderTendenciaSide();
+    renderSegAlertas(); // actualizar badge
   } catch(err) {
-    document.getElementById('citas-list').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Error al cargar las citas.</p></div>';
+    document.getElementById('citas-list').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Error al cargar las citas. <a href="#" onclick="cargarCitas()" style="color:var(--primary-lt)">Reintentar</a></p></div>';
+    console.error('cargarCitas error:', err);
   }
 }
 
@@ -1623,8 +1674,9 @@ async function ejecutarCancelacion() {
   var btn = document.getElementById('btn-confirmar-cancelar');
   btn.disabled = true; btn.textContent = 'Cancelando…';
   try {
+    var token = await getValidToken();
     var url = 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(CALENDAR_ID) + '/events/' + eventoCancelar;
-    await fetch(url, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + accessToken } });
+    await fetch(url, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
     todasLasCitas = todasLasCitas.filter(function(ev) { return ev.id !== eventoCancelar; });
     calcularStats(); renderCitas(); cerrarModal();
   } catch(err) { alert('Error al cancelar. Intenta de nuevo.'); }
