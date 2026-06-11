@@ -522,6 +522,144 @@ header {
 .ep-hist-fecha { font-weight: 700; color: var(--ink-2); min-width: 68px; }
 .ep-hist-det { flex: 1; color: var(--ink-3); }
 
+/* ══ NOTA PREMIUM ──────────────────────────────────── */
+.nota-card { overflow: visible; }
+.nota-card-hdr {
+  background: linear-gradient(135deg, #0C1E35 0%, #1A3A5C 60%, #1B5E8A 100%);
+  padding: 16px 18px 14px; border-radius: var(--radius) var(--radius) 0 0;
+  position: relative; overflow: hidden;
+}
+.nota-card-hdr::before {
+  content: ''; position: absolute; top: -30px; right: -20px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: rgba(255,255,255,.03);
+}
+.nota-card-hdr::after {
+  content: ''; position: absolute; bottom: -40px; right: 40px;
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(41,128,185,.12);
+}
+.nota-fecha-lbl {
+  font-size: .68rem; font-weight: 700; color: rgba(255,255,255,.35);
+  letter-spacing: .5px;
+}
+.nota-area-premium {
+  width: 100%; border: none; outline: none; resize: none;
+  background: rgba(255,255,255,.07); border-radius: var(--radius-sm);
+  padding: 10px 12px; color: rgba(255,255,255,.9);
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: .82rem;
+  line-height: 1.7; min-height: 80px; margin-top: 10px;
+  border: 1px solid rgba(255,255,255,.1); transition: all .25s;
+  position: relative; z-index: 1;
+}
+.nota-area-premium::placeholder { color: rgba(255,255,255,.3); }
+.nota-area-premium:focus { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); }
+.nota-chars { font-size: .65rem; color: rgba(255,255,255,.3); font-weight: 500; }
+.nota-save-btn {
+  padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.1); color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: .7rem;
+  font-weight: 700; cursor: pointer; transition: all .2s; position: relative; z-index: 1;
+  letter-spacing: .3px;
+}
+.nota-save-btn:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.4); }
+
+/* PRIORIDADES */
+.prio-section { padding: 14px 18px 16px; }
+.add-prio-btn {
+  font-size: .7rem; font-weight: 700; color: var(--accent);
+  background: var(--accent-lt); border: none; border-radius: 20px;
+  padding: 4px 12px; cursor: pointer; transition: all .2s;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.add-prio-btn:hover { background: var(--accent); color: #fff; }
+
+.prio-form {
+  background: var(--surface-2); border: 1px solid var(--ink-5);
+  border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 12px;
+  animation: slideD .2s ease;
+}
+.prio-input {
+  width: 100%; border: 1px solid var(--ink-4); border-radius: var(--radius-sm);
+  padding: 8px 11px; font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: .8rem; color: var(--ink); outline: none; background: #fff;
+  transition: border-color .2s;
+}
+.prio-input:focus { border-color: var(--accent); }
+.prio-niveles { display: flex; gap: 6px; margin-top: 8px; }
+.nivel-btn {
+  flex: 1; padding: 6px 4px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--ink-4); background: var(--surface);
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: .7rem;
+  font-weight: 700; cursor: pointer; transition: all .2s; color: var(--ink-2);
+}
+.nivel-btn.alta.active  { background: var(--danger-lt); border-color: var(--danger); color: var(--danger); }
+.nivel-btn.media.active { background: var(--gold-lt); border-color: var(--gold); color: var(--gold); }
+.nivel-btn.baja.active  { background: var(--emerald-lt); border-color: var(--emerald); color: var(--emerald); }
+.prio-cancel-btn {
+  flex: 1; padding: 7px; border-radius: var(--radius-sm);
+  border: 1px solid var(--ink-4); background: var(--surface);
+  color: var(--ink-3); font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: .75rem; font-weight: 700; cursor: pointer;
+}
+.prio-save-btn {
+  flex: 2; padding: 7px; border-radius: var(--radius-sm);
+  border: none; background: var(--ink); color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: .75rem; font-weight: 700; cursor: pointer; transition: all .2s;
+}
+.prio-save-btn:hover { background: var(--accent); }
+
+.prio-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: var(--radius-sm);
+  border: 1px solid var(--ink-5); background: var(--surface-2);
+  margin-bottom: 7px; transition: all .2s; position: relative;
+  overflow: hidden;
+}
+.prio-item::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; border-radius: 3px 0 0 3px;
+}
+.prio-item.alta::before  { background: var(--danger); }
+.prio-item.media::before { background: var(--gold); }
+.prio-item.baja::before  { background: var(--emerald); }
+.prio-item:hover { border-color: var(--ink-4); background: #fff; }
+.prio-item-txt { flex: 1; font-size: .8rem; font-weight: 500; color: var(--ink); }
+.prio-item-tag {
+  font-size: .62rem; padding: 2px 9px; border-radius: 20px; font-weight: 700;
+}
+.prio-item.alta .prio-item-tag  { background: var(--danger-lt); color: var(--danger); }
+.prio-item.media .prio-item-tag { background: var(--gold-lt); color: var(--gold); }
+.prio-item.baja .prio-item-tag  { background: var(--emerald-lt); color: var(--emerald); }
+.prio-del-btn {
+  width: 22px; height: 22px; border-radius: 50%; border: none;
+  background: var(--ink-5); color: var(--ink-3); font-size: .7rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all .2s; flex-shrink: 0;
+}
+.prio-del-btn:hover { background: var(--danger-lt); color: var(--danger); }
+.prio-empty {
+  text-align: center; padding: 18px 0;
+  color: var(--ink-3); font-size: .78rem; font-weight: 500;
+}
+.prio-empty-icon { font-size: 1.5rem; margin-bottom: 4px; display: block; opacity: .4; }
+
+/* ══ ACCESO BLOQUEADO ──────────────────────────────── */
+#acceso-bloqueado {
+  display: none; position: fixed; inset: 0;
+  background: var(--ink); z-index: 999;
+  align-items: center; justify-content: center; flex-direction: column;
+  text-align: center; padding: 24px;
+}
+.blocked-icon { font-size: 3rem; margin-bottom: 16px; }
+.blocked-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 600; color: #fff; margin-bottom: 8px;
+}
+.blocked-sub { color: rgba(255,255,255,.4); font-size: .85rem; max-width: 320px; line-height: 1.6; }
+.blocked-email { color: var(--gold); font-weight: 700; font-size: .9rem; margin-top: 12px; }
+
 @media(max-width: 900px) {
   .agenda-grid { grid-template-columns: 1fr; }
   .seg-grid { grid-template-columns: 1fr; }
@@ -549,6 +687,15 @@ header {
     <button class="btn-salir" onclick="cerrarSesion()">Salir →</button>
   </div>
 </header>
+
+<!-- ACCESO BLOQUEADO -->
+<div id="acceso-bloqueado" style="display:none;position:fixed;inset:0;background:var(--ink);z-index:999;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:24px">
+  <div class="blocked-icon">🔒</div>
+  <div class="blocked-title">Acceso no autorizado</div>
+  <div class="blocked-sub">Esta aplicación está configurada para un usuario específico. Tu cuenta no tiene permiso para acceder.</div>
+  <div class="blocked-email" id="blocked-email-lbl"></div>
+  <button onclick="cerrarSesion()" style="margin-top:24px;padding:10px 24px;border-radius:20px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.6);font-family:'Plus Jakarta Sans',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer">← Volver al inicio</button>
+</div>
 
 <!-- LOGIN -->
 <div id="login-screen">
@@ -634,18 +781,41 @@ header {
         <!-- COLUMNA DERECHA -->
         <div class="right-col">
 
-          <div class="card">
-            <div class="card-hdr"><span class="card-ttl">✏️ Nota del día</span></div>
-            <div class="card-body">
-              <textarea class="note-area" id="nota-dia" placeholder="Escribe una nota para hoy…"></textarea>
-              <div style="display:flex;align-items:center">
-                <button class="save-note-btn" onclick="guardarNota()">💾 Guardar</button>
-                <span class="saved-lbl" id="nota-saved">✓ Guardado</span>
+          <div class="card nota-card">
+            <div class="nota-card-hdr">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span class="card-ttl" style="color:rgba(255,255,255,.5)">✏️ Nota del día</span>
+                <span class="nota-fecha-lbl" id="nota-fecha-lbl">—</span>
               </div>
-              <div class="prio-list" id="prio-list">
-                <div style="font-size:.65rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Prioridades</div>
+              <textarea class="nota-area-premium" id="nota-dia" placeholder="Escribe aquí tus observaciones, acuerdos o notas clave del día…" oninput="actualizarChars()"></textarea>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+                <span class="nota-chars" id="nota-chars">0 caracteres</span>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span class="saved-lbl" id="nota-saved">✓ Guardado</span>
+                  <button class="nota-save-btn" onclick="guardarNota()">Guardar nota</button>
+                </div>
               </div>
-              <button onclick="agregarPrioridad()" style="margin-top:8px;font-size:.68rem;color:var(--accent);background:none;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700">+ Agregar prioridad</button>
+            </div>
+            <!-- PRIORIDADES -->
+            <div class="prio-section">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <span class="card-ttl">🚩 Prioridades del día</span>
+                <button class="add-prio-btn" onclick="toggleFormPrio()">+ Nueva</button>
+              </div>
+              <!-- Formulario inline -->
+              <div class="prio-form" id="prio-form" style="display:none">
+                <input class="prio-input" type="text" id="prio-texto" placeholder="Descripción de la prioridad…" maxlength="80">
+                <div class="prio-niveles">
+                  <button class="nivel-btn alta" id="nb-alta" onclick="setNivel('alta')">🔴 Alta</button>
+                  <button class="nivel-btn media active" id="nb-media" onclick="setNivel('media')">🟡 Media</button>
+                  <button class="nivel-btn baja" id="nb-baja" onclick="setNivel('baja')">🟢 Baja</button>
+                </div>
+                <div style="display:flex;gap:7px;margin-top:8px">
+                  <button class="prio-cancel-btn" onclick="toggleFormPrio()">Cancelar</button>
+                  <button class="prio-save-btn" onclick="confirmarPrioridad()">Agregar</button>
+                </div>
+              </div>
+              <div class="prio-list" id="prio-list"></div>
             </div>
           </div>
 
@@ -871,18 +1041,49 @@ const CLIENT_ID   = '264077603671-cghhf64qjlpnomo6t4ps39ulqpsdfts1.apps.googleus
 const CALENDAR_ID = 'primary';
 const SCOPES      = 'https://www.googleapis.com/auth/calendar.readonly';
 
+// ══ CONFIG ══════════════════════════════════════════
+const CLIENT_ID          = '264077603671-cghhf64qjlpnomo6t4ps39ulqpsdfts1.apps.googleusercontent.com';
+const CALENDAR_ID        = 'primary';
+const SCOPES             = 'https://www.googleapis.com/auth/calendar.readonly';
+// ▼ ENTREGAR AL CLIENTE: cambiar '*' por el correo del cliente
+// Ejemplo: 'gerente@empresa.com' — solo ese correo puede entrar
+// Dejar '*' para permitir cualquier Gmail (modo desarrollo)
+const USUARIO_AUTORIZADO = '*';
+
 var accessToken = null;
+var usuarioEmail = null;
 var todasLasCitas = [];
 var calYear, calMonth, calVista = 'mes', calDiaSel = null;
 var chartTendencia, chartModalidad, chartEmpresas, chartDiaSemana, chartHora, chartProcesos;
+var nivelSeleccionado = 'media';
 
 // ══ AUTH ══════════════════════════════════════════
 function login() {
   var client = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID, scope: SCOPES,
-    callback: function(r) {
+    client_id: CLIENT_ID, scope: SCOPES + ' https://www.googleapis.com/auth/userinfo.email',
+    callback: async function(r) {
       if (r.access_token) {
         accessToken = r.access_token;
+        // Obtener email del usuario
+        try {
+          var infoRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+            headers: { 'Authorization': 'Bearer ' + accessToken }
+          });
+          var info = await infoRes.json();
+          usuarioEmail = info.email || '';
+          // ── VALIDACIÓN DE ACCESO ──────────────────
+          if (USUARIO_AUTORIZADO !== '*' && usuarioEmail.toLowerCase() !== USUARIO_AUTORIZADO.toLowerCase()) {
+            document.getElementById('blocked-email-lbl').textContent = usuarioEmail;
+            document.getElementById('acceso-bloqueado').style.display = 'flex';
+            accessToken = null;
+            return;
+          }
+          // ─────────────────────────────────────────
+          var nombre = info.name || usuarioEmail.split('@')[0];
+          document.getElementById('user-name-hdr').textContent = nombre;
+          document.getElementById('user-avatar').textContent = nombre.substring(0,2).toUpperCase();
+        } catch(e) { console.log('Info error:', e); }
+
         var hoy = new Date();
         calYear = hoy.getFullYear(); calMonth = hoy.getMonth();
         document.getElementById('login-screen').style.display = 'none';
@@ -892,7 +1093,7 @@ function login() {
         renderVisitas();
         renderProcesos();
       } else {
-        document.getElementById('login-error').textContent = 'Error al iniciar sesión.';
+        document.getElementById('login-error').textContent = 'Error al iniciar sesión. Intenta de nuevo.';
       }
     }
   });
@@ -900,7 +1101,8 @@ function login() {
 }
 
 function cerrarSesion() {
-  accessToken = null;
+  accessToken = null; usuarioEmail = null;
+  document.getElementById('acceso-bloqueado').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('app-screen').style.display = 'none';
   document.getElementById('user-name-hdr').textContent = '—';
@@ -1197,17 +1399,35 @@ function renderProximas() {
 }
 
 // ══ NOTAS Y PRIORIDADES ══════════════════════════
-function getFechaKey() { return 'nota_' + new Date().toISOString().slice(0,10); }
-function getPrioKey()  { return 'prio_' + new Date().toISOString().slice(0,10); }
+function getFechaKey() {
+  var h = new Date(); return 'nota_' + h.getFullYear() + '_' + h.getMonth() + '_' + h.getDate();
+}
+function getPrioKey() {
+  var h = new Date(); return 'prio_' + h.getFullYear() + '_' + h.getMonth() + '_' + h.getDate();
+}
 
 function cargarNotaDelDia() {
+  var hoy = new Date();
+  var dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  var meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  var lbl = dias[hoy.getDay()] + ' ' + hoy.getDate() + ' ' + meses[hoy.getMonth()];
+  var el = document.getElementById('nota-fecha-lbl');
+  if (el) el.textContent = lbl;
   var nota = localStorage.getItem(getFechaKey()) || '';
-  document.getElementById('nota-dia').value = nota;
+  var ta = document.getElementById('nota-dia');
+  if (ta) { ta.value = nota; actualizarChars(); }
   renderPrioridades();
 }
 
+function actualizarChars() {
+  var ta = document.getElementById('nota-dia');
+  var lbl = document.getElementById('nota-chars');
+  if (ta && lbl) lbl.textContent = ta.value.length + ' caracteres';
+}
+
 function guardarNota() {
-  localStorage.setItem(getFechaKey(), document.getElementById('nota-dia').value);
+  var val = document.getElementById('nota-dia').value;
+  localStorage.setItem(getFechaKey(), val);
   var lbl = document.getElementById('nota-saved');
   lbl.classList.add('show');
   setTimeout(function(){ lbl.classList.remove('show'); }, 2000);
@@ -1219,32 +1439,57 @@ function getPrioridades() {
 
 function renderPrioridades() {
   var prios = getPrioridades();
-  var list  = document.getElementById('prio-list');
-  var html  = '<div style="font-size:.65rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Prioridades del día</div>';
-  prios.forEach(function(p,i){
-    var col = p.nivel==='alta'?'ph':p.nivel==='media'?'pm':'pl';
-    var tag = p.nivel==='alta'?'h':p.nivel==='media'?'m':'l';
-    html += '<div class="prio-row"><span class="pdot '+col+'"></span><span style="flex:1">'+p.texto+'</span><span class="ptag '+tag+'">'+p.nivel.charAt(0).toUpperCase()+p.nivel.slice(1)+'</span>'
-      +'<button onclick="eliminarPrio('+i+')" style="background:none;border:none;cursor:pointer;color:var(--ink-3);font-size:.8rem;margin-left:6px">✕</button></div>';
-  });
-  if (prios.length===0) html += '<div style="color:var(--ink-3);font-size:.75rem">Sin prioridades para hoy.</div>';
-  list.innerHTML = html;
+  var list = document.getElementById('prio-list');
+  if (!list) return;
   document.getElementById('s-prio').textContent = prios.length;
+  if (prios.length === 0) {
+    list.innerHTML = '<div class="prio-empty"><span class="prio-empty-icon">🚩</span>Sin prioridades para hoy</div>';
+    return;
+  }
+  list.innerHTML = prios.map(function(p, i) {
+    var tags = { alta: 'Alta', media: 'Media', baja: 'Baja' };
+    return '<div class="prio-item ' + p.nivel + '">'
+      + '<span class="prio-item-txt">' + p.texto + '</span>'
+      + '<span class="prio-item-tag">' + (tags[p.nivel]||'Media') + '</span>'
+      + '<button class="prio-del-btn" onclick="eliminarPrio(' + i + ')">✕</button>'
+      + '</div>';
+  }).join('');
 }
 
-function agregarPrioridad() {
-  var txt = prompt('Texto de la prioridad:');
-  if (!txt) return;
-  var nivel = prompt('Nivel (alta / media / baja):', 'media') || 'media';
+var nivelPrioActual = 'media';
+
+function toggleFormPrio() {
+  var form = document.getElementById('prio-form');
+  var visible = form.style.display !== 'none';
+  form.style.display = visible ? 'none' : 'block';
+  if (!visible) {
+    document.getElementById('prio-texto').value = '';
+    setNivel('media');
+    setTimeout(function(){ document.getElementById('prio-texto').focus(); }, 50);
+  }
+}
+
+function setNivel(nivel) {
+  nivelPrioActual = nivel;
+  ['alta','media','baja'].forEach(function(n) {
+    var btn = document.getElementById('nb-' + n);
+    if (btn) btn.classList.toggle('active', n === nivel);
+  });
+}
+
+function confirmarPrioridad() {
+  var txt = document.getElementById('prio-texto').value.trim();
+  if (!txt) { document.getElementById('prio-texto').focus(); return; }
   var prios = getPrioridades();
-  prios.push({ texto: txt, nivel: nivel });
+  prios.unshift({ texto: txt, nivel: nivelPrioActual });
   localStorage.setItem(getPrioKey(), JSON.stringify(prios));
+  toggleFormPrio();
   renderPrioridades();
 }
 
 function eliminarPrio(i) {
   var prios = getPrioridades();
-  prios.splice(i,1);
+  prios.splice(i, 1);
   localStorage.setItem(getPrioKey(), JSON.stringify(prios));
   renderPrioridades();
 }
