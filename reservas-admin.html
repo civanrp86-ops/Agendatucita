@@ -858,7 +858,170 @@
   .seg-btn-save:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
   .last-update-lbl { font-size: .68rem; color: var(--text-light); }
 
+  /* ══ LAYOUT DOS COLUMNAS AGENDA ══════════ */
+  .agenda-two-col {
+    display: grid; grid-template-columns: 1fr 290px; gap: 16px; align-items: start;
+  }
+  .agenda-main-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .agenda-side-col { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 80px; }
+
+  @media(max-width:900px) {
+    .agenda-two-col { grid-template-columns: 1fr; }
+    .agenda-side-col { position: static; }
+  }
+
+  /* ══ SIDE CARDS ══════════════════════════ */
+  .side-card {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+    padding: 16px 18px; overflow: hidden;
+  }
+  .side-card-ttl {
+    font-size: .65rem; font-weight: 800; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: .9px;
+    display: block; margin-bottom: 2px;
+  }
+
+  /* ══ NOTA ADMIN ══════════════════════════ */
+  .nota-card-admin { padding: 0; overflow: hidden; }
+  .nota-hdr-admin {
+    background: linear-gradient(135deg, #071828 0%, #0C2D48 55%, #1B4F72 100%);
+    padding: 14px 16px 12px; position: relative; overflow: hidden;
+  }
+  .nota-hdr-admin::before {
+    content:''; position:absolute; top:-20px; right:-20px;
+    width:100px; height:100px; border-radius:50%;
+    background:rgba(255,255,255,.03);
+  }
+  .nota-fecha-admin { font-size:.65rem; font-weight:700; color:rgba(255,255,255,.35); }
+  .nota-ta-admin {
+    width:100%; border:none; outline:none; resize:none;
+    background:rgba(255,255,255,.07); border-radius:8px;
+    padding:9px 11px; color:rgba(255,255,255,.9);
+    font-family:'Plus Jakarta Sans',sans-serif; font-size:.78rem;
+    line-height:1.7; min-height:72px; margin-top:8px;
+    border:1px solid rgba(255,255,255,.1); transition:all .2s; position:relative; z-index:1;
+  }
+  .nota-ta-admin::placeholder { color:rgba(255,255,255,.3); }
+  .nota-ta-admin:focus { background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.22); }
+  .nota-chars-admin { font-size:.62rem; color:rgba(255,255,255,.3); font-weight:500; }
+  .nota-saved-admin {
+    font-size:.65rem; color:var(--accent); font-weight:700;
+    opacity:0; transition:opacity .3s;
+  }
+  .nota-saved-admin.show { opacity:1; }
+  .nota-btn-admin {
+    padding:5px 13px; border-radius:20px; border:1px solid rgba(255,255,255,.2);
+    background:rgba(255,255,255,.1); color:#fff;
+    font-family:'Plus Jakarta Sans',sans-serif; font-size:.68rem;
+    font-weight:700; cursor:pointer; transition:all .2s; z-index:1; position:relative;
+  }
+  .nota-btn-admin:hover { background:rgba(255,255,255,.2); }
+  .prio-body-admin { padding:14px 16px; }
+  .add-prio-admin-btn {
+    font-size:.65rem; font-weight:700; color:var(--primary-lt);
+    background:rgba(41,128,185,.08); border:1px solid rgba(41,128,185,.2);
+    border-radius:20px; padding:3px 10px; cursor:pointer;
+    font-family:'Plus Jakarta Sans',sans-serif; transition:all .2s;
+  }
+  .add-prio-admin-btn:hover { background:var(--primary-lt); color:#fff; }
+  .prio-form-admin {
+    background:var(--surface-2); border:1px solid var(--border-lt);
+    border-radius:10px; padding:10px 12px; margin-bottom:10px;
+    animation:fadeUp .2s ease;
+  }
+  .prio-input-admin {
+    width:100%; border:1px solid var(--border); border-radius:8px;
+    padding:7px 10px; font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:.78rem; color:var(--text); outline:none; background:#fff;
+    transition:border-color .2s;
+  }
+  .prio-input-admin:focus { border-color:var(--primary-lt); }
+  .prio-niveles-admin { display:flex; gap:5px; margin-top:7px; }
+  .pnivel-admin {
+    flex:1; padding:5px; border-radius:7px;
+    border:1.5px solid var(--border); background:var(--surface);
+    font-family:'Plus Jakarta Sans',sans-serif; font-size:.65rem;
+    font-weight:700; cursor:pointer; transition:all .2s; color:var(--text-muted);
+  }
+  .pnivel-admin.alta.active  { background:rgba(220,38,38,.08); border-color:var(--danger); color:var(--danger); }
+  .pnivel-admin.media.active { background:rgba(201,168,76,.08); border-color:var(--gold); color:#92702A; }
+  .pnivel-admin.baja.active  { background:rgba(26,188,156,.08); border-color:var(--accent); color:var(--accent-dk); }
+  .prio-cancel-admin {
+    flex:1; padding:6px; border-radius:8px; border:1px solid var(--border);
+    background:var(--surface); color:var(--text-muted);
+    font-family:'Plus Jakarta Sans',sans-serif; font-size:.72rem; font-weight:700; cursor:pointer;
+  }
+  .prio-save-admin {
+    flex:2; padding:6px; border-radius:8px; border:none;
+    background:linear-gradient(135deg, var(--primary), var(--primary-lt));
+    color:#fff; font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:.72rem; font-weight:700; cursor:pointer;
+  }
+  .prio-item-admin {
+    display:flex; align-items:center; gap:8px;
+    padding:7px 10px; border-radius:8px;
+    border:1px solid var(--border-lt); background:var(--surface-2);
+    margin-bottom:6px; position:relative; overflow:hidden;
+  }
+  .prio-item-admin::before {
+    content:''; position:absolute; left:0; top:0; bottom:0;
+    width:3px; border-radius:3px 0 0 3px;
+  }
+  .prio-item-admin.alta::before  { background:var(--danger); }
+  .prio-item-admin.media::before { background:var(--gold); }
+  .prio-item-admin.baja::before  { background:var(--accent); }
+  .prio-item-admin-txt { flex:1; font-size:.75rem; font-weight:600; color:var(--text); }
+  .prio-item-admin-tag {
+    font-size:.58rem; padding:2px 7px; border-radius:20px; font-weight:700;
+  }
+  .prio-item-admin.alta .prio-item-admin-tag  { background:rgba(220,38,38,.1); color:var(--danger); }
+  .prio-item-admin.media .prio-item-admin-tag { background:rgba(201,168,76,.1); color:#92702A; }
+  .prio-item-admin.baja .prio-item-admin-tag  { background:rgba(26,188,156,.1); color:var(--accent-dk); }
+  .prio-del-admin {
+    width:20px; height:20px; border-radius:50%; border:none;
+    background:var(--border-lt); color:var(--text-light); font-size:.65rem;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s;
+  }
+  .prio-del-admin:hover { background:rgba(220,38,38,.1); color:var(--danger); }
+  .prio-empty-admin { text-align:center; padding:14px 0; color:var(--text-light); font-size:.75rem; }
+
+  /* ══ PRÓXIMAS HOY ═════════════════════════ */
+  .proxima-row {
+    display:flex; align-items:center; gap:8px;
+    padding:7px 10px; border-radius:8px;
+    background:var(--surface-2); border:1px solid var(--border-lt);
+    margin-bottom:6px;
+  }
+  .prox-hora { font-size:.7rem; font-weight:800; color:var(--primary); min-width:36px; }
+  .prox-nombre { font-size:.75rem; color:var(--text); flex:1; font-weight:500; }
+  .prox-pill {
+    font-size:.6rem; font-weight:700; padding:2px 7px; border-radius:20px;
+  }
+  .prox-p { background:rgba(26,188,156,.1); color:var(--accent-dk); }
+  .prox-v { background:rgba(41,128,185,.1); color:var(--primary-lt); }
+
+  /* ══ ESTADÍSTICAS ════════════════════════ */
+  .est-grid {
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;
+  }
+  .est-card {
+    background:var(--surface); border-radius:var(--radius);
+    box-shadow:var(--shadow-sm); border:1px solid var(--border);
+    padding:16px 18px; animation:fadeUp .4s ease both;
+  }
+  .est-card.wide { grid-column:span 2; }
+  .est-card-ttl {
+    font-size:.65rem; font-weight:800; color:var(--text-muted);
+    text-transform:uppercase; letter-spacing:.9px; margin-bottom:12px; display:block;
+  }
+  @media(max-width:900px) {
+    .est-grid { grid-template-columns:1fr; }
+    .est-card.wide { grid-column:span 1; }
+  }
+
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -902,6 +1065,7 @@
         📊 Seguimiento
         <span class="tab-badge alerta" id="badge-alertas-admin">0</span>
       </button>
+      <button class="tab-btn" onclick="setTab('estadisticas', this)">📈 Estadísticas</button>
     </div>
 
     <!-- ══ TAB AGENDA ══════════════════════════ -->
@@ -927,7 +1091,13 @@
       </div>
     </div>
 
-    <!-- ANALYTICS DASHBOARD — siempre visible -->
+    <!-- LAYOUT DOS COLUMNAS -->
+    <div class="agenda-two-col">
+
+      <!-- COLUMNA IZQUIERDA — Calendario + Filtros + Citas -->
+      <div class="agenda-main-col">
+
+    <!-- ANALYTICS DASHBOARD -->
     <div class="analytics-section" id="analytics-section">
       <div class="analytics-grid">
 
@@ -1054,6 +1224,68 @@
       <div id="block-result" style="padding:0 24px 18px"></div>
     </div>
 
+      </div><!-- fin agenda-main-col -->
+
+      <!-- COLUMNA DERECHA -->
+      <div class="agenda-side-col">
+
+        <!-- NOTA DEL DÍA -->
+        <div class="side-card nota-card-admin">
+          <div class="nota-hdr-admin">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span class="side-card-ttl" style="color:rgba(255,255,255,.55)">✏️ Nota del día</span>
+              <span class="nota-fecha-admin" id="nota-fecha-admin">—</span>
+            </div>
+            <textarea class="nota-ta-admin" id="nota-dia-admin" placeholder="Observaciones, acuerdos, notas clave del día…" oninput="adminNotaChars()"></textarea>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+              <span class="nota-chars-admin" id="nota-chars-admin">0 caracteres</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="nota-saved-admin" id="nota-saved-admin">✓ Guardado</span>
+                <button class="nota-btn-admin" onclick="guardarNotaAdmin()">Guardar</button>
+              </div>
+            </div>
+          </div>
+          <!-- PRIORIDADES -->
+          <div class="prio-body-admin">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <span class="side-card-ttl">🚩 Prioridades</span>
+              <button class="add-prio-admin-btn" onclick="toggleFormPrioAdmin()">+ Nueva</button>
+            </div>
+            <div class="prio-form-admin" id="prio-form-admin" style="display:none">
+              <input class="prio-input-admin" type="text" id="prio-txt-admin" placeholder="Descripción de la prioridad…" maxlength="80">
+              <div class="prio-niveles-admin">
+                <button class="pnivel-admin alta" id="pna-alta" onclick="setNivelAdmin('alta')">🔴 Alta</button>
+                <button class="pnivel-admin media active" id="pna-media" onclick="setNivelAdmin('media')">🟡 Media</button>
+                <button class="pnivel-admin baja" id="pna-baja" onclick="setNivelAdmin('baja')">🟢 Baja</button>
+              </div>
+              <div style="display:flex;gap:6px;margin-top:8px">
+                <button class="prio-cancel-admin" onclick="toggleFormPrioAdmin()">Cancelar</button>
+                <button class="prio-save-admin" onclick="confirmarPrioAdmin()">Agregar</button>
+              </div>
+            </div>
+            <div id="prio-list-admin"></div>
+          </div>
+        </div>
+
+        <!-- TENDENCIA -->
+        <div class="side-card">
+          <div class="side-card-ttl" style="margin-bottom:12px">📈 Tendencia semanal</div>
+          <svg id="trend-svg-side" width="100%" height="65" viewBox="0 0 260 65" preserveAspectRatio="none" style="overflow:visible"></svg>
+          <div id="trend-lbls-side" style="display:flex;justify-content:space-between;margin-top:5px"></div>
+        </div>
+
+        <!-- PRÓXIMAS HOY -->
+        <div class="side-card">
+          <div class="side-card-ttl" style="margin-bottom:10px">🕐 Próximas hoy</div>
+          <div id="proximas-hoy-list">
+            <div style="color:var(--text-light);font-size:.78rem">Sin citas hoy.</div>
+          </div>
+        </div>
+
+      </div><!-- fin agenda-side-col -->
+
+    </div><!-- fin agenda-two-col -->
+
     </div><!-- fin tab-agenda -->
 
     <!-- ══ TAB SEGUIMIENTO ══════════════════════ -->
@@ -1101,6 +1333,57 @@
       </div>
 
     </div><!-- fin tab-seguimiento -->
+
+    <!-- ══ TAB ESTADÍSTICAS ══════════════════════ -->
+    <div class="tab-panel" id="tab-estadisticas">
+
+      <div class="stats-grid" style="margin-bottom:18px">
+        <div class="stat-card blue">
+          <div class="stat-icon blue">📊</div>
+          <div><div class="stat-val" id="est-total">—</div><div class="stat-label">Total citas</div></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon green">🏥</div>
+          <div><div class="stat-val" id="est-pres">—</div><div class="stat-label" id="est-pres-lbl">Presencial</div></div>
+        </div>
+        <div class="stat-card gold">
+          <div class="stat-icon gold">💻</div>
+          <div><div class="stat-val" id="est-virt">—</div><div class="stat-label" id="est-virt-lbl">Virtual</div></div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon purple">🏢</div>
+          <div><div class="stat-val" id="est-emps">—</div><div class="stat-label">Empresas</div></div>
+        </div>
+      </div>
+
+      <div class="est-grid">
+        <div class="est-card wide">
+          <div class="est-card-ttl">📈 Tendencia — últimas 12 semanas</div>
+          <canvas id="ch-tendencia" height="90"></canvas>
+        </div>
+        <div class="est-card">
+          <div class="est-card-ttl">🍩 Presencial vs Virtual</div>
+          <canvas id="ch-modalidad" height="150"></canvas>
+        </div>
+        <div class="est-card wide">
+          <div class="est-card-ttl">🏢 Top empresas</div>
+          <canvas id="ch-empresas" height="90"></canvas>
+        </div>
+        <div class="est-card">
+          <div class="est-card-ttl">📅 Citas por día de la semana</div>
+          <canvas id="ch-diasem" height="150"></canvas>
+        </div>
+        <div class="est-card">
+          <div class="est-card-ttl">⏰ Citas por hora del día</div>
+          <canvas id="ch-hora" height="150"></canvas>
+        </div>
+        <div class="est-card">
+          <div class="est-card-ttl">⚙️ Estado de procesos</div>
+          <canvas id="ch-procesos" height="150"></canvas>
+        </div>
+      </div>
+
+    </div><!-- fin tab-estadisticas -->
 
   </div>
 </div>
@@ -1250,6 +1533,9 @@ async function cargarCitas() {
     calcularStats();
     renderCitas();
     renderAnalytics();
+    iniciarNotaAdmin();
+    renderProximasAdmin();
+    renderTendenciaSide();
   } catch(err) {
     document.getElementById('citas-list').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Error al cargar las citas.</p></div>';
   }
@@ -1740,11 +2026,173 @@ function setTab(tab, btn) {
   document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
   btn.classList.add('active');
   document.getElementById('tab-' + tab).classList.add('active');
-  if (tab === 'seguimiento') {
-    renderSegAlertas();
-    renderSegVisitas();
-    renderSegProcesos();
+  if (tab === 'seguimiento') { renderSegAlertas(); renderSegVisitas(); renderSegProcesos(); }
+  if (tab === 'estadisticas') setTimeout(renderEstadisticas, 80);
+}
+
+// ══ NOTA DEL DÍA ADMIN ════════════════════════════
+function getAdminNotaKey() { var h=new Date(); return 'adm_nota_'+h.getFullYear()+'_'+h.getMonth()+'_'+h.getDate(); }
+function getAdminPrioKey() { var h=new Date(); return 'adm_prio_'+h.getFullYear()+'_'+h.getMonth()+'_'+h.getDate(); }
+
+function iniciarNotaAdmin() {
+  var hoy=new Date();
+  var dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  var meses=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  var lbl=document.getElementById('nota-fecha-admin');
+  if(lbl) lbl.textContent=dias[hoy.getDay()]+' '+hoy.getDate()+' '+meses[hoy.getMonth()];
+  var ta=document.getElementById('nota-dia-admin');
+  if(ta){ ta.value=localStorage.getItem(getAdminNotaKey())||''; adminNotaChars(); }
+  renderPriosAdmin();
+}
+function adminNotaChars() {
+  var ta=document.getElementById('nota-dia-admin'), lbl=document.getElementById('nota-chars-admin');
+  if(ta&&lbl) lbl.textContent=ta.value.length+' caracteres';
+}
+function guardarNotaAdmin() {
+  localStorage.setItem(getAdminNotaKey(), document.getElementById('nota-dia-admin').value);
+  var lbl=document.getElementById('nota-saved-admin'); lbl.classList.add('show');
+  setTimeout(function(){ lbl.classList.remove('show'); },2000);
+}
+function getAdminPrios() { try{ return JSON.parse(localStorage.getItem(getAdminPrioKey()))||[]; }catch(e){return[];} }
+function renderPriosAdmin() {
+  var prios=getAdminPrios(), list=document.getElementById('prio-list-admin'); if(!list) return;
+  if(prios.length===0){ list.innerHTML='<div class="prio-empty-admin">🚩 Sin prioridades para hoy</div>'; return; }
+  list.innerHTML=prios.map(function(p,i){
+    return '<div class="prio-item-admin '+p.nivel+'">'
+      +'<span class="prio-item-admin-txt">'+p.texto+'</span>'
+      +'<span class="prio-item-admin-tag">'+(p.nivel==='alta'?'Alta':p.nivel==='media'?'Media':'Baja')+'</span>'
+      +'<button class="prio-del-admin" onclick="eliminarPrioAdmin('+i+')">✕</button>'
+      +'</div>';
+  }).join('');
+}
+var nivelAdminActual='media';
+function toggleFormPrioAdmin(){
+  var f=document.getElementById('prio-form-admin'); var vis=f.style.display!=='none';
+  f.style.display=vis?'none':'block';
+  if(!vis){ document.getElementById('prio-txt-admin').value=''; setNivelAdmin('media'); setTimeout(function(){document.getElementById('prio-txt-admin').focus();},50); }
+}
+function setNivelAdmin(n){
+  nivelAdminActual=n;
+  ['alta','media','baja'].forEach(function(x){ var b=document.getElementById('pna-'+x); if(b) b.classList.toggle('active',x===n); });
+}
+function confirmarPrioAdmin(){
+  var txt=document.getElementById('prio-txt-admin').value.trim(); if(!txt){ document.getElementById('prio-txt-admin').focus(); return; }
+  var prios=getAdminPrios(); prios.unshift({texto:txt,nivel:nivelAdminActual});
+  localStorage.setItem(getAdminPrioKey(),JSON.stringify(prios)); toggleFormPrioAdmin(); renderPriosAdmin();
+}
+function eliminarPrioAdmin(i){
+  var prios=getAdminPrios(); prios.splice(i,1); localStorage.setItem(getAdminPrioKey(),JSON.stringify(prios)); renderPriosAdmin();
+}
+
+// ══ PRÓXIMAS HOY ══════════════════════════════════
+function renderProximasAdmin() {
+  var hoy=new Date(); hoy.setHours(0,0,0,0); var fin=new Date(hoy); fin.setHours(23,59,59);
+  var proximas=todasLasCitas.filter(function(ev){ var s=new Date(ev.start.dateTime); return s>=hoy&&s<=fin; })
+    .sort(function(a,b){return new Date(a.start.dateTime)-new Date(b.start.dateTime);}).slice(0,6);
+  var list=document.getElementById('proximas-hoy-list'); if(!list) return;
+  if(proximas.length===0){ list.innerHTML='<div style="color:var(--text-light);font-size:.75rem">Sin citas hoy.</div>'; return; }
+  list.innerHTML=proximas.map(function(ev){
+    var s=new Date(ev.start.dateTime), hora=s.toTimeString().slice(0,5);
+    var nombre=(ev.summary||'').replace('Cita: ','').substring(0,26);
+    var desc=ev.description||'', modal=((desc.match(/Modalidad: (.+)/)||[])[1]||'Presencial');
+    var mc=modal.toLowerCase().includes('virtual')?'v':'p';
+    return '<div class="proxima-row"><span class="prox-hora">'+hora+'</span><span class="prox-nombre">'+nombre+'</span><span class="prox-pill prox-'+mc+'">'+modal+'</span></div>';
+  }).join('');
+}
+
+// ══ TENDENCIA LATERAL ═════════════════════════════
+function renderTendenciaSide() {
+  var hoy=new Date(); hoy.setHours(23,59,59); var sem=[];
+  for(var w=7;w>=0;w--){
+    var ini=new Date(hoy); ini.setDate(hoy.getDate()-(w*7+6)); ini.setHours(0,0,0,0);
+    var fin=new Date(hoy); fin.setDate(hoy.getDate()-w*7); fin.setHours(23,59,59);
+    var c=todasLasCitas.filter(function(ev){ var s=new Date(ev.start.dateTime); return s>=ini&&s<=fin; }).length;
+    sem.push({l:ini.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'}),c:c});
   }
+  var max=Math.max.apply(null,sem.map(function(s){return s.c;}))||1;
+  var W=260,H=55,pL=4,pR=4,pT=10,pB=6,n=sem.length;
+  var xs=sem.map(function(_,i){return pL+(i/(n-1))*(W-pL-pR);});
+  var ys=sem.map(function(s){return pT+(1-s.c/max)*(H-pT-pB);});
+  var area='M '+xs[0]+' '+(H-pB); xs.forEach(function(x,i){area+=' L '+x+' '+ys[i];}); area+=' L '+xs[n-1]+' '+(H-pB)+' Z';
+  var line='M '+xs[0]+' '+ys[0];
+  for(var i=1;i<n;i++){ var c1x=xs[i-1]+(xs[i]-xs[i-1])*.5,c2x=xs[i]-(xs[i]-xs[i-1])*.5; line+=' C '+c1x+' '+ys[i-1]+' '+c2x+' '+ys[i]+' '+xs[i]+' '+ys[i]; }
+  var dots=xs.map(function(x,i){ var last=i===n-1,col=last?'#C9A84C':'#1ABC9C';
+    return '<circle cx="'+x+'" cy="'+ys[i]+'" r="'+(last?4:2.5)+'" fill="'+col+'" stroke="#fff" stroke-width="1.5"><title>'+sem[i].l+': '+sem[i].c+'</title></circle>'
+      +(sem[i].c>0?'<text x="'+x+'" y="'+(ys[i]-6)+'" text-anchor="middle" font-size="7" font-weight="700" fill="'+col+'">'+sem[i].c+'</text>':'');
+  }).join('');
+  var defs='<defs><linearGradient id="tgs" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1ABC9C" stop-opacity=".15"/><stop offset="100%" stop-color="#1ABC9C" stop-opacity="0"/></linearGradient></defs>';
+  var svg=document.getElementById('trend-svg-side'); if(!svg) return;
+  svg.innerHTML=defs+'<path d="'+area+'" fill="url(#tgs)"/><path d="'+line+'" fill="none" stroke="#1ABC9C" stroke-width="1.8" stroke-linecap="round"/>'+dots;
+  var lblDiv=document.getElementById('trend-lbls-side'); if(!lblDiv) return;
+  lblDiv.innerHTML=sem.map(function(s,i){ var last=i===n-1;
+    return '<span style="font-size:.52rem;font-weight:'+(last?'700':'500')+';color:'+(last?'var(--gold)':'var(--text-light)')+';flex:1;text-align:center">'+s.l+'</span>';
+  }).join('');
+}
+
+// ══ ESTADÍSTICAS CHARTS ═══════════════════════════
+var chTend,chMod,chEmp,chDia,chHora,chProc;
+function renderEstadisticas() {
+  var total=todasLasCitas.length,pres=0,virt=0,empC={},diaC={0:0,1:0,2:0,3:0,4:0,5:0,6:0},horaC={};
+  todasLasCitas.forEach(function(ev){
+    var desc=ev.description||'',modal=((desc.match(/Modalidad: (.+)/)||[])[1]||'Presencial');
+    if(modal.toLowerCase().includes('virtual')) virt++; else pres++;
+    var emp=((desc.match(/Empresa: (.+)/)||[])[1]||''); if(emp) empC[emp]=(empC[emp]||0)+1;
+    var s=new Date(ev.start.dateTime); diaC[s.getDay()]=(diaC[s.getDay()]||0)+1;
+    var h=s.getHours(); horaC[h]=(horaC[h]||0)+1;
+  });
+  document.getElementById('est-total').textContent=total;
+  document.getElementById('est-pres').textContent=pres;
+  document.getElementById('est-pres-lbl').textContent=total>0?Math.round(pres/total*100)+'% presencial':'Presencial';
+  document.getElementById('est-virt').textContent=virt;
+  document.getElementById('est-virt-lbl').textContent=total>0?Math.round(virt/total*100)+'% virtual':'Virtual';
+  document.getElementById('est-emps').textContent=Object.keys(empC).length;
+  var semanas=[],semLbls=[],hoy=new Date();
+  for(var w=11;w>=0;w--){
+    var ini=new Date(hoy); ini.setDate(hoy.getDate()-(w*7+6)); ini.setHours(0,0,0,0);
+    var fin=new Date(hoy); fin.setDate(hoy.getDate()-w*7); fin.setHours(23,59,59);
+    semanas.push(todasLasCitas.filter(function(ev){ var s=new Date(ev.start.dateTime); return s>=ini&&s<=fin; }).length);
+    semLbls.push(ini.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit'}));
+  }
+  var defs={responsive:true,plugins:{legend:{labels:{font:{family:'Plus Jakarta Sans',size:11},color:'#94A3B8'}}}};
+  if(chTend) chTend.destroy();
+  chTend=new Chart(document.getElementById('ch-tendencia'),{ type:'line', data:{ labels:semLbls,
+    datasets:[{label:'Citas',data:semanas,borderColor:'#1ABC9C',backgroundColor:'rgba(26,188,156,.08)',
+      borderWidth:2,pointBackgroundColor:'#1ABC9C',pointRadius:4,fill:true,tension:.4}]},
+    options:{...defs,scales:{x:{grid:{color:'rgba(200,211,222,.3)'},ticks:{color:'#94A3B8',font:{size:10}}},
+      y:{grid:{color:'rgba(200,211,222,.3)'},ticks:{color:'#94A3B8',font:{size:10},stepSize:1},beginAtZero:true}}}});
+  if(chMod) chMod.destroy();
+  chMod=new Chart(document.getElementById('ch-modalidad'),{ type:'doughnut',
+    data:{labels:['Presencial','Virtual'],datasets:[{data:[pres,virt],backgroundColor:['#1ABC9C','#2980B9'],borderWidth:0,hoverOffset:6}]},
+    options:{...defs,cutout:'65%',plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:11},color:'#64748B'}}}}});
+  var empLista=Object.entries(empC).sort(function(a,b){return b[1]-a[1];}).slice(0,7);
+  if(chEmp) chEmp.destroy();
+  chEmp=new Chart(document.getElementById('ch-empresas'),{ type:'bar',
+    data:{labels:empLista.map(function(e){return e[0].length>20?e[0].substring(0,20)+'…':e[0];}),
+      datasets:[{label:'Citas',data:empLista.map(function(e){return e[1];}),backgroundColor:'rgba(41,128,185,.75)',borderRadius:5,borderSkipped:false}]},
+    options:{...defs,scales:{x:{grid:{display:false},ticks:{color:'#94A3B8',font:{size:9}}},
+      y:{grid:{color:'rgba(200,211,222,.3)'},ticks:{color:'#94A3B8',font:{size:10},stepSize:1},beginAtZero:true}}}});
+  var diasN=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  if(chDia) chDia.destroy();
+  chDia=new Chart(document.getElementById('ch-diasem'),{ type:'bar',
+    data:{labels:diasN,datasets:[{label:'Citas',data:diasN.map(function(_,i){return diaC[i]||0;}),
+      backgroundColor:['rgba(201,168,76,.6)','rgba(41,128,185,.8)','rgba(41,128,185,.8)','rgba(41,128,185,.8)','rgba(41,128,185,.8)','rgba(41,128,185,.8)','rgba(201,168,76,.6)'],
+      borderRadius:5,borderSkipped:false}]},
+    options:{...defs,scales:{x:{grid:{display:false},ticks:{color:'#94A3B8',font:{size:11}}},
+      y:{grid:{color:'rgba(200,211,222,.3)'},ticks:{color:'#94A3B8',font:{size:10},stepSize:1},beginAtZero:true}}}});
+  var horas=[7,8,9,10,11,12,13,14,15,16,17,18];
+  if(chHora) chHora.destroy();
+  chHora=new Chart(document.getElementById('ch-hora'),{ type:'bar',
+    data:{labels:horas.map(function(h){return h+':00';}),datasets:[{label:'Citas',data:horas.map(function(h){return horaC[h]||0;}),
+      backgroundColor:'rgba(26,188,156,.75)',borderRadius:5,borderSkipped:false}]},
+    options:{...defs,scales:{x:{grid:{display:false},ticks:{color:'#94A3B8',font:{size:9}}},
+      y:{grid:{color:'rgba(200,211,222,.3)'},ticks:{color:'#94A3B8',font:{size:10},stepSize:1},beginAtZero:true}}}});
+  var procs=getSegProcesos(),pC={alta:0,media:0,baja:0};
+  procs.forEach(function(p){pC[p.prio]=(pC[p.prio]||0)+1;});
+  if(chProc) chProc.destroy();
+  chProc=new Chart(document.getElementById('ch-procesos'),{ type:'doughnut',
+    data:{labels:['Alta','Media','Baja'],datasets:[{data:[pC.alta,pC.media,pC.baja],
+      backgroundColor:['#DC2626','#C9A84C','#1ABC9C'],borderWidth:0,hoverOffset:6}]},
+    options:{...defs,cutout:'60%',plugins:{legend:{position:'bottom',labels:{padding:12,font:{size:11},color:'#64748B'}}}}});
 }
 
 // ══ SEGUIMIENTO — STORAGE ═════════════════════════
