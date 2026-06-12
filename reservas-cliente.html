@@ -207,10 +207,9 @@
     <div class="info-chip">📅 <span>Lunes a Viernes</span></div>
     <div class="dur-wrap">
       <span class="dur-label">⏱ Duración</span>
-      <button class="dur-btn" onclick="setDuration(0.75)">45 min</button>
-      <button class="dur-btn active" onclick="setDuration(1)">1h</button>
-      <button class="dur-btn" onclick="setDuration(2)">2h</button>
-      <button class="dur-btn" onclick="setDuration(3)">3h</button>
+      <button class="dur-btn active" onclick="setDuration(1.5)">1h 30</button>
+      <button class="dur-btn" onclick="setDuration(2.5)">2h 30</button>
+      <button class="dur-btn" onclick="setDuration(3.5)">3h 30</button>
     </div>
   </div>
 
@@ -347,7 +346,7 @@ function endHour(h, dur) {
 }
 
 function durLabel(dur) {
-  if (dur === 0.75) return '45 min';
+  if (dur === 1.5) return '1h 30 min';
   return dur + ' hora' + (dur > 1 ? 's' : '');
 }
 
@@ -355,7 +354,7 @@ function durLabel(dur) {
 var currentDate  = new Date();
 var selectedDate = null;
 var selectedHour = null;
-var sessionDur   = 1;
+var sessionDur   = 1.5;
 var busySlots    = {};
 var formData     = {};
 
@@ -472,7 +471,7 @@ async function loadMonthBusy(year, month) {
       var dateStr = toDateStr(evStart);
       if (!busySlots[dateStr]) busySlots[dateStr] = [];
       // Bloquear todos los slots que se solapan con este evento
-      [0.75, 1, 2, 3].forEach(function(dur) {
+      [1, 1.5, 2, 3].forEach(function(dur) {
         getAllH(dur).forEach(function(h) {
           var slotStart = new Date(dateStr + 'T' + h + ':00');
           var slotEnd   = new Date(slotStart.getTime() + dur*60*60*1000);
@@ -660,7 +659,7 @@ function mostrarExito(nombre) {
 }
 
 function reiniciar() {
-  selectedDate = null; selectedHour = null; formData = {}; sessionDur = 1;
+  selectedDate = null; selectedHour = null; formData = {}; sessionDur = 1.5;
   document.querySelectorAll('.dur-btn').forEach(function(b, i) { b.classList.toggle('active', i === 0); });
   document.getElementById('success-screen').style.display = 'none';
   show('booking-screen'); show('steps-bar');
