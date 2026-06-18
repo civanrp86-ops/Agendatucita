@@ -584,8 +584,10 @@ function togglePM() {
 }
 
 function selectDur(el) {
-  document.querySelectorAll('.dur-opt').forEach(e => e.classList.remove('selected'));
-  el.classList.add('selected');
+  el.classList.toggle('selected');
+  // Asegurarse de que al menos una esté seleccionada
+  const selected = document.querySelectorAll('.dur-opt.selected');
+  if (selected.length === 0) el.classList.add('selected');
 }
 
 function selectBuf(el) {
@@ -649,8 +651,8 @@ function wizardNext(step) {
     wizardData.pmEnabled = document.getElementById('pm-toggle').classList.contains('on');
     wizardData.pmStart  = document.getElementById('pm-start').value;
     wizardData.pmEnd    = document.getElementById('pm-end').value;
-    const durSel = document.querySelector('.dur-opt.selected');
-    wizardData.duration = durSel ? parseFloat(durSel.dataset.dur) : 1.5;
+    const durSel = [...document.querySelectorAll('.dur-opt.selected')].map(e => e.dataset.dur);
+    wizardData.duration = durSel.join(',');
     const bufSel = document.querySelector('.buf-opt.selected');
     wizardData.buffer   = bufSel ? parseInt(bufSel.dataset.buf) : 0;
     // Guardar y mostrar resultado
@@ -687,8 +689,7 @@ function generateResultLink() {
     pm_enabled: wizardData.pmEnabled ? '1' : '0',
     pm_start:   wizardData.pmStart,
     pm_end:     wizardData.pmEnd,
-    duration:   wizardData.duration,
-    buffer:     wizardData.buffer
+    duration:   wizardData.duration,    buffer:     wizardData.buffer
   });
 
   const baseUrl = 'https://civanrp86-ops.github.io/Agendatucita/reservas-cliente.html';
