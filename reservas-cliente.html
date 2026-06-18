@@ -214,9 +214,7 @@
     <div class="info-chip">📅 <span>Lunes a Viernes</span></div>
     <div class="dur-wrap">
       <span class="dur-label">⏱ Duración</span>
-      <button class="dur-btn active" onclick="setDuration(1.5)">1h30</button>
-      <button class="dur-btn" onclick="setDuration(2.5)">2h30</button>
-      <button class="dur-btn" onclick="setDuration(3.5)">3h30</button>
+      <div id="dur-btns-container"></div>
     </div>
   </div>
 
@@ -347,7 +345,7 @@ function getQueryParams() {
     pm_enabled:  params.get('pm_enabled') !== '0',
     pm_start:    params.get('pm_start')    || '14:00',
     pm_end:      params.get('pm_end')      || '17:00',
-    duration:    parseFloat(params.get('duration') || '1.5'),
+    duration:    params.get('duration') || '1.5,2.5,3.5',
     buffer:      parseInt(params.get('buffer') || '0')
   };
 }
@@ -375,9 +373,10 @@ const CALENDAR_ID = config.email;
 const APPS_SCRIPT = config.apps_script;
 const OWNER_EMAIL = config.email;
 const OWNER_NAME  = config.name;
-const WORK_DAYS   = config.days.split(',').map(Number);
-const BUFFER_MINS = config.buffer;
-const DEFAULT_DUR = config.duration;
+const WORK_DAYS    = config.days.split(',').map(Number);
+const BUFFER_MINS  = config.buffer;
+const DURATIONS    = config.duration.split(',').map(Number);
+const DEFAULT_DUR  = DURATIONS[0];
 
 // ══ HORARIOS BASE ══════════════════════════════════════
 function buildSlots(startTime, endTime, dur) {
@@ -444,24 +443,29 @@ var busySlots    = {};
 var formData     = {};
 
 // ══ INIT ═══════════════════════════════════════════════
-// Activar el botón de duración correcto
-document.querySelectorAll('.dur-btn').forEach(function(b, i) {
-  var durs = [1.5, 2.5, 3.5];
-  b.classList.toggle('active', durs[i] === DEFAULT_DUR);
+// Generar botones de duración según DURATIONS
+const DUR_LABELS = { 1.5: '1h30', 2.5: '2h30', 3.5: '3h30' };
+var durContainer = document.getElementById('dur-btns-container');
+DURATIONS.forEach(function(d, i) {
+  var btn = document.createElement('button');
+  btn.className = 'dur-btn' + (i === 0 ? ' active' : '');
+  btn.textContent = DUR_LABELS[d] || (d + 'h');
+  btn.onclick = function() { setDuration(d); };
+  durContainer.appendChild(btn);
 });
+
 renderCalendar();
 loadMonthBusy(currentDate.getFullYear(), currentDate.getMonth());
 showServiceInfo(DEFAULT_DUR);
 
-// ══ DURACIÓN ═══════════════════════════════════════════
 function setDuration(h) {
   sessionDur = h;
   document.querySelectorAll('.dur-btn').forEach(function(b) {
-    b.classList.remove('active');
+    b.classList.toggle('active', parseFloat(b.textContent) === h || 
+      (h === 1.5 && b.textContent === '1h30') ||
+      (h === 2.5 && b.textContent === '2h30') ||
+      (h === 3.5 && b.textContent === '3h30'));
   });
-  var idx = [1.5, 2.5, 3.5].indexOf(h);
-  if (idx >= 0) document.querySelectorAll('.dur-btn')[idx].classList.add('active');
-
   showServiceInfo(h);
   selectedHour = null;
   document.getElementById('btn-next1').disabled = true;
@@ -698,10 +702,7 @@ function mostrarExito(nombre) {
 
 function reiniciar() {
   selectedDate = null; selectedHour = null; formData = {}; sessionDur = DEFAULT_DUR;
-  document.querySelectorAll('.dur-btn').forEach(function(b, i) {
-    var durs = [1.5, 2.5, 3.5];
-    b.classList.toggle('active', durs[i] === DEFAULT_DUR);
-  });
+  document.querySelectorAll('.dur-btn').forEach(function(b, i) { b.classList.toggle('active', i === 0); });
   showServiceInfo(DEFAULT_DUR);
   document.getElementById('success-screen').style.display = 'none';
   show('booking-screen'); show('steps-bar');
@@ -718,4 +719,3 @@ function show(id) { document.getElementById(id).style.display = ''; }
 function hide(id) { document.getElementById(id).style.display = 'none'; }
 </script>
 </body>
-</html>
