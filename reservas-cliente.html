@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AgendaTuCita — Sandra Estupiñán</title>
+<title>AgendaTuCita</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -11,6 +11,7 @@
     --primary-lt: #2E86C1;
     --accent:     #1ABC9C;
     --accent-dk:  #148F77;
+    --gold:       #C9A84C;
     --bg:         #F4F6F9;
     --surface:    #FFFFFF;
     --border:     #D5DCE8;
@@ -98,87 +99,80 @@
     aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center;
     font-size: .88rem; cursor: pointer; border: 1px solid transparent; font-weight: 500; transition: all .2s; position: relative;
   }
-  .cal-day:hover:not(.disabled):not(.empty) { background: rgba(27,79,114,.08); border-color: var(--primary-lt); }
-  .cal-day.today   { border-color: var(--primary-lt); color: var(--primary-lt); font-weight: 700; }
+  .cal-day:hover { border-color: var(--border); background: var(--bg); }
+  .cal-day.available { cursor: pointer; }
+  .cal-day.available:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
   .cal-day.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
-  .cal-day.disabled { color: #C5CBD3; cursor: not-allowed; background: #F8F9FB; }
-  .cal-day.empty   { cursor: default; }
-  .cal-day.has-slots::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
-  .cal-day.selected::after  { background: rgba(255,255,255,.7); }
+  .cal-day.today::after { content: ''; position: absolute; bottom: 2px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+  .cal-day.disabled { color: var(--text-muted); opacity: .4; cursor: not-allowed; }
 
-  .slots-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .slots-header h4 { font-size: .95rem; font-weight: 600; }
-  .slots-header span { font-size: .82rem; color: var(--text-muted); background: var(--bg); padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border); }
-  .slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
+  .slots-wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 8px; }
   .slot-btn {
-    padding: 10px 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface);
-    font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 500; cursor: pointer;
-    text-align: center; color: var(--text); transition: all .2s;
+    padding: 8px 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+    cursor: pointer; font-size: .82rem; font-weight: 500; color: var(--text);
+    transition: all .2s; font-family: 'DM Sans', sans-serif;
   }
-  .slot-btn:hover:not(.taken) { border-color: var(--primary-lt); color: var(--primary); background: rgba(27,79,114,.05); }
-  .slot-btn.selected { background: var(--primary); border-color: var(--primary); color: #fff; }
-  .slot-btn.taken    { background: #F8F9FB; color: #C5CBD3; cursor: not-allowed; text-decoration: line-through; }
-  .slot-period {
-    font-size: .7rem; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
-    color: var(--text-muted); margin: 14px 0 8px; display: flex; align-items: center; gap: 8px;
-  }
-  .slot-period::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .slot-btn:hover { border-color: var(--primary); background: var(--bg); }
+  .slot-btn.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .slot-btn.busy { background: #F5F5F5; color: var(--text-muted); cursor: not-allowed; opacity: .6; }
 
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media(max-width:540px) { .form-grid { grid-template-columns: 1fr; } }
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
+  .form-group { display: flex; flex-direction: column; }
   .form-group.full { grid-column: 1 / -1; }
-  label { font-size: .78rem; font-weight: 600; color: var(--text-muted); letter-spacing: .3px; text-transform: uppercase; }
-  input, select, textarea {
-    font-family: 'DM Sans', sans-serif; font-size: .95rem; padding: 11px 14px;
-    border-radius: 8px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text);
-    outline: none; transition: border-color .2s;
+  .form-group label { font-size: .82rem; font-weight: 600; color: var(--primary); margin-bottom: 6px; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: .92rem;
+    transition: all .2s;
   }
-  input:focus, select:focus, textarea:focus { border-color: var(--primary-lt); background: #fff; }
-  textarea { resize: vertical; min-height: 80px; }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,79,114,.1);
+  }
 
   .summary-box {
-    background: linear-gradient(135deg, rgba(27,79,114,.06), rgba(26,188,156,.06));
-    border: 1px solid rgba(27,79,114,.15); border-radius: 10px; padding: 18px; margin-bottom: 20px;
+    background: var(--bg); border-radius: 8px; padding: 16px; margin-bottom: 16px;
+    border: 1px solid var(--border);
   }
-  .summary-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: .92rem; }
-  .summary-row + .summary-row { border-top: 1px solid rgba(27,79,114,.08); }
-  .summary-icon  { font-size: 1rem; width: 20px; text-align: center; }
-  .summary-label { color: var(--text-muted); font-size: .82rem; min-width: 90px; }
-  .summary-val   { font-weight: 600; color: var(--primary); }
+  .summary-row {
+    display: grid; grid-template-columns: 32px 120px 1fr; gap: 12px; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--border); font-size: .9rem;
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-icon { font-size: 1.2rem; text-align: center; }
+  .summary-label { color: var(--text-muted); font-weight: 500; }
+  .summary-val { color: var(--primary); font-weight: 600; }
 
   .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 13px 28px; border-radius: 10px; font-family: 'DM Sans', sans-serif;
-    font-size: .95rem; font-weight: 600; cursor: pointer; border: none; transition: all .25s;
+    padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: .92rem; font-weight: 600;
+    transition: all .2s; display: inline-flex; align-items: center; gap: 8px;
   }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-lt));
-    color: #fff; box-shadow: 0 4px 14px rgba(27,79,114,.3); width: 100%;
-  }
-  .btn-primary:hover    { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(27,79,114,.4); }
-  .btn-primary:disabled { opacity: .55; cursor: not-allowed; transform: none; }
-  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
-  .btn-ghost:hover { background: var(--bg); color: var(--text); }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: #154360; }
+  .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--primary); }
+  .btn-ghost:hover { border-color: var(--primary); background: var(--bg); }
 
-  #success-screen { display: none; text-align: center; padding: 20px; }
-  .success-icon {
-    width: 80px; height: 80px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-dk));
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: 2rem; margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(26,188,156,.3);
-  }
-  #success-screen h2 { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: var(--primary); margin-bottom: 10px; }
-  #success-screen p  { color: var(--text-muted); font-size: .95rem; line-height: 1.6; max-width: 420px; margin: 0 auto 24px; }
-  .confirm-details { background: var(--bg); border-radius: 10px; padding: 18px; text-align: left; max-width: 420px; margin: 0 auto 24px; border: 1px solid var(--border); }
-
-  .loader { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 28px; color: var(--text-muted); font-size: .9rem; }
-  .spinner { width: 22px; height: 22px; border: 2.5px solid var(--border); border-top-color: var(--primary-lt); border-radius: 50%; animation: spin .7s linear infinite; }
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin .6s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .alert { padding: 12px 16px; border-radius: 8px; font-size: .88rem; margin-top: 14px; display: flex; align-items: flex-start; gap: 10px; }
+  .loader { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+
+  .alert { padding: 12px 16px; border-radius: 8px; margin: 12px 0; font-size: .9rem; }
   .alert-error   { background: #FDECEA; color: #C0392B; border: 1px solid #F5C6CB; }
   .alert-info    { background: #EBF5FB; color: #1B4F72; border: 1px solid #AED6F1; }
+
+  .success-icon {
+    width: 80px; height: 80px; border-radius: 50%; background: var(--accent);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 3rem; margin: 0 auto 20px;
+  }
+  .success-title { font-size: 1.6rem; font-weight: 600; color: var(--primary); text-align: center; margin-bottom: 12px; }
+  .success-text { color: var(--text-muted); text-align: center; margin-bottom: 24px; }
 
   footer { text-align: center; padding: 20px; font-size: .78rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 40px; }
   footer strong { color: var(--primary); }
@@ -188,8 +182,8 @@
 
 <header>
   <h1>📅 AgendaTuCita</h1>
-  <p>Fisioterapia &amp; Rehabilitación Profesional</p>
-  <div class="badge-esp">Dra. Sandra Estupiñán · Cúcuta, Norte de Santander</div>
+  <p id="header-profession">Consultas Profesionales</p>
+  <div class="badge-esp" id="header-badge"></div>
 </header>
 
 <div class="container">
@@ -207,9 +201,9 @@
     <div class="info-chip">📅 <span>Lunes a Viernes</span></div>
     <div class="dur-wrap">
       <span class="dur-label">⏱ Duración</span>
-      <button class="dur-btn active" onclick="setDuration(1.5)">1h 30</button>
-      <button class="dur-btn" onclick="setDuration(2.5)">2h 30</button>
-      <button class="dur-btn" onclick="setDuration(3.5)">3h 30</button>
+      <button class="dur-btn active" onclick="setDuration(1)">1h</button>
+      <button class="dur-btn" onclick="setDuration(2)">2h</button>
+      <button class="dur-btn" onclick="setDuration(3)">3h</button>
     </div>
   </div>
 
@@ -296,78 +290,109 @@
   </div>
 
   <!-- ÉXITO -->
-  <div id="success-screen" class="card">
+  <div id="success-screen" class="card" style="display:none;text-align:center">
     <div class="success-icon">✓</div>
-    <h2>¡Cita confirmada!</h2>
-    <p>Tu reserva quedó registrada en el calendario de la Dra. Sandra Estupiñán. Nos vemos pronto.</p>
-    <div class="confirm-details" id="success-details"></div>
-    <div class="alert alert-info" style="max-width:420px;margin:0 auto 20px;text-align:left">
-      📌 <div><strong>Recuerda:</strong> Si necesitas cancelar o reprogramar, comunícate con antelación.</div>
+    <div class="success-title">¡Cita confirmada!</div>
+    <div class="success-text">Tu cita ha sido registrada exitosamente. Recibirás un email de confirmación en breve.</div>
+    <div id="success-details"></div>
+    <div style="margin-top:24px">
+      <button class="btn btn-primary" onclick="reiniciar()">Agendar otra cita</button>
     </div>
-    <button class="btn btn-primary" onclick="reiniciar()" style="max-width:260px">+ Agendar otra cita</button>
   </div>
 
 </div>
 
 <footer>
-  <strong>AgendaTuCita</strong> · Dra. Sandra Estupiñán · Fisioterapia &amp; Seguridad y Salud en el Trabajo · Cúcuta, Norte de Santander<br>
+  <strong>AgendaTuCita</strong> · <span id="footer-name"></span> · <span id="footer-profession"></span> · Cúcuta, Norte de Santander<br>
 </footer>
 
 <script>
-// ══ CONFIGURACIÓN ══════════════════════════
-const API_KEY     = 'AIzaSyAPocHbXxs17BKkavW0rKkCyc4avUCyRpM';
-const CALENDAR_ID = 'estuval2022@gmail.com';
-const APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycby944JWCEqXjU5f4NWdHrPc6jcsltxfmQwBPcnem7UELe17XmP6okdCseg6duRESsMD/exec';
+// ══ LEER PARÁMETROS DE URL ═════════════════════════════
+function getQueryParams() {
+  var params = new URLSearchParams(window.location.search);
+  return {
+    email:       params.get('email') || 'estuval2022@gmail.com',
+    name:        params.get('name') || 'Sandra Estupiñán',
+    profession:  params.get('profession') || 'Consultas Profesionales',
+    api_key:     params.get('api_key') || 'AIzaSyAPocHbXxs17BKkavW0rKkCyc4avUCyRpM',
+    apps_script: params.get('apps_script') || 'https://script.google.com/macros/s/AKfycbzcs6d1mgg7wdHGup1x4PFWV7MlDft0x3Sg_AmkXPOWjc_ksKlNvZcGgva1agi5akuH/exec',
+    primary:     params.get('primary') || '#1B4F72',
+    accent:      params.get('accent') || '#1ABC9C',
+    gold:        params.get('gold') || '#C9A84C'
+  };
+}
 
-// ══ HORARIOS BASE ══════════════════════════
-const AM_START = '07:00', AM_END = '11:00'; // mañana 07:00-11:00
-const PM_START = '14:00', PM_END = '17:00'; // tarde 14:00-17:00
+var config = getQueryParams();
 
-function toMin(hStr) {
-  var p = hStr.split(':'); return parseInt(p[0]) * 60 + parseInt(p[1]);
-}
-function toHHMM(mins) {
-  var h = Math.floor(mins / 60), m = mins % 60;
-  return (h < 10 ? '0' : '') + h + ':' + (m === 0 ? '00' : m);
-}
-// Genera slots cada 'dur' horas (puede ser 0.75) dentro del rango [startStr, endStr]
-function genSlots(startStr, endStr, dur) {
-  var startMin = toMin(startStr), endMin = toMin(endStr), durMin = Math.round(dur * 60);
-  var out = [], t = startMin;
-  while (t + durMin <= endMin) { out.push(toHHMM(t)); t += durMin; }
-  return out;
-}
-function getAM(dur) { return genSlots(AM_START, AM_END, dur); }
-function getPM(dur) { return genSlots(PM_START, PM_END, dur); }
+// ══ APLICAR CONFIGURACIÓN ══════════════════════════════
+document.documentElement.style.setProperty('--primary', config.primary);
+document.documentElement.style.setProperty('--primary-lt', lighten(config.primary, 20));
+document.documentElement.style.setProperty('--accent', config.accent);
+document.documentElement.style.setProperty('--accent-dk', darken(config.accent, 15));
+document.documentElement.style.setProperty('--gold', config.gold);
+
+// Actualizar header
+document.getElementById('header-profession').textContent = config.profession;
+document.getElementById('header-badge').textContent = config.name + ' · Cúcuta, Norte de Santander';
+
+// Actualizar footer
+document.getElementById('footer-name').textContent = config.name;
+document.getElementById('footer-profession').textContent = config.profession;
+
+// ══ CONFIGURACIÓN ══════════════════════════════════════
+const API_KEY     = config.api_key;
+const CALENDAR_ID = config.email;
+const APPS_SCRIPT = config.apps_script;
+const OWNER_EMAIL = config.email;
+const OWNER_NAME  = config.name;
+
+// ══ HORARIOS BASE ══════════════════════════════════════
+const AM_BASE = ['07:00','08:00','09:00','10:00'];
+const PM_BASE = ['14:00','15:00','16:00'];
+
+function getAM(dur) { return AM_BASE.filter(h => parseInt(h) + dur <= 11); }
+function getPM(dur) { return PM_BASE.filter(h => parseInt(h) + dur <= 17); }
 function getAllH(dur) { return [...getAM(dur), ...getPM(dur)]; }
 
 function endHour(h, dur) {
-  return toHHMM(toMin(h) + Math.round(dur * 60));
+  var parts = h.split(':');
+  var hr = parseInt(parts[0]) + dur;
+  return (hr < 10 ? '0' : '') + hr + ':00';
 }
 
-function durLabel(dur) {
-  if (dur === 1.5) return '1h 30 min';
-  return dur + ' hora' + (dur > 1 ? 's' : '');
+// ══ UTILIDADES DE COLOR ════════════════════════════════
+function lighten(color, percent) {
+  var num = parseInt(color.replace("#",""), 16);
+  var amt = Math.round(2.55 * percent);
+  var R = (num >> 16) + amt;
+  var G = (num >> 8 & 0x00FF) + amt;
+  var B = (num & 0x0000FF) + amt;
+  return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 +
+    (G<255?G<1?0:G:255)*0x100+(B<255?B<1?0:B:255))
+    .toString(16).slice(1);
 }
 
-// ══ ESTADO ══════════════════════════════
+function darken(color, percent) {
+  return lighten(color, -percent);
+}
+
+// ══ ESTADO ═════════════════════════════════════════════
 var currentDate  = new Date();
 var selectedDate = null;
 var selectedHour = null;
-var sessionDur   = 1.5;
+var sessionDur   = 1;
 var busySlots    = {};
 var formData     = {};
 
-// ══ INIT ════════════════════════════════
+// ══ INIT ═══════════════════════════════════════════════
 renderCalendar();
 loadMonthBusy(currentDate.getFullYear(), currentDate.getMonth());
 
-// ══ DURACIÓN ════════════════════════════
+// ══ DURACIÓN ═══════════════════════════════════════════
 function setDuration(h) {
   sessionDur = h;
-  document.querySelectorAll('.dur-btn').forEach(function(b) {
-    var val = b.getAttribute('onclick').match(/setDuration\(([\d.]+)\)/)[1];
-    b.classList.toggle('active', parseFloat(val) === h);
+  document.querySelectorAll('.dur-btn').forEach(function(b, i) {
+    b.classList.toggle('active', i + 1 === h);
   });
   selectedHour = null;
   document.getElementById('btn-next1').disabled = true;
@@ -375,7 +400,7 @@ function setDuration(h) {
   renderCalendar();
 }
 
-// ══ CALENDARIO ══════════════════════════
+// ══ CALENDARIO ═════════════════════════════════════════
 function renderCalendar() {
   var y = currentDate.getFullYear();
   var m = currentDate.getMonth();
@@ -398,212 +423,141 @@ function renderCalendar() {
   var today = new Date(); today.setHours(0,0,0,0);
 
   for (var i = 0; i < startOffset; i++) {
-    var e = document.createElement('div');
-    e.className = 'cal-day empty';
-    grid.appendChild(e);
+    var empty = document.createElement('div');
+    grid.appendChild(empty);
   }
 
   for (var d = 1; d <= daysInMonth; d++) {
     var date = new Date(y, m, d);
-    date.setHours(0,0,0,0);
-    var dow    = date.getDay();
-    var isWE   = dow === 0 || dow === 6;
-    var isPast = date < today;
-    var dateStr = toDateStr(date);
-    var busy    = busySlots[dateStr] || [];
-    var allH    = getAllH(sessionDur);
-    var allBusy = allH.every(function(h) { return busy.includes(h); });
-    var isSelected = selectedDate && toDateStr(selectedDate) === dateStr;
-    var isToday    = date.getTime() === today.getTime();
-    var hasSlots   = !isWE && !isPast && !allBusy;
-
     var cell = document.createElement('div');
     cell.className = 'cal-day';
-    if (isWE || isPast || allBusy) cell.classList.add('disabled');
-    if (isToday)    cell.classList.add('today');
-    if (isSelected) cell.classList.add('selected');
-    if (hasSlots)   cell.classList.add('has-slots');
     cell.textContent = d;
 
-    if (!isWE && !isPast && !allBusy) {
-      (function(dt) {
-        cell.onclick = function() { selectDate(dt); };
-      })(date);
+    if (date < today) {
+      cell.classList.add('disabled');
+    } else {
+      if (date.getTime() === today.getTime()) cell.classList.add('today');
+      if (selectedDate && selectedDate.getTime() === date.getTime()) cell.classList.add('selected');
+      cell.classList.add('available');
+      cell.onclick = function() { selectDate(new Date(date)); };
     }
+
     grid.appendChild(cell);
   }
 }
 
 function changeMonth(dir) {
   currentDate.setMonth(currentDate.getMonth() + dir);
+  selectedDate = null; selectedHour = null;
+  document.getElementById('btn-next1').disabled = true;
   renderCalendar();
   loadMonthBusy(currentDate.getFullYear(), currentDate.getMonth());
-  if (selectedDate && (selectedDate.getMonth() !== currentDate.getMonth() || selectedDate.getFullYear() !== currentDate.getFullYear())) {
-    selectedDate = null; selectedHour = null;
-    document.getElementById('slots-card').style.display = 'none';
-  }
 }
 
-function selectDate(date) {
-  selectedDate = date;
+function selectDate(d) {
+  selectedDate = new Date(d);
   selectedHour = null;
   document.getElementById('btn-next1').disabled = true;
   renderCalendar();
-  renderSlots(date);
+  renderSlots(d);
   document.getElementById('slots-card').style.display = 'block';
-  document.getElementById('slots-card').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
-// ══ DISPONIBILIDAD ══════════════════════
-async function loadMonthBusy(year, month) {
-  var timeMin = new Date(year, month, 1).toISOString();
-  var timeMax = new Date(year, month + 1, 0, 23, 59).toISOString();
-  var url = 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(CALENDAR_ID) + '/events'
-    + '?key=' + API_KEY + '&timeMin=' + timeMin + '&timeMax=' + timeMax + '&singleEvents=true&orderBy=startTime';
-  try {
-    var res  = await fetch(url);
-    var data = await res.json();
-    if (!data.items) return;
-    data.items.forEach(function(ev) {
-      if (!ev.start.dateTime) return; // ignorar eventos de día completo
-      var evStart = new Date(ev.start.dateTime);
-      var evEnd   = new Date(ev.end.dateTime);
-      var dateStr = toDateStr(evStart);
-      if (!busySlots[dateStr]) busySlots[dateStr] = [];
-      // Bloquear todos los slots que se solapan con este evento
-      [1, 1.5, 2, 3].forEach(function(dur) {
-        getAllH(dur).forEach(function(h) {
-          var slotStart = new Date(dateStr + 'T' + h + ':00');
-          var slotEnd   = new Date(slotStart.getTime() + dur*60*60*1000);
-          // Un slot se solapa si el evento empieza antes de que termine el slot Y termina después de que empieza el slot
-          if (evStart < slotEnd && evEnd > slotStart) {
-            if (!busySlots[dateStr].includes(h)) busySlots[dateStr].push(h);
-          }
-        });
-      });
-    });
-    renderCalendar();
-    if (selectedDate) renderSlots(selectedDate);
-  } catch(err) {
-    console.warn('Error cargando disponibilidad:', err);
-  }
+function renderSlots(d) {
+  var dateStr = toDateStr(d);
+  var busy = busySlots[dateStr] || [];
+  var avail = getAllH(sessionDur);
+  var html = '';
+
+  avail.forEach(function(h) {
+    var isBusy = busy.includes(h);
+    html += '<button class="slot-btn' + (isBusy ? ' busy' : '') + (h === selectedHour ? ' selected' : '') +
+            '" ' + (isBusy ? 'disabled' : 'onclick="selectSlot(\'' + h + '\')"') + '>' + h + '</button>';
+  });
+
+  document.getElementById('slots-container').innerHTML = html;
 }
 
-// ══ SLOTS ════════════════════════════════
-function renderSlots(date) {
-  var dateStr   = toDateStr(date);
-  var busy      = busySlots[dateStr] || [];
-  var horariosAM = getAM(sessionDur);
-  var horariosPM = getPM(sessionDur);
-  var disponibles = horariosAM.concat(horariosPM).filter(function(h) { return !busy.includes(h); }).length;
-  var fmtDate = date.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long' });
-  var container = document.getElementById('slots-container');
-
-  var html = '<div class="slots-header">'
-    + '<h4>' + cap(fmtDate) + '</h4>'
-    + '<span>' + disponibles + ' disponibles &middot; ' + durLabel(sessionDur) + '</span>'
-    + '</div>';
-
-  html += '<div class="slot-period">🌅 Mañana</div><div class="slots-grid">';
-  if (horariosAM.length === 0) {
-    html += '<p style="color:var(--text-muted);font-size:.85rem;padding:8px">Sin disponibilidad AM para ' + durLabel(sessionDur) + '</p>';
-  } else {
-    horariosAM.forEach(function(h) {
-      var taken = busy.includes(h);
-      var sel   = h === selectedHour;
-      html += '<button class="slot-btn' + (taken ? ' taken' : '') + (sel ? ' selected' : '') + '"'
-        + (taken ? '' : ' onclick="selectHour(\'' + h + '\')"') + '>' + h + '</button>';
-    });
-  }
-  html += '</div>';
-
-  html += '<div class="slot-period">🌤 Tarde</div><div class="slots-grid">';
-  if (horariosPM.length === 0) {
-    html += '<p style="color:var(--text-muted);font-size:.85rem;padding:8px">Sin disponibilidad PM para ' + durLabel(sessionDur) + '</p>';
-  } else {
-    horariosPM.forEach(function(h) {
-      var taken = busy.includes(h);
-      var sel   = h === selectedHour;
-      html += '<button class="slot-btn' + (taken ? ' taken' : '') + (sel ? ' selected' : '') + '"'
-        + (taken ? '' : ' onclick="selectHour(\'' + h + '\')"') + '>' + h + '</button>';
-    });
-  }
-  html += '</div>';
-
-  container.innerHTML = html;
-}
-
-function selectHour(h) {
+function selectSlot(h) {
   selectedHour = h;
   renderSlots(selectedDate);
   document.getElementById('btn-next1').disabled = false;
 }
 
-// ══ PASOS ════════════════════════════════
-function goStep1() {
-  show('panel-step1'); hide('panel-step2'); hide('panel-step3');
-  setStep(1);
+function loadMonthBusy(y, m) {
+  var monthStart = new Date(y, m, 1);
+  var monthEnd = new Date(y, m + 1, 0);
+
+  fetch('https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(CALENDAR_ID) + 
+        '/events?key=' + API_KEY + 
+        '&timeMin=' + monthStart.toISOString() +
+        '&timeMax=' + monthEnd.toISOString() +
+        '&singleEvents=true&orderBy=startTime')
+    .then(r => r.json())
+    .then(data => {
+      busySlots = {};
+      if (data.items) {
+        data.items.forEach(function(evt) {
+          var start = new Date(evt.start.dateTime);
+          var dateStr = toDateStr(start);
+          var h = String(start.getHours()).padStart(2,'0') + ':00';
+          if (!busySlots[dateStr]) busySlots[dateStr] = [];
+          busySlots[dateStr].push(h);
+        });
+      }
+      renderCalendar();
+      if (selectedDate) renderSlots(selectedDate);
+    })
+    .catch(err => {
+      document.getElementById('slots-container').innerHTML = '<div class="alert alert-error">Error al cargar disponibilidad</div>';
+    });
 }
+
+// ══ PASOS ══════════════════════════════════════════════
+function updateSteps(step) {
+  ['step1','step2','step3'].forEach((s,i) => {
+    document.getElementById(s).classList.toggle('active', s === 'step' + step);
+    document.getElementById(s).classList.toggle('done', i < step - 1);
+  });
+  ['line1','line2'].forEach((l,i) => {
+    document.getElementById(l).classList.toggle('done', i < step - 1);
+  });
+  ['panel-step1','panel-step2','panel-step3'].forEach((p,i) => {
+    document.getElementById(p).style.display = (i + 1 === step) ? 'block' : 'none';
+  });
+}
+
+function goStep1() { updateSteps(1); window.scrollTo({top:0, behavior:'smooth'}); }
 function goStep2() {
-  show('panel-step2'); hide('panel-step1'); hide('panel-step3');
-  setStep(2);
-  document.getElementById('mini-summary').innerHTML = buildMiniSummary();
+  if (document.getElementById('inp-nombre').value && document.getElementById('inp-apellido').value && document.getElementById('inp-tel').value) {
+    formData.nombre = document.getElementById('inp-nombre').value;
+    formData.apellido = document.getElementById('inp-apellido').value;
+    formData.tel = document.getElementById('inp-tel').value;
+    formData.email = document.getElementById('inp-email').value;
+    formData.modalidad = document.getElementById('inp-modalidad').value;
+    formData.motivo = document.getElementById('inp-motivo').value;
+    updateSteps(2);
+    window.scrollTo({top:0, behavior:'smooth'});
+  } else {
+    document.getElementById('form-error').innerHTML = '<div class="alert alert-error">⚠️ Por favor completa todos los campos obligatorios</div>';
+  }
 }
 function goStep3() {
-  var nombre   = document.getElementById('inp-nombre').value.trim();
-  var apellido = document.getElementById('inp-apellido').value.trim();
-  var tel      = document.getElementById('inp-tel').value.trim();
-  var errDiv   = document.getElementById('form-error');
-  if (!nombre || !apellido || !tel) {
-    errDiv.innerHTML = '<div class="alert alert-error">⚠️ Por favor completa nombre, apellido y teléfono.</div>';
-    return;
-  }
-  errDiv.innerHTML = '';
-  formData = {
-    nombre: nombre, apellido: apellido, tel: tel,
-    email:     document.getElementById('inp-email').value.trim(),
-    modalidad: document.getElementById('inp-modalidad').value,
-    motivo:    document.getElementById('inp-motivo').value.trim()
-  };
-  show('panel-step3'); hide('panel-step1'); hide('panel-step2');
-  setStep(3);
-  document.getElementById('full-summary').innerHTML = buildFullSummary();
-}
-
-function setStep(n) {
-  [1,2,3].forEach(function(i) {
-    var el = document.getElementById('step' + i);
-    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
-  });
-  [1,2].forEach(function(i) {
-    var el = document.getElementById('line' + i);
-    el.className = 'step-line' + (i < n ? ' done' : '');
-  });
-}
-
-// ══ RESÚMENES ════════════════════════════
-function buildMiniSummary() {
   var fmtDate = selectedDate.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-  return '<div class="summary-row"><span class="summary-icon">📅</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>'
-    + '<div class="summary-row"><span class="summary-icon">🕐</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' – ' + endHour(selectedHour, sessionDur) + '</span></div>'
-    + '<div class="summary-row"><span class="summary-icon">⏱</span><span class="summary-label">Duración</span><span class="summary-val">' + durLabel(sessionDur) + '</span></div>';
+  var summary = 
+    '<div class="summary-row"><span class="summary-icon">👤</span><span class="summary-label">Nombre</span><span class="summary-val">' + formData.nombre + ' ' + formData.apellido + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">📅</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">🕐</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' – ' + endHour(selectedHour, sessionDur) + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">⏱</span><span class="summary-label">Duración</span><span class="summary-val">' + sessionDur + ' hora' + (sessionDur > 1 ? 's' : '') + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">📞</span><span class="summary-label">Teléfono</span><span class="summary-val">' + formData.tel + '</span></div>' +
+    (formData.email ? '<div class="summary-row"><span class="summary-icon">📧</span><span class="summary-label">Email</span><span class="summary-val">' + formData.email + '</span></div>' : '') +
+    '<div class="summary-row"><span class="summary-icon">📋</span><span class="summary-label">Modalidad</span><span class="summary-val">' + formData.modalidad + '</span></div>';
+  document.getElementById('full-summary').innerHTML = summary;
+  updateSteps(3);
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
-function buildFullSummary() {
-  var nombre  = formData.nombre + ' ' + formData.apellido;
-  var fmtDate = selectedDate.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-  var html = '<div class="summary-row"><span class="summary-icon">👤</span><span class="summary-label">Paciente</span><span class="summary-val">' + nombre + '</span></div>'
-    + '<div class="summary-row"><span class="summary-icon">📅</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>'
-    + '<div class="summary-row"><span class="summary-icon">🕐</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' – ' + endHour(selectedHour, sessionDur) + '</span></div>'
-    + '<div class="summary-row"><span class="summary-icon">⏱</span><span class="summary-label">Duración</span><span class="summary-val">' + durLabel(sessionDur) + '</span></div>'
-    + '<div class="summary-row"><span class="summary-icon">🤝</span><span class="summary-label">Modalidad</span><span class="summary-val">' + formData.modalidad + '</span></div>'
-    + '<div class="summary-row"><span class="summary-icon">📱</span><span class="summary-label">Teléfono</span><span class="summary-val">' + formData.tel + '</span></div>';
-  if (formData.email) html += '<div class="summary-row"><span class="summary-icon">✉️</span><span class="summary-label">Correo</span><span class="summary-val">' + formData.email + '</span></div>';
-  if (formData.motivo) html += '<div class="summary-row"><span class="summary-icon">📝</span><span class="summary-label">Motivo</span><span class="summary-val">' + formData.motivo + '</span></div>';
-  return html;
-}
-
-// ══ CONFIRMAR ════════════════════════════
+// ══ CONFIRMAR CITA ═════════════════════════════════════
 async function confirmarCita() {
   var btn    = document.getElementById('btn-confirm');
   var errDiv = document.getElementById('confirm-error');
@@ -623,17 +577,18 @@ async function confirmarCita() {
     meeting_reason: formData.motivo || 'No especificado',
     meeting_type:   formData.modalidad || 'Presencial',
     start_time:     startISO,
-    end_time:       endISO
+    end_time:       endISO,
+    owner_email:    OWNER_EMAIL,
+    owner_name:     OWNER_NAME,
+    calendar_id:    CALENDAR_ID
   };
 
   try {
-    // Usamos no-cors para evitar bloqueo CORS desde GitHub Pages
     await fetch(APPS_SCRIPT, {
       method: 'POST',
       mode: 'no-cors',
       body: JSON.stringify(payload)
     });
-    // Con no-cors no podemos leer la respuesta, pero si no hay excepción = éxito
     if (!busySlots[dateStr]) busySlots[dateStr] = [];
     busySlots[dateStr].push(selectedHour);
     mostrarExito(nombre);
@@ -651,15 +606,15 @@ function mostrarExito(nombre) {
   ss.style.display = 'block';
   var fmtDate = selectedDate.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
   document.getElementById('success-details').innerHTML =
-    '<div class="summary-row"><span class="summary-icon">👤</span><span class="summary-label">Paciente</span><span class="summary-val">' + nombre + '</span></div>'
-    + '<div class="summary-row"><span class="summary-icon">📅</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>'
-    + '<div class="summary-row"><span class="summary-icon">🕐</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' – ' + endHour(selectedHour, sessionDur) + '</span></div>'
-    + '<div class="summary-row"><span class="summary-icon">⏱</span><span class="summary-label">Duración</span><span class="summary-val">' + durLabel(sessionDur) + '</span></div>';
+    '<div class="summary-row"><span class="summary-icon">👤</span><span class="summary-label">Paciente</span><span class="summary-val">' + nombre + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">📅</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">🕐</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' – ' + endHour(selectedHour, sessionDur) + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">⏱</span><span class="summary-label">Duración</span><span class="summary-val">' + sessionDur + ' hora' + (sessionDur > 1 ? 's' : '') + '</span></div>';
   ss.scrollIntoView({ behavior:'smooth' });
 }
 
 function reiniciar() {
-  selectedDate = null; selectedHour = null; formData = {}; sessionDur = 1.5;
+  selectedDate = null; selectedHour = null; formData = {}; sessionDur = 1;
   document.querySelectorAll('.dur-btn').forEach(function(b, i) { b.classList.toggle('active', i === 0); });
   document.getElementById('success-screen').style.display = 'none';
   show('booking-screen'); show('steps-bar');
@@ -667,7 +622,7 @@ function reiniciar() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ══ UTILIDADES ════════════════════════════
+// ══ UTILIDADES =════════════════════════════════════════
 function toDateStr(d) {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
