@@ -515,21 +515,23 @@ function renderCalendar() {
   }
 
   for (var d = 1; d <= daysInMonth; d++) {
-    var date = new Date(y, m, d);
-    var cell = document.createElement('div');
-    cell.className = 'cal-day';
-    cell.textContent = d;
+    (function(day) {
+      var date = new Date(y, m, day);
+      var cell = document.createElement('div');
+      cell.className = 'cal-day';
+      cell.textContent = day;
 
-    if (date < today || !isWorkDay(date)) {
-      cell.classList.add('disabled');
-    } else {
-      if (date.getTime() === today.getTime()) cell.classList.add('today');
-      if (selectedDate && selectedDate.getTime() === date.getTime()) cell.classList.add('selected');
-      cell.classList.add('available');
-      cell.onclick = function() { selectDate(new Date(date)); };
-    }
+      if (date < today || !isWorkDay(date)) {
+        cell.classList.add('disabled');
+      } else {
+        if (date.getTime() === today.getTime()) cell.classList.add('today');
+        if (selectedDate && selectedDate.getTime() === date.getTime()) cell.classList.add('selected');
+        cell.classList.add('available');
+        cell.onclick = function() { selectDate(new Date(date)); };
+      }
 
-    grid.appendChild(cell);
+      grid.appendChild(cell);
+    })(d);
   }
 }
 
@@ -719,3 +721,4 @@ function show(id) { document.getElementById(id).style.display = ''; }
 function hide(id) { document.getElementById(id).style.display = 'none'; }
 </script>
 </body>
+</html>
