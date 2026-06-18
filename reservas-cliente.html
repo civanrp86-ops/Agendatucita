@@ -166,6 +166,19 @@
   .alert-error   { background: #FDECEA; color: #C0392B; border: 1px solid #F5C6CB; }
   .alert-info    { background: #EBF5FB; color: #1B4F72; border: 1px solid #AED6F1; }
 
+  .service-info {
+    display: none; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-lt) 100%);
+    color: #fff; border-radius: 10px; padding: 10px 16px;
+    font-size: .88rem; font-weight: 500; margin-top: 10px;
+    animation: fadeIn .3s ease;
+  }
+  .service-info.visible { display: flex; }
+  .service-info .service-icon { font-size: 1.4rem; }
+  .service-info .service-text strong { display: block; font-size: .95rem; }
+  .service-info .service-text span { opacity: .85; font-size: .8rem; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
   .success-icon {
     width: 80px; height: 80px; border-radius: 50%; background: var(--accent);
     color: #fff; display: flex; align-items: center; justify-content: center;
@@ -201,9 +214,18 @@
     <div class="info-chip">📅 <span>Lunes a Viernes</span></div>
     <div class="dur-wrap">
       <span class="dur-label">⏱ Duración</span>
-      <button class="dur-btn active" onclick="setDuration(1)">1h</button>
-      <button class="dur-btn" onclick="setDuration(2)">2h</button>
-      <button class="dur-btn" onclick="setDuration(3)">3h</button>
+      <button class="dur-btn active" onclick="setDuration(1.5)">1h30</button>
+      <button class="dur-btn" onclick="setDuration(2.5)">2h30</button>
+      <button class="dur-btn" onclick="setDuration(3.5)">3h30</button>
+    </div>
+  </div>
+
+  <!-- Cuadro de tipo de servicio -->
+  <div class="service-info" id="service-info">
+    <div class="service-icon" id="service-icon"></div>
+    <div class="service-text">
+      <strong id="service-title"></strong>
+      <span id="service-desc"></span>
     </div>
   </div>
 
@@ -350,15 +372,24 @@ const OWNER_NAME  = config.name;
 const AM_BASE = ['07:00','08:00','09:00','10:00'];
 const PM_BASE = ['14:00','15:00','16:00'];
 
-function getAM(dur) { return AM_BASE.filter(h => parseInt(h) + dur <= 11); }
-function getPM(dur) { return PM_BASE.filter(h => parseInt(h) + dur <= 17); }
+function getAM(dur) { return AM_BASE.filter(h => parseInt(h) + Math.ceil(dur) <= 11); }
+function getPM(dur) { return PM_BASE.filter(h => parseInt(h) + Math.ceil(dur) <= 17); }
 function getAllH(dur) { return [...getAM(dur), ...getPM(dur)]; }
 
 function endHour(h, dur) {
   var parts = h.split(':');
-  var hr = parseInt(parts[0]) + dur;
-  return (hr < 10 ? '0' : '') + hr + ':00';
+  var totalMins = parseInt(parts[0]) * 60 + parseInt(parts[1]) + Math.round(dur * 60);
+  var hr  = Math.floor(totalMins / 60);
+  var min = totalMins % 60;
+  return (hr < 10 ? '0' : '') + hr + ':' + (min < 10 ? '0' : '') + min;
 }
+
+// ══ TIPOS DE SERVICIO ══════════════════════════════════
+const SERVICE_TYPES = {
+  1.5: { icon: '📚', title: 'Capacitación',           desc: 'Sesión de formación y entrenamiento (1h 30min)' },
+  2.5: { icon: '💼', title: 'Asesoría',               desc: 'Consulta y orientación especializada (2h 30min)' },
+  3.5: { icon: '🔍', title: 'Inspección y/o Asesoría', desc: 'Visita de inspección con análisis en sitio (3h 30min)' }
+};
 
 // ══ UTILIDADES DE COLOR ════════════════════════════════
 function lighten(color, percent) {
@@ -380,24 +411,39 @@ function darken(color, percent) {
 var currentDate  = new Date();
 var selectedDate = null;
 var selectedHour = null;
-var sessionDur   = 1;
+var sessionDur   = 1.5;
 var busySlots    = {};
 var formData     = {};
 
 // ══ INIT ═══════════════════════════════════════════════
 renderCalendar();
 loadMonthBusy(currentDate.getFullYear(), currentDate.getMonth());
+showServiceInfo(1.5); // Mostrar info del servicio por defecto
 
 // ══ DURACIÓN ═══════════════════════════════════════════
 function setDuration(h) {
   sessionDur = h;
-  document.querySelectorAll('.dur-btn').forEach(function(b, i) {
-    b.classList.toggle('active', i + 1 === h);
+  document.querySelectorAll('.dur-btn').forEach(function(b) {
+    b.classList.remove('active');
   });
+  var idx = [1.5, 2.5, 3.5].indexOf(h);
+  if (idx >= 0) document.querySelectorAll('.dur-btn')[idx].classList.add('active');
+
+  showServiceInfo(h);
   selectedHour = null;
   document.getElementById('btn-next1').disabled = true;
   if (selectedDate) renderSlots(selectedDate);
   renderCalendar();
+}
+
+function showServiceInfo(dur) {
+  var info = SERVICE_TYPES[dur];
+  if (!info) return;
+  var box = document.getElementById('service-info');
+  document.getElementById('service-icon').textContent  = info.icon;
+  document.getElementById('service-title').textContent = info.title;
+  document.getElementById('service-desc').textContent  = info.desc;
+  box.classList.add('visible');
 }
 
 // ══ CALENDARIO ═════════════════════════════════════════
@@ -614,8 +660,9 @@ function mostrarExito(nombre) {
 }
 
 function reiniciar() {
-  selectedDate = null; selectedHour = null; formData = {}; sessionDur = 1;
+  selectedDate = null; selectedHour = null; formData = {}; sessionDur = 1.5;
   document.querySelectorAll('.dur-btn').forEach(function(b, i) { b.classList.toggle('active', i === 0); });
+  showServiceInfo(1.5);
   document.getElementById('success-screen').style.display = 'none';
   show('booking-screen'); show('steps-bar');
   goStep1();
