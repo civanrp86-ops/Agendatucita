@@ -333,14 +333,22 @@
 function getQueryParams() {
   var params = new URLSearchParams(window.location.search);
   return {
-    email:       params.get('email') || 'estuval2022@gmail.com',
-    name:        params.get('name') || 'Sandra Estupiñán',
-    profession:  params.get('profession') || 'Consultas Profesionales',
-    api_key:     params.get('api_key') || 'AIzaSyAPocHbXxs17BKkavW0rKkCyc4avUCyRpM',
+    email:       params.get('email')       || 'estuval2022@gmail.com',
+    name:        params.get('name')        || 'Sandra Estupiñán',
+    profession:  params.get('profession')  || 'Consultas Profesionales',
+    api_key:     params.get('api_key')     || 'AIzaSyAPocHbXxs17BKkavW0rKkCyc4avUCyRpM',
     apps_script: params.get('apps_script') || 'https://script.google.com/macros/s/AKfycbzcs6d1mgg7wdHGup1x4PFWV7MlDft0x3Sg_AmkXPOWjc_ksKlNvZcGgva1agi5akuH/exec',
-    primary:     params.get('primary') || '#1B4F72',
-    accent:      params.get('accent') || '#1ABC9C',
-    gold:        params.get('gold') || '#C9A84C'
+    primary:     params.get('primary')     || '#1B4F72',
+    accent:      params.get('accent')      || '#1ABC9C',
+    gold:        params.get('gold')        || '#C9A84C',
+    days:        params.get('days')        || '1,2,3,4,5',
+    am_start:    params.get('am_start')    || '07:00',
+    am_end:      params.get('am_end')      || '11:00',
+    pm_enabled:  params.get('pm_enabled') !== '0',
+    pm_start:    params.get('pm_start')    || '14:00',
+    pm_end:      params.get('pm_end')      || '17:00',
+    duration:    parseFloat(params.get('duration') || '1.5'),
+    buffer:      parseInt(params.get('buffer') || '0')
   };
 }
 
@@ -367,13 +375,33 @@ const CALENDAR_ID = config.email;
 const APPS_SCRIPT = config.apps_script;
 const OWNER_EMAIL = config.email;
 const OWNER_NAME  = config.name;
+const WORK_DAYS   = config.days.split(',').map(Number);
+const BUFFER_MINS = config.buffer;
+const DEFAULT_DUR = config.duration;
 
 // ══ HORARIOS BASE ══════════════════════════════════════
-const AM_BASE = ['07:00','08:00','09:00','10:00'];
-const PM_BASE = ['14:00','15:00','16:00'];
+function buildSlots(startTime, endTime, dur) {
+  var slots = [];
+  var startH = parseInt(startTime.split(':')[0]);
+  var startM = parseInt(startTime.split(':')[1]);
+  var endH   = parseInt(endTime.split(':')[0]);
+  var endM   = parseInt(endTime.split(':')[1]);
+  var startTotal = startH * 60 + startM;
+  var endTotal   = endH * 60 + endM;
+  var durMins    = Math.round(dur * 60);
+  var bufMins    = BUFFER_MINS;
+  var cur = startTotal;
+  while (cur + durMins <= endTotal) {
+    var h = Math.floor(cur / 60);
+    var m = cur % 60;
+    slots.push((h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m);
+    cur += durMins + bufMins;
+  }
+  return slots;
+}
 
-function getAM(dur) { return AM_BASE.filter(h => parseInt(h) + Math.ceil(dur) <= 11); }
-function getPM(dur) { return PM_BASE.filter(h => parseInt(h) + Math.ceil(dur) <= 17); }
+function getAM(dur) { return buildSlots(config.am_start, config.am_end, dur); }
+function getPM(dur) { return config.pm_enabled ? buildSlots(config.pm_start, config.pm_end, dur) : []; }
 function getAllH(dur) { return [...getAM(dur), ...getPM(dur)]; }
 
 function endHour(h, dur) {
@@ -411,14 +439,19 @@ function darken(color, percent) {
 var currentDate  = new Date();
 var selectedDate = null;
 var selectedHour = null;
-var sessionDur   = 1.5;
+var sessionDur   = DEFAULT_DUR;
 var busySlots    = {};
 var formData     = {};
 
 // ══ INIT ═══════════════════════════════════════════════
+// Activar el botón de duración correcto
+document.querySelectorAll('.dur-btn').forEach(function(b, i) {
+  var durs = [1.5, 2.5, 3.5];
+  b.classList.toggle('active', durs[i] === DEFAULT_DUR);
+});
 renderCalendar();
 loadMonthBusy(currentDate.getFullYear(), currentDate.getMonth());
-showServiceInfo(1.5); // Mostrar info del servicio por defecto
+showServiceInfo(DEFAULT_DUR);
 
 // ══ DURACIÓN ═══════════════════════════════════════════
 function setDuration(h) {
@@ -447,6 +480,10 @@ function showServiceInfo(dur) {
 }
 
 // ══ CALENDARIO ═════════════════════════════════════════
+function isWorkDay(date) {
+  return WORK_DAYS.includes(date.getDay());
+}
+
 function renderCalendar() {
   var y = currentDate.getFullYear();
   var m = currentDate.getMonth();
@@ -479,7 +516,7 @@ function renderCalendar() {
     cell.className = 'cal-day';
     cell.textContent = d;
 
-    if (date < today) {
+    if (date < today || !isWorkDay(date)) {
       cell.classList.add('disabled');
     } else {
       if (date.getTime() === today.getTime()) cell.classList.add('today');
@@ -660,9 +697,12 @@ function mostrarExito(nombre) {
 }
 
 function reiniciar() {
-  selectedDate = null; selectedHour = null; formData = {}; sessionDur = 1.5;
-  document.querySelectorAll('.dur-btn').forEach(function(b, i) { b.classList.toggle('active', i === 0); });
-  showServiceInfo(1.5);
+  selectedDate = null; selectedHour = null; formData = {}; sessionDur = DEFAULT_DUR;
+  document.querySelectorAll('.dur-btn').forEach(function(b, i) {
+    var durs = [1.5, 2.5, 3.5];
+    b.classList.toggle('active', durs[i] === DEFAULT_DUR);
+  });
+  showServiceInfo(DEFAULT_DUR);
   document.getElementById('success-screen').style.display = 'none';
   show('booking-screen'); show('steps-bar');
   goStep1();
