@@ -1,0 +1,825 @@
+
+
+		<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — AgendaTuCita</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
+
+  :root {
+    --primary:     #0C2D48;
+    --primary-md:  #1B4F72;
+    --primary-lt:  #2980B9;
+    --accent:      #1ABC9C;
+    --accent-dk:   #148F77;
+    --gold:        #C9A84C;
+    --gold-lt:     #F0D080;
+    --danger:      #DC2626;
+    --bg:          #F0F4F8;
+    --surface:     #FFFFFF;
+    --surface-2:   #F8FAFC;
+    --border:      #DDE4EE;
+    --border-lt:   #EEF2F7;
+    --text:        #0A1628;
+    --text-muted:  #64748B;
+    --text-light:  #94A3B8;
+    --radius:      18px;
+    --shadow:      0 8px 40px rgba(12,45,72,.10);
+    --shadow-md:   0 16px 56px rgba(12,45,72,.14);
+    --shadow-sm:   0 2px 12px rgba(12,45,72,.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; font-size: 15px;
+    line-height: 1.65; -webkit-font-smoothing: antialiased;
+  }
+
+  /* ══ ASISTENTE DE CONFIGURACIÓN ════════════════════════════ */
+  #wizard-overlay {
+    display: none; position: fixed; inset: 0;
+    background: linear-gradient(135deg, rgba(7,24,40,.95) 0%, rgba(12,45,72,.92) 100%);
+    z-index: 9999; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  #wizard-overlay.show { display: flex; }
+
+  .wizard-container {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow-md); width: 100%; max-width: 520px;
+    overflow: hidden;
+  }
+
+  .wizard-header {
+    background: linear-gradient(150deg, #071828 0%, #0C2D48 40%, #1B4F72 80%, #2980B9 100%);
+    color: #fff; padding: 32px 28px; text-align: center;
+  }
+  .wizard-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem; font-weight: 600; margin-bottom: 8px;
+  }
+  .wizard-header p { font-size: .9rem; opacity: .85; }
+
+  .wizard-body { padding: 32px 28px; }
+
+  .wizard-step { display: none; }
+  .wizard-step.active { display: block; animation: fadeIn .4s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Horarios */
+  .days-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .day-chip {
+    width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--border);
+    background: var(--surface); cursor: pointer; display: flex; align-items: center;
+    justify-content: center; font-size: .78rem; font-weight: 700; color: var(--text-muted);
+    transition: all .2s; user-select: none;
+  }
+  .day-chip.selected { background: var(--primary-md); border-color: var(--primary-md); color: #fff; }
+  .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .time-group { display: flex; flex-direction: column; gap: 4px; }
+  .time-group label { font-size: .78rem; font-weight: 600; color: var(--text-muted); }
+  .time-group input[type="time"] {
+    padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px;
+    font-size: .9rem; font-family: inherit; color: var(--text);
+    background: var(--surface-2); transition: border .2s;
+  }
+  .time-group input[type="time"]:focus { outline: none; border-color: var(--primary-md); }
+  .toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .toggle-label { font-size: .85rem; font-weight: 600; color: var(--text); }
+  .toggle-switch {
+    width: 40px; height: 22px; background: var(--border); border-radius: 11px;
+    cursor: pointer; position: relative; transition: background .2s;
+  }
+  .toggle-switch.on { background: var(--accent); }
+  .toggle-switch::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px; border-radius: 50%; background: #fff;
+    transition: transform .2s;
+  }
+  .toggle-switch.on::after { transform: translateX(18px); }
+  .pm-section { padding: 12px; background: var(--surface-2); border-radius: 10px; border: 1px solid var(--border-lt); margin-bottom: 16px; }
+  .duration-opts { display: flex; gap: 8px; margin-bottom: 16px; }
+  .dur-opt {
+    flex: 1; padding: 10px 6px; border: 2px solid var(--border); border-radius: 10px;
+    background: var(--surface); cursor: pointer; text-align: center;
+    font-size: .82rem; font-weight: 700; color: var(--text-muted); transition: all .2s;
+  }
+  .dur-opt .dur-opt-sub { font-size: .7rem; font-weight: 500; display: block; margin-top: 2px; }
+  .dur-opt.selected { background: var(--primary-md); border-color: var(--primary-md); color: #fff; }
+  .buffer-opts { display: flex; gap: 8px; }
+  .buf-opt {
+    flex: 1; padding: 8px 4px; border: 2px solid var(--border); border-radius: 8px;
+    background: var(--surface); cursor: pointer; text-align: center;
+    font-size: .82rem; font-weight: 600; color: var(--text-muted); transition: all .2s;
+  }
+  .buf-opt.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .wizard-progress {
+    display: flex; gap: 8px; margin-bottom: 28px;
+  }
+  .progress-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--border); transition: all .3s;
+  }
+  .progress-dot.active { background: var(--primary); width: 28px; border-radius: 4px; }
+  .progress-dot.done { background: var(--accent); }
+
+  .wizard-label {
+    font-size: .75rem; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; display: block;
+  }
+
+  .wizard-input {
+    width: 100%; padding: 12px 14px; border: 1.5px solid var(--border);
+    border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .95rem; color: var(--text); background: var(--surface-2);
+    margin-bottom: 16px; transition: border-color .2s;
+  }
+  .wizard-input:focus {
+    outline: none; border-color: var(--primary-lt); background: var(--surface);
+  }
+
+  .palette-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px;
+  }
+  .palette-option {
+    padding: 16px; border-radius: 12px; border: 2px solid var(--border);
+    cursor: pointer; transition: all .25s; background: var(--surface-2);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .palette-option:hover { border-color: var(--primary); }
+  .palette-option.selected { border-color: var(--primary); background: rgba(12,45,72,.08); }
+
+  .palette-swatch {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 600; font-size: .75rem;
+  }
+  .palette-label { flex: 1; }
+  .palette-name { font-weight: 600; font-size: .88rem; color: var(--text); }
+  .palette-desc { font-size: .75rem; color: var(--text-muted); margin-top: 2px; }
+
+  .wizard-buttons {
+    display: flex; gap: 12px; margin-top: 28px;
+  }
+  .wizard-btn {
+    padding: 12px 20px; border-radius: 10px; border: none;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: .9rem; font-weight: 600;
+    cursor: pointer; transition: all .25s;
+  }
+  .wizard-btn-secondary {
+    background: var(--border); color: var(--text); flex: 0.5;
+  }
+  .wizard-btn-secondary:hover { background: var(--border-lt); }
+  .wizard-btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+    color: white; flex: 1;
+  }
+  .wizard-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(12,45,72,.3); }
+
+  .wizard-result {
+    background: var(--surface-2); border-radius: 12px; padding: 20px; margin-bottom: 16px;
+  }
+  .wizard-result h3 { font-size: .9rem; color: var(--text-muted); margin-bottom: 12px; }
+  .result-link {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px; font-size: .75rem; color: var(--primary); word-break: break-all;
+    font-family: 'Monaco', monospace; cursor: pointer; transition: all .2s;
+    max-height: 120px; overflow-y: auto;
+  }
+  .result-link:hover { background: var(--bg); border-color: var(--primary); }
+
+  .wizard-msg { color: var(--text-muted); font-size: .85rem; text-align: center; margin-top: 12px; }
+  .wizard-msg.success { color: var(--accent); }
+
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 0%, rgba(26,188,156,.05) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(41,128,185,.06) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ══ HEADER ════════════════════════════════ */
+  header {
+    background: linear-gradient(150deg, #071828 0%, #0C2D48 40%, #1B4F72 80%, #2980B9 100%);
+    color: #fff; padding: 0 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 4px 24px rgba(12,45,72,.3);
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 50% 120% at 20% 50%, rgba(201,168,76,.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; position: relative; }
+  .header-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; font-weight: 600; letter-spacing: -.3px;
+  }
+  .header-sub { font-size: .72rem; opacity: .65; letter-spacing: .5px; text-transform: uppercase; font-weight: 600; }
+  .header-divider { width: 1px; height: 28px; background: rgba(255,255,255,.15); margin: 0 4px; }
+  .badge-admin {
+    background: rgba(201,168,76,.15); border: 1px solid rgba(201,168,76,.35);
+    border-radius: 20px; padding: 4px 12px; font-size: .72rem;
+    font-weight: 700; color: var(--gold-lt); letter-spacing: .5px;
+    position: relative;
+  }
+  .header-right { display: flex; align-items: center; gap: 10px; position: relative; }
+  #admin-name {
+    font-size: .82rem; font-weight: 600; color: rgba(255,255,255,.85);
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+    border-radius: 20px; padding: 5px 14px;
+  }
+  .btn-salir {
+    padding: 6px 16px; border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.25);
+    background: transparent; color: rgba(255,255,255,.7);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .78rem; font-weight: 700; cursor: pointer;
+    transition: all .25s; letter-spacing: .3px;
+  }
+  .btn-salir:hover { background: rgba(255,255,255,.15); color: #fff; }
+
+  /* ══ LOGIN ════════════════════════════════ */
+  #login-screen {
+    min-height: 100vh; display: flex; align-items: center;
+    justify-content: center; padding: 20px; position: relative; z-index: 1;
+  }
+  .login-card {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow-md); padding: 48px 40px;
+    width: 100%; max-width: 420px;
+    border: 1px solid var(--border); text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .login-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-lt), var(--accent));
+  }
+  .login-icon {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+    border-radius: 20px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; margin: 0 auto 24px;
+    box-shadow: 0 8px 24px rgba(12,45,72,.25);
+  }
+  .login-card h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.9rem; font-weight: 700; color: var(--primary);
+    margin-bottom: 8px; letter-spacing: -.3px;
+  }
+  .login-card p { color: var(--text-muted); font-size: .9rem; margin-bottom: 32px; line-height: 1.6; }
+  .login-btn {
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-md), var(--primary-lt));
+    color: #fff; border: none; border-radius: 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .95rem; font-weight: 800; cursor: pointer;
+    box-shadow: 0 8px 24px rgba(12,45,72,.3);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: all .3s;
+  }
+  .login-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(12,45,72,.4); }
+  .login-error { color: var(--danger); font-size: .82rem; margin-bottom: 10px; font-weight: 600; }
+
+  /* ══ ADMIN LAYOUT ══════════════════════════ */
+  #admin-screen { display: none; }
+  .admin-container { max-width: 1120px; margin: 0 auto; padding: 32px 16px 60px; position: relative; z-index: 1; }
+
+  /* PLACEHOLDER para el resto del CSS del admin original */
+  /* Voy a agregarlo en la PARTE 2 */
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ASISTENTE DE CONFIGURACIÓN -->
+<div id="wizard-overlay">
+  <div class="wizard-container">
+    <!-- PASO 1: Correo -->
+    <div class="wizard-step active" id="wizard-step-1">
+      <div class="wizard-header">
+        <h2>🚀 Bienvenido</h2>
+        <p>Configura tu sistema en 3 pasos</p>
+      </div>
+      <div class="wizard-body">
+        <div class="wizard-progress">
+          <div class="progress-dot active"></div>
+          <div class="progress-dot"></div>
+          <div class="progress-dot"></div>
+          <div class="progress-dot"></div>
+          <div class="progress-dot"></div>
+        </div>
+        <label class="wizard-label">Tu correo de Google Calendar</label>
+        <input type="email" id="wizard-email" class="wizard-input" placeholder="tu@gmail.com" required>
+        <p style="font-size:.85rem;color:var(--text);margin-bottom:12px;text-align:left;line-height:1.6">
+            📧 <strong>Correo vinculado:</strong> <strong id="config-email"></strong>
+            <br><br>
+            Las citas de tus clientes se guardarán en tu calendario de Google.
+        </p>
+        <div class="wizard-buttons">
+          <button class="wizard-btn wizard-btn-primary" onclick="wizardNext(1)">Siguiente →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 2: Nombre y Profesión -->
+    <div class="wizard-step" id="wizard-step-2">
+      <div class="wizard-header">
+        <h2>👤 Tu Perfil</h2>
+        <p>Cómo te presentarás a tus clientes</p>
+      </div>
+      <div class="wizard-body">
+        <div class="wizard-progress">
+          <div class="progress-dot done"></div>
+          <div class="progress-dot active"></div>
+          <div class="progress-dot"></div>
+          <div class="progress-dot"></div>
+          <div class="progress-dot"></div>
+        </div>
+        <label class="wizard-label">Nombre completo</label>
+        <input type="text" id="wizard-name" class="wizard-input" placeholder="Juan Pérez" required>
+        <label class="wizard-label">Profesión/Especialidad</label>
+        <input type="text" id="wizard-profession" class="wizard-input" placeholder="Ej: Fisioterapeuta, Consultor, etc." required>
+        <div class="wizard-buttons">
+          <button class="wizard-btn wizard-btn-secondary" onclick="wizardPrev(2)">← Atrás</button>
+          <button class="wizard-btn wizard-btn-primary" onclick="wizardNext(2)">Siguiente →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 3: Paleta de Colores -->
+    <div class="wizard-step" id="wizard-step-3">
+      <div class="wizard-header">
+        <h2>🎨 Elige tu Paleta</h2>
+        <p>Personaliza la apariencia visual</p>
+      </div>
+      <div class="wizard-body">
+        <div class="wizard-progress">
+          <div class="progress-dot done"></div>
+          <div class="progress-dot done"></div>
+          <div class="progress-dot active"></div>
+          <div class="progress-dot"></div>
+          <div class="progress-dot"></div>
+        </div>
+        <div class="palette-grid" id="palette-grid"></div>
+        <div class="wizard-buttons">
+          <button class="wizard-btn wizard-btn-secondary" onclick="wizardPrev(3)">← Atrás</button>
+          <button class="wizard-btn wizard-btn-primary" onclick="wizardNext(3)">Siguiente →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 4: Horarios -->
+    <div class="wizard-step" id="wizard-step-4">
+      <div class="wizard-header">
+        <h2>🗓️ Horarios</h2>
+        <p>Configura tu disponibilidad</p>
+      </div>
+      <div class="wizard-body">
+        <div class="wizard-progress">
+          <div class="progress-dot done"></div>
+          <div class="progress-dot done"></div>
+          <div class="progress-dot done"></div>
+          <div class="progress-dot active"></div>
+          <div class="progress-dot"></div>
+        </div>
+
+        <label class="wizard-label">Días laborales</label>
+        <div class="days-grid">
+          <div class="day-chip selected" data-day="1" onclick="toggleDay(this)">Lu</div>
+          <div class="day-chip selected" data-day="2" onclick="toggleDay(this)">Ma</div>
+          <div class="day-chip selected" data-day="3" onclick="toggleDay(this)">Mi</div>
+          <div class="day-chip selected" data-day="4" onclick="toggleDay(this)">Ju</div>
+          <div class="day-chip selected" data-day="5" onclick="toggleDay(this)">Vi</div>
+          <div class="day-chip" data-day="6" onclick="toggleDay(this)">Sá</div>
+          <div class="day-chip" data-day="0" onclick="toggleDay(this)">Do</div>
+        </div>
+
+        <label class="wizard-label">🌅 Horario mañana</label>
+        <div class="time-row">
+          <div class="time-group"><label>Inicio</label><input type="time" id="am-start" value="07:00"></div>
+          <div class="time-group"><label>Fin</label><input type="time" id="am-end" value="11:00"></div>
+        </div>
+
+        <div class="pm-section">
+          <div class="toggle-row">
+            <div class="toggle-switch on" id="pm-toggle" onclick="togglePM()"></div>
+            <span class="toggle-label">🌆 Horario tarde</span>
+          </div>
+          <div id="pm-fields">
+            <div class="time-row">
+              <div class="time-group"><label>Inicio</label><input type="time" id="pm-start" value="14:00"></div>
+              <div class="time-group"><label>Fin</label><input type="time" id="pm-end" value="17:00"></div>
+            </div>
+          </div>
+        </div>
+
+        <label class="wizard-label">⏱ Duración de citas</label>
+        <div class="duration-opts">
+          <div class="dur-opt selected" data-dur="1.5" onclick="selectDur(this)">1h30<span class="dur-opt-sub">Capacitación</span></div>
+          <div class="dur-opt" data-dur="2.5" onclick="selectDur(this)">2h30<span class="dur-opt-sub">Asesoría</span></div>
+          <div class="dur-opt" data-dur="3.5" onclick="selectDur(this)">3h30<span class="dur-opt-sub">Inspección</span></div>
+        </div>
+
+        <label class="wizard-label">⏳ Tiempo entre citas</label>
+        <div class="buffer-opts">
+          <div class="buf-opt selected" data-buf="0" onclick="selectBuf(this)">Sin pausa</div>
+          <div class="buf-opt" data-buf="15" onclick="selectBuf(this)">15 min</div>
+          <div class="buf-opt" data-buf="30" onclick="selectBuf(this)">30 min</div>
+        </div>
+
+        <div class="wizard-buttons" style="margin-top:20px">
+          <button class="wizard-btn wizard-btn-secondary" onclick="wizardPrev(4)">← Atrás</button>
+          <button class="wizard-btn wizard-btn-primary" onclick="wizardNext(4)">Finalizar →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 5: Resultado -->
+    <div class="wizard-step" id="wizard-step-5">
+      <div class="wizard-header">
+        <h2>✅ ¡Listo!</h2>
+        <p>Tu sistema está configurado</p>
+      </div>
+      <div class="wizard-result">
+        <h3>✅ Configuración completada</h3>
+        <p style="font-size:.85rem;color:var(--text);margin-bottom:12px;text-align:left;line-height:1.6">
+          Tu sistema está listo. Ahora puedes acceder a tu panel de administración y comenzar a recibir citas de tus clientes.
+        </p>
+        </div>
+        <div class="wizard-result">
+          <h3>🔗 Comparte este link con tus clientes:</h3>
+          <div class="result-link" id="result-link" onclick="copiarLink(this)">Copiando...</div>
+          <p class="wizard-msg success" id="copy-msg" style="display:none">✅ Enlace copiado al portapapeles</p>
+        </div>
+        <div class="wizard-result" style="background:var(--surface)">
+          <h3>👤 Vista previa:</h3>
+          <p style="font-size:.85rem;color:var(--text-muted);margin-top:8px">
+            <span id="preview-name"></span> · <span id="preview-profession"></span>
+          </p>
+        </div>
+        <div class="wizard-buttons">
+          <button class="wizard-btn wizard-btn-primary" onclick="cerrarWizard()" style="width:100%">Ir al Panel de Admin →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="header-left">
+    <div>
+      <div class="header-logo">📅 AgendaTuCita</div>
+      <div class="header-sub">Panel de administración</div>
+    </div>
+    <div class="header-divider"></div>
+    <span class="badge-admin">✦ Admin</span>
+  </div>
+  <div class="header-right">
+    <span id="admin-name"></span>
+    <button class="btn-salir" onclick="cerrarSesion()">Salir →</button>
+  </div>
+</header>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-icon">🔐</div>
+    <h2>Acceso Admin</h2>
+    <p>Inicia sesión con tu cuenta de Google para acceder al panel de administración</p>
+    <div class="login-error" id="login-error"></div>
+    <button class="login-btn" onclick="login()">
+      <img src="https://www.google.com/favicon.ico" width="18" height="18">
+      Continuar con Google
+    </button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-screen">
+  <!-- El contenido del admin irá aquí (PARTE 2) -->
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+// ══ PALETAS DE COLOR ════════════════════════════
+const PALETAS = [
+  {
+    id: 'azul-profesional',
+    nombre: 'Azul Profesional',
+    desc: 'Clásico y confiable',
+    primary: '#1B4F72',
+    accent: '#1ABC9C',
+    gold: '#C9A84C'
+  },
+  {
+    id: 'esmeralda',
+    nombre: 'Esmeralda Minimalista',
+    desc: 'Fresco y moderno',
+    primary: '#0F5C4B',
+    accent: '#00B8A0',
+    gold: '#D4A574'
+  },
+  {
+    id: 'vino-oro',
+    nombre: 'Vino & Oro',
+    desc: 'Elegante y premium',
+    primary: '#722E51',
+    accent: '#E8B4A8',
+    gold: '#D4AF37'
+  },
+  {
+    id: 'violeta',
+    nombre: 'Violeta Moderno',
+    desc: 'Creativo e inspirador',
+    primary: '#6D28D9',
+    accent: '#EC4899',
+    gold: '#F59E0B'
+  },
+  {
+    id: 'grafito',
+    nombre: 'Grafito Corporativo',
+    desc: 'Sobrio y profesional',
+    primary: '#374151',
+    accent: '#B45309',
+    gold: '#D97706'
+  }
+];
+
+let wizardData = {
+  email: '',
+  name: '',
+  profession: '',
+  palette: 'azul-profesional',
+  days: [1,2,3,4,5],
+  amStart: '07:00',
+  amEnd: '11:00',
+  pmEnabled: true,
+  pmStart: '14:00',
+  pmEnd: '17:00',
+  duration: 1.5,
+  buffer: 0
+};
+
+// ══ HELPERS HORARIOS ════════════════════════════
+function toggleDay(el) {
+  el.classList.toggle('selected');
+}
+
+function togglePM() {
+  const toggle = document.getElementById('pm-toggle');
+  const fields = document.getElementById('pm-fields');
+  toggle.classList.toggle('on');
+  fields.style.display = toggle.classList.contains('on') ? 'block' : 'none';
+}
+
+function selectDur(el) {
+  document.querySelectorAll('.dur-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectBuf(el) {
+  document.querySelectorAll('.buf-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function initWizard() {
+  const stored = localStorage.getItem('_agendata_config');
+  if (stored) {
+    // Ya se completó el asistente
+    document.getElementById('wizard-overlay').classList.remove('show');
+    document.getElementById('login-screen').style.display = 'flex';
+  } else {
+    // Mostrar asistente
+    document.getElementById('wizard-overlay').classList.add('show');
+    renderPaletteGrid();
+  }
+}
+
+function renderPaletteGrid() {
+  const grid = document.getElementById('palette-grid');
+  grid.innerHTML = PALETAS.map(p => `
+    <div class="palette-option ${p.id === wizardData.palette ? 'selected' : ''}" onclick="selectPalette('${p.id}')">
+      <div class="palette-swatch" style="background:${p.primary}">A</div>
+      <div class="palette-label">
+        <div class="palette-name">${p.nombre}</div>
+        <div class="palette-desc">${p.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectPalette(id) {
+  wizardData.palette = id;
+  renderPaletteGrid();
+}
+
+function wizardNext(step) {
+  if (step === 1) {
+    const email = document.getElementById('wizard-email').value.trim();
+    if (!email) { alert('Por favor ingresa un correo válido'); return; }
+    wizardData.email = email;
+    showStep(2);
+  } else if (step === 2) {
+    const name = document.getElementById('wizard-name').value.trim();
+    const prof = document.getElementById('wizard-profession').value.trim();
+    if (!name || !prof) { alert('Por favor completa nombre y profesión'); return; }
+    wizardData.name = name;
+    wizardData.profession = prof;
+    showStep(3);
+  } else if (step === 3) {
+    showStep(4);
+  } else if (step === 4) {
+    // Leer días seleccionados
+    const selectedDays = [...document.querySelectorAll('.day-chip.selected')].map(e => e.dataset.day);
+    if (selectedDays.length === 0) { alert('Selecciona al menos un día laboral'); return; }
+    wizardData.days     = selectedDays.join(',');
+    wizardData.amStart  = document.getElementById('am-start').value;
+    wizardData.amEnd    = document.getElementById('am-end').value;
+    wizardData.pmEnabled = document.getElementById('pm-toggle').classList.contains('on');
+    wizardData.pmStart  = document.getElementById('pm-start').value;
+    wizardData.pmEnd    = document.getElementById('pm-end').value;
+    const durSel = document.querySelector('.dur-opt.selected');
+    wizardData.duration = durSel ? parseFloat(durSel.dataset.dur) : 1.5;
+    const bufSel = document.querySelector('.buf-opt.selected');
+    wizardData.buffer   = bufSel ? parseInt(bufSel.dataset.buf) : 0;
+    // Guardar y mostrar resultado
+    localStorage.setItem('_agendata_config', JSON.stringify(wizardData));
+    generateResultLink();
+    showStep(5);
+  }
+}
+
+function wizardPrev(step) {
+  showStep(step - 1);
+}
+
+function showStep(num) {
+  [1,2,3,4,5].forEach(i => {
+    document.getElementById(`wizard-step-${i}`).classList.remove('active');
+  });
+  document.getElementById(`wizard-step-${num}`).classList.add('active');
+}
+
+function generateResultLink() {
+  const palette = PALETAS.find(p => p.id === wizardData.palette);
+  const params = new URLSearchParams({
+    email:      wizardData.email,
+    name:       wizardData.name,
+    profession: wizardData.profession,
+    palette:    wizardData.palette,
+    primary:    palette.primary,
+    accent:     palette.accent,
+    gold:       palette.gold,
+    days:       wizardData.days,
+    am_start:   wizardData.amStart,
+    am_end:     wizardData.amEnd,
+    pm_enabled: wizardData.pmEnabled ? '1' : '0',
+    pm_start:   wizardData.pmStart,
+    pm_end:     wizardData.pmEnd,
+    duration:   wizardData.duration,
+    buffer:     wizardData.buffer
+  });
+
+  const baseUrl = 'https://civanrp86-ops.github.io/Agendatucita/reservas-cliente.html';
+  const fullLink = `${baseUrl}?${params.toString()}`;
+
+  document.getElementById('result-link').textContent = fullLink;
+  document.getElementById('preview-name').textContent = wizardData.name;
+  document.getElementById('preview-profession').textContent = wizardData.profession;
+}
+
+function copiarLink(elem) {
+  const link = elem.textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    document.getElementById('copy-msg').style.display = 'block';
+    setTimeout(() => {
+      document.getElementById('copy-msg').style.display = 'none';
+    }, 2500);
+  });
+}
+
+function cerrarWizard() {
+  document.getElementById('wizard-overlay').classList.remove('show');
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+// ══ CONFIGURACIÓN ════════════════════════════════
+const CLIENT_ID   = '264077603671-cghhf64qjlpnomo6t4ps39ulqpsdfts1.apps.googleusercontent.com';
+const CALENDAR_ID = 'primary';  // ✅ CORREGIDO: 'primary' para que sea dinámico
+const API_KEY     = 'AIzaSyDVbFV9haagvNa_Sl1c-tAjR2k7t4OVjxs';
+const APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwuc8ajM5wKzbps_TDmk8enidM5hw8UJPb9y2AOpifADOEjC4DRgbEpfLlGzFVBgA1y/exec';
+const SCOPES      = 'https://www.googleapis.com/auth/calendar';
+
+var todasLasCitas  = [];
+var filtroActual   = 'hoy';
+var eventoCancelar = null;
+var accessToken    = null;
+var tokenClient    = null;
+
+function login() {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: function(response) {
+      if (response.access_token) {
+        accessToken = response.access_token;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-screen').style.display = 'block';
+        
+        // Obtener nombre del asistente o usar default
+        const config = JSON.parse(localStorage.getItem('_agendata_config') || '{}');
+        const adminName = config.name || 'Sandra Estupiñán';
+        document.getElementById('admin-name').textContent = '👩‍⚕️ ' + adminName;
+        
+        cargarCitas();
+      } else {
+        document.getElementById('login-error').textContent = 'Error al iniciar sesión con Google.';
+      }
+    }
+  });
+  tokenClient.requestAccessToken();
+}
+
+function cerrarSesion() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('admin-screen').style.display = 'none';
+  accessToken = null;
+}
+
+async function cargarCitas() {
+  document.getElementById('citas-list').innerHTML = '<div class="loader"><div class="spinner"></div> Cargando citas…</div>';
+  if (!accessToken) {
+    document.getElementById('citas-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🔑</div><p>Sin sesión activa.</p></div>';
+    return;
+  }
+  var hoy     = new Date(); hoy.setHours(0,0,0,0);
+  var timeMin = new Date(hoy.getFullYear(), hoy.getMonth() - 2, 1).toISOString();
+  var timeMax = new Date(hoy.getFullYear(), hoy.getMonth() + 3, 0, 23, 59).toISOString();
+  var url = 'https://www.googleapis.com/calendar/v3/calendars/'
+    + encodeURIComponent(CALENDAR_ID)
+    + '/events?timeMin=' + encodeURIComponent(timeMin)
+    + '&timeMax=' + encodeURIComponent(timeMax)
+    + '&singleEvents=true&orderBy=startTime&maxResults=500';
+  try {
+    var res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + accessToken } });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    todasLasCitas = (data.items || []).filter(function(ev) { return ev.start && ev.start.dateTime; });
+    calcularStats();
+    renderCitas();
+  } catch(err) {
+    document.getElementById('citas-list').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Error al cargar. <a href="#" onclick="cargarCitas()" style="color:var(--primary-lt)">Reintentar</a></p></div>';
+    console.error('cargarCitas error:', err);
+  }
+}
+
+function calcularStats() {
+  var hoy    = new Date(); hoy.setHours(0,0,0,0);
+  var fin_hoy = new Date(hoy); fin_hoy.setHours(23,59,59);
+  var fin_sem = new Date(hoy); fin_sem.setDate(hoy.getDate() + 7);
+  var ini_mes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  var fin_mes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0, 23, 59);
+  var s1=0,s2=0,s3=0,s4=0;
+  todasLasCitas.forEach(function(ev) {
+    var start = new Date(ev.start.dateTime);
+    if (start >= hoy && start <= fin_hoy) s1++;
+    if (start >= hoy && start <= fin_sem) { s2++; s4++; }
+    if (start >= ini_mes && start <= fin_mes) s3++;
+  });
+  if (document.getElementById('stat-hoy')) {
+    document.getElementById('stat-hoy').textContent = s1;
+    document.getElementById('stat-semana').textContent = s2;
+    document.getElementById('stat-mes').textContent = s3;
+    document.getElementById('stat-pendientes').textContent = s4;
+  }
+}
+
+function renderCitas() {
+  if (!document.getElementById('citas-list')) return;
+  document.getElementById('citas-list').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">Citas cargadas correctamente</div>';
+}
+
+// Inicializar
+window.addEventListener('load', function() {
+  initWizard();
+});
+// Mostrar correo en Paso 4
+const cfgEmail = JSON.parse(localStorage.getItem('_agendata_config') || '{}');
+if(cfgEmail.email && document.getElementById('config-email')) {
+  document.getElementById('config-email').textContent = cfgEmail.email;
+}
+</script>
+
+</body>
+</html>
