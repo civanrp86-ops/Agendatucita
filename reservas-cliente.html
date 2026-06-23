@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AgendaTuCita</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -662,6 +663,65 @@ function goStep3() {
 }
 
 // ══ CONFIRMAR CITA ═════════════════════════════════════
+// ══ EMAILJS ════════════════════════════════════════════
+const EMAILJS_PUBLIC_KEY  = 'l8klrftm9RT_1UTwc';
+const EMAILJS_SERVICE_ID  = 'service_ro19ta2';
+const EMAILJS_TPL_CLIENTE = 'template_oulw4u7';
+const EMAILJS_TPL_OWNER   = 'template_jwnaab7';
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+function formatDateES(dateStr) {
+  var d = new Date(dateStr);
+  return d.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+
+function formatTime(dateStr) {
+  var d = new Date(dateStr);
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+async function enviarCorreos(payload) {
+  var startISO = payload.start_time;
+  var endISO   = payload.end_time;
+  var durH     = sessionDur;
+  var durStr   = durH === 1.5 ? '1h 30min' : durH === 2.5 ? '2h 30min' : '3h 30min';
+
+  var params = {
+    to_email:         payload.client_email,
+    client_name:      payload.client_name,
+    client_phone:     payload.client_phone,
+    client_email:     payload.client_email,
+    meeting_date:     formatDateES(startISO),
+    meeting_start:    formatTime(startISO),
+    meeting_end:      formatTime(endISO),
+    meeting_duration: durStr,
+    meeting_reason:   payload.meeting_reason,
+    meeting_type:     payload.meeting_type,
+    owner_name:       payload.owner_name,
+    owner_email:      payload.owner_email,
+    meet_link:        'No aplica',
+    email:            payload.client_email
+  };
+
+  // Correo al cliente (solo si tiene email)
+  if (payload.client_email) {
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TPL_CLIENTE, params);
+    } catch(e) {
+      console.warn('Error correo cliente:', e);
+    }
+  }
+
+  // Correo al dueño/profesional
+  var paramsOwner = Object.assign({}, params, { to_email: payload.owner_email });
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TPL_OWNER, paramsOwner);
+  } catch(e) {
+    console.warn('Error correo owner:', e);
+  }
+}
+
 async function confirmarCita() {
   var btn    = document.getElementById('btn-confirm');
   var errDiv = document.getElementById('confirm-error');
@@ -688,11 +748,16 @@ async function confirmarCita() {
   };
 
   try {
+    // 1. Crear evento en calendario (Apps Script)
     await fetch(APPS_SCRIPT, {
       method: 'POST',
       mode: 'no-cors',
       body: JSON.stringify(payload)
     });
+
+    // 2. Enviar correos vía EmailJS
+    await enviarCorreos(payload);
+
     if (!busySlots[dateStr]) busySlots[dateStr] = [];
     busySlots[dateStr].push(selectedHour);
     mostrarExito(nombre);
