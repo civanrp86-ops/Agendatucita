@@ -189,7 +189,7 @@
       <label style="font-size:.82rem;font-weight:600;color:var(--primary);margin:12px 0 6px;display:block">Turno ma&ntilde;ana *</label>
       <div class="time-row">
         <label>Desde</label><input type="time" id="am-start" value="07:00">
-        <label>Hasta</label><input type="time" id="am-end" value="11:00">
+        <label>Hasta</label><input type="time" id="am-end" value="12:00">
       </div>
       <div class="toggle-row" style="margin-top:16px">
         <label class="toggle"><input type="checkbox" id="pm-toggle" checked onchange="togglePM()"><span class="toggle-slider"></span></label>
@@ -197,15 +197,15 @@
       </div>
       <div id="pm-panel">
         <div class="time-row">
-          <label>Desde</label><input type="time" id="pm-start" value="14:00">
-          <label>Hasta</label><input type="time" id="pm-end" value="17:00">
+          <label>Desde</label><input type="time" id="pm-start" value="12:00">
+          <label>Hasta</label><input type="time" id="pm-end" value="18:00">
         </div>
       </div>
       <label style="font-size:.82rem;font-weight:600;color:var(--primary);margin:16px 0 4px;display:block">Duraci&oacute;n de cada cita * <span style="font-weight:400;color:var(--text-muted)">(puedes elegir varias)</span></label>
       <div class="dur-chips">
-        <div class="dur-chip active" data-dur="1.5">1h 30min</div>
-        <div class="dur-chip active" data-dur="2.5">2h 30min</div>
-        <div class="dur-chip active" data-dur="3.5">3h 30min</div>
+        <div class="dur-chip active" data-dur="1">1 hora</div>
+        <div class="dur-chip" data-dur="2">2 horas</div>
+        <div class="dur-chip" data-dur="3">3 horas</div>
       </div>
       <label style="font-size:.82rem;font-weight:600;color:var(--primary);margin:16px 0 4px;display:block">Tiempo entre citas</label>
       <div class="buffer-opts">
@@ -297,18 +297,10 @@
           <button class="btn-copy-link" id="btn-copy-final" onclick="copyFinalLink()">&#128203; Copiar</button>
         </div>
       </div>
-      <div id="short-link-box" style="display:none;margin-top:4px">
-        <div class="link-box">
-          <label>Link corto</label>
-          <div class="link-input-wrap">
-            <input type="text" id="short-link" class="link-input" readonly>
-            <button class="btn-copy-link" id="btn-copy-short" onclick="copyShortLink()">&#128203; Copiar</button>
-          </div>
-        </div>
-      </div>
+
       <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
         <button class="btn btn-success" style="flex:1" onclick="previewLink()">&#128065;&#65039; Previsualizar</button>
-        <button class="btn btn-ghost" onclick="shortenLink()">&#9986;&#65039; Acortar link</button>
+
         <button class="btn btn-ghost" onclick="goStep(1)">&#8635; Nueva configuraci&oacute;n</button>
       </div>
       <div class="instruction-box" style="margin-top:20px">
@@ -453,37 +445,13 @@ function generateLink(){
     primary:pal.primary, accent:pal.accent, gold:pal.gold
   });
   document.getElementById('generated-link').value = base+'?'+params.toString();
-  document.getElementById('short-link-box').style.display='none';
+
 }
 
 function copyFinalLink(){
   var v=document.getElementById('generated-link').value;
   navigator.clipboard.writeText(v).then(function(){
     var b=document.getElementById('btn-copy-final');
-    b.textContent='\u2713 Copiado!'; b.classList.add('copied');
-    setTimeout(function(){b.innerHTML='&#128203; Copiar';b.classList.remove('copied');},2000);
-  });
-}
-
-async function shortenLink(){
-  var link=document.getElementById('generated-link').value;
-  var box=document.getElementById('short-link-box');
-  var inp=document.getElementById('short-link');
-  box.style.display='block';
-  inp.value='Generando...';
-  try{
-    var res=await fetch('https://tinyurl.com/api-create.php?url='+encodeURIComponent(link));
-    inp.value=await res.text();
-  }catch(e){
-    inp.value='Error - abre tinyurl.com para acortar manualmente';
-    window.open('https://tinyurl.com/app','_blank');
-  }
-}
-
-function copyShortLink(){
-  var v=document.getElementById('short-link').value;
-  navigator.clipboard.writeText(v).then(function(){
-    var b=document.getElementById('btn-copy-short');
     b.textContent='\u2713 Copiado!'; b.classList.add('copied');
     setTimeout(function(){b.innerHTML='&#128203; Copiar';b.classList.remove('copied');},2000);
   });
