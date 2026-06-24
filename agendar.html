@@ -756,7 +756,7 @@ async function enviarCorreos(payload) {
   var startISO = payload.start_time;
   var endISO   = payload.end_time;
   var durH     = sessionDur;
-  var durStr   = durH === 1.5 ? '1h 30min' : durH === 2.5 ? '2h 30min' : '3h 30min';
+  var durStr = durH === 1 ? '1 hora' : durH === 2 ? '2 horas' : durH === 3 ? '3 horas' : durH === 1.5 ? '1h 30min' : durH === 2.5 ? '2h 30min' : '3h 30min';
 
   var params = {
     to_email:         payload.client_email,
