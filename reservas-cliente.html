@@ -676,7 +676,7 @@ function selectSlot(h) {
 
 function loadMonthBusy(y, m) {
   var monthStart = new Date(y, m, 1);
-  var monthEnd   = new Date(y, m + 1, 0);
+  var monthEnd   = new Date(y, m + 1, 1); // Primer dia del mes siguiente para incluir eventos del ultimo dia
 
   fetch('https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(CALENDAR_ID) +
         '/events?key=' + API_KEY +
