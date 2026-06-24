@@ -511,7 +511,10 @@ function generateLink() {
 
   var pal = PALETAS[selectedPaleta];
 
-  var base = window.location.origin + window.location.pathname.replace('configurar.html','') + 'agendar.html';
+  // Construir URL base correctamente
+  var pathParts = window.location.pathname.split('/');
+  pathParts[pathParts.length - 1] = 'agendar.html';
+  var base = window.location.origin + pathParts.join('/');
 
   var params = new URLSearchParams({
     name:       nombre,
