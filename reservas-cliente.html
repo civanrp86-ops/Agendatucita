@@ -293,6 +293,10 @@
               <option value="Virtual">&#128187; Virtual</option>
             </select>
           </div>
+          <div class="form-group">
+            <label>Empresa / Organizaci&#243;n</label>
+            <input type="text" id="inp-empresa" placeholder="Nombre de la empresa (opcional)">
+          </div>
           <div class="form-group full">
             <label>Motivo de la consulta</label>
             <textarea id="inp-motivo" placeholder="Describe brevemente tu condici&#243;n o motivo&#8230;"></textarea>
@@ -606,10 +610,10 @@ function renderCalendar() {
         if (selectedDate && selectedDate.getTime() === date.getTime()) cell.classList.add('selected');
         cell.classList.add('available');
         // Mostrar punto verde si el día tiene al menos un slot libre
-        var dStr   = toDateStr(date);
-        var busy   = busySlots[dStr] || [];
-        var total  = getAllH(sessionDur).length;
-        if (total > 0 && busy.length < total) cell.classList.add('has-slots');
+        var dStr  = toDateStr(date);
+        var total = getAllH(sessionDur);
+        var free  = total.filter(function(h){ return !isSlotBusy(dStr, h, sessionDur); });
+        if (free.length > 0) cell.classList.add('has-slots');
         cell.onclick = function() { selectDate(new Date(date)); };
       }
 
@@ -635,6 +639,20 @@ function selectDate(d) {
   document.getElementById('slots-card').style.display = 'block';
 }
 
+// Verifica si un slot se solapa con cualquier evento del dia
+function isSlotBusy(dateStr, slotTime, durHours) {
+  var events = busySlots[dateStr] || [];
+  if (!events.length) return false;
+  var parts     = slotTime.split(':');
+  var slotStart = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+  var slotEnd   = slotStart + Math.round(durHours * 60);
+  return events.some(function(evt) {
+    // Solapamiento: slot empieza antes de que termine el evento
+    //               Y slot termina despues de que empieza el evento
+    return slotStart < evt.e && slotEnd > evt.s;
+  });
+}
+
 function renderSlots(d) {
   var dateStr = toDateStr(d);
   var busy = busySlots[dateStr] || [];
@@ -642,7 +660,7 @@ function renderSlots(d) {
   var html = '';
 
   avail.forEach(function(h) {
-    var isBusy = busy.includes(h);
+    var isBusy = isSlotBusy(dateStr, h, sessionDur);
     html += '<button class="slot-btn' + (isBusy ? ' busy' : '') + (h === selectedHour ? ' selected' : '') +
             '" ' + (isBusy ? 'disabled' : 'onclick="selectSlot(\'' + h + '\')"') + '>' + h + '</button>';
   });
@@ -670,11 +688,17 @@ function loadMonthBusy(y, m) {
       busySlots = {};
       if (data.items) {
         data.items.forEach(function(evt) {
-          var start = new Date(evt.start.dateTime);
+          // Ignorar eventos de todo el dia
+          if (!evt.start.dateTime) return;
+          var start   = new Date(evt.start.dateTime);
+          var end     = new Date(evt.end.dateTime);
           var dateStr = toDateStr(start);
-          var h = String(start.getHours()).padStart(2,'0') + ':00';
           if (!busySlots[dateStr]) busySlots[dateStr] = [];
-          busySlots[dateStr].push(h);
+          // Guardar rango en minutos desde medianoche
+          busySlots[dateStr].push({
+            s: start.getHours() * 60 + start.getMinutes(),
+            e: end.getHours()   * 60 + end.getMinutes()
+          });
         });
       }
       renderCalendar();
@@ -719,6 +743,7 @@ function goStep3() {
   formData.apellido  = apellido;
   formData.tel       = tel;
   formData.email     = document.getElementById('inp-email').value;
+  formData.empresa   = document.getElementById('inp-empresa').value.trim();
   formData.modalidad = document.getElementById('inp-modalidad').value;
   formData.motivo    = document.getElementById('inp-motivo').value;
 
@@ -755,6 +780,7 @@ async function enviarCorreos(payload) {
     client_name:      payload.client_name,
     client_phone:     payload.client_phone,
     client_email:     payload.client_email,
+    client_empresa:   payload.client_empresa || '',
     meeting_date:     formatDateES(startISO),
     meeting_start:    formatTime(startISO),
     meeting_end:      formatTime(endISO),
@@ -795,6 +821,7 @@ async function confirmarCita() {
     client_name:    nombre,
     client_phone:   formData.tel,
     client_email:   formData.email || '',
+    client_empresa: formData.empresa || '',
     meeting_reason: formData.motivo || 'No especificado',
     meeting_type:   formData.modalidad || 'Presencial',
     start_time:     startISO,
