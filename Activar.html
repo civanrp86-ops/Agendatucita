@@ -157,6 +157,10 @@
           <label>Profesi&oacute;n / Especialidad *</label>
           <input type="text" id="p1-profesion" placeholder="Ej: Fisioterapeuta &middot; SST">
         </div>
+        <div class="form-group">
+          <label>Ciudad *</label>
+          <input type="text" id="p1-ciudad" placeholder="Ej: Bogot&#225;, Medell&#237;n, C&#250;cuta">
+        </div>
         <div class="form-group full">
           <label>Email de Google Calendar *</label>
           <input type="email" id="p1-email" placeholder="tu@gmail.com">
@@ -406,7 +410,8 @@ function validateStep(n){
     var nom=document.getElementById('p1-nombre').value.trim();
     var prof=document.getElementById('p1-profesion').value.trim();
     var mail=document.getElementById('p1-email').value.trim();
-    if(!nom||!prof||!mail){err.innerHTML='<div class="alert alert-error">&#9888;&#65039; Completa todos los campos.</div>';return false;}
+    var ciudad = document.getElementById('p1-ciudad').value.trim();
+    if(!nom||!prof||!mail||!ciudad){err.innerHTML='<div class="alert alert-error">&#9888;&#65039; Completa todos los campos.</div>';return false;}
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){err.innerHTML='<div class="alert alert-error">&#9888;&#65039; Email no v&aacute;lido.</div>';return false;}
   }
   if(n===2){
@@ -422,6 +427,7 @@ function validateStep(n){
 function generateLink(){
   var nombre  = document.getElementById('p1-nombre').value.trim();
   var prof    = document.getElementById('p1-profesion').value.trim();
+  var ciudad  = document.getElementById('p1-ciudad').value.trim();
   var email   = document.getElementById('p1-email').value.trim();
   var amStart = document.getElementById('am-start').value;
   var amEnd   = document.getElementById('am-end').value;
@@ -442,7 +448,7 @@ function generateLink(){
   var PROD_API_KEY     = 'AIzaSyDVynTeTFMHDi1VB-7DouJSLAsRAZ9S7JA';
 
   var params = new URLSearchParams({
-    name:nombre, profession:prof, email:email,
+    name:nombre, profession:prof, email:email, city:ciudad,
     apps_script:PROD_APPS_SCRIPT,
     api_key:PROD_API_KEY,
     am_start:amStart, am_end:amEnd,
