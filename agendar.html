@@ -732,7 +732,7 @@ function goStep3() {
     '<div class="summary-row"><span class="summary-icon">\u{1F464}</span><span class="summary-label">Nombre</span><span class="summary-val">' + nombre + ' ' + apellido + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\u{1F4C5}</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\u{1F550}</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' \u2013 ' + endHour(selectedHour, sessionDur) + '</span></div>' +
-    '<div class="summary-row"><span class="summary-icon">\u23f1</span><span class="summary-label">Duraci\u00f3n</span><span class="summary-val">' + sessionDur + ' hora' + (sessionDur > 1 ? 's' : '') + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">\u23f1</span><span class="summary-label">Duraci\u00f3n</span><span class="summary-val">' + (sessionDur === 1 ? '1 hora' : sessionDur === 2 ? '2 horas' : sessionDur === 3 ? '3 horas' : sessionDur === 1.5 ? '1h 30min' : sessionDur === 2.5 ? '2h 30min' : '3h 30min') + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\u{1F4DE}</span><span class="summary-label">Tel\u00e9fono</span><span class="summary-val">' + tel + '</span></div>' +
     (formData.email ? '<div class="summary-row"><span class="summary-icon">\u{1F4E7}</span><span class="summary-label">Email</span><span class="summary-val">' + formData.email + '</span></div>' : '') +
     (formData.empresa ? '<div class="summary-row"><span class="summary-icon">&#127970;</span><span class="summary-label">Empresa</span><span class="summary-val">' + formData.empresa + '</span></div>' : '') +
@@ -841,7 +841,7 @@ function mostrarExito(nombre) {
     '<div class="summary-row"><span class="summary-icon">\u{1F464}</span><span class="summary-label">Cliente</span><span class="summary-val">' + nombre + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\u{1F4C5}</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\u{1F550}</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' \u2013 ' + endHour(selectedHour, sessionDur) + '</span></div>' +
-    '<div class="summary-row"><span class="summary-icon">\u23f1</span><span class="summary-label">Duraci\u00f3n</span><span class="summary-val">' + sessionDur + ' hora' + (sessionDur > 1 ? 's' : '') + '</span></div>';
+    '<div class="summary-row"><span class="summary-icon">\u23f1</span><span class="summary-label">Duraci\u00f3n</span><span class="summary-val">' + (sessionDur === 1 ? '1 hora' : sessionDur === 2 ? '2 horas' : sessionDur === 3 ? '3 horas' : sessionDur === 1.5 ? '1h 30min' : sessionDur === 2.5 ? '2h 30min' : '3h 30min') + '</span></div>';
   ss.scrollIntoView({behavior:'smooth'});
 }
 
