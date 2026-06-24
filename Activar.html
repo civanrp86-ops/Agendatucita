@@ -98,6 +98,16 @@
   .success-title{font-size:1.5rem;font-weight:600;color:var(--primary);margin-bottom:8px}
   .success-text{color:var(--text-muted);margin-bottom:24px;font-size:.92rem}
   footer{text-align:center;padding:20px;font-size:.78rem;color:var(--text-muted);border-top:1px solid var(--border);margin-top:40px}
+  .lock-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary) 0%,var(--primary-lt) 100%)}
+  .lock-card{background:#fff;border-radius:16px;padding:40px 32px;width:100%;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+  .lock-logo{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--primary);margin-bottom:8px}
+  .lock-subtitle{font-size:.88rem;color:var(--text-muted);margin-bottom:28px}
+  .lock-input{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:1rem;text-align:center;letter-spacing:2px;transition:all .2s;margin-bottom:12px}
+  .lock-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(27,79,114,.1)}
+  .lock-btn{width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s}
+  .lock-btn:hover{background:#154360}
+  .lock-error{color:#C0392B;font-size:.85rem;margin-top:8px;display:none}
+  .lock-hint{font-size:.75rem;color:var(--text-muted);margin-top:16px}
   footer strong{color:var(--primary)}
 </style>
 </head>
@@ -106,7 +116,20 @@
   <h1>&#9881;&#65039; AgendaTuCita</h1>
   <p>Activa tu agenda profesional en 5 pasos</p>
 </header>
-<div class="container">
+<!-- PANTALLA DE ACTIVACIÓN -->
+<div class="lock-screen" id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-logo">&#128197; AgendaTuCita</div>
+    <div class="lock-subtitle">Ingresa tu c&oacute;digo de activaci&oacute;n</div>
+    <input type="password" class="lock-input" id="lock-code" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+      onkeydown="if(event.key==='Enter') checkCode()">
+    <button class="lock-btn" onclick="checkCode()">&#128274; Activar mi agenda</button>
+    <div class="lock-error" id="lock-error">&#10060; C&oacute;digo incorrecto. Verifica el c&oacute;digo que recibiste.</div>
+    <div class="lock-hint">&#128222; Si no tienes tu c&oacute;digo, contacta a AgendaTuCita</div>
+  </div>
+</div>
+
+<div class="container" id="main-container" style="display:none">
   <div class="steps" id="steps-bar">
     <div class="step active" id="stp1"><div class="step-num">1</div><span>Perfil</span></div>
     <div class="step-line" id="ln1"></div>
@@ -306,9 +329,28 @@
     </div>
   </div>
 </div>
+</div><!-- /main-container -->
 <footer><strong>AgendaTuCita</strong> &middot; Sistema de agendamiento profesional</footer>
 
 <script>
+// ══ CÓDIGO DE ACTIVACIÓN ══════════════════════════════
+// Cambia esta contraseña cuando entregues el producto a un cliente
+var ACTIVATION_CODE = 'AgendaPro2026';
+
+function checkCode() {
+  var input = document.getElementById('lock-code').value.trim();
+  var err   = document.getElementById('lock-error');
+  if (input === ACTIVATION_CODE) {
+    document.getElementById('lock-screen').style.display    = 'none';
+    document.getElementById('main-container').style.display = 'block';
+    err.style.display = 'none';
+  } else {
+    err.style.display = 'block';
+    document.getElementById('lock-code').value = '';
+    document.getElementById('lock-code').focus();
+  }
+}
+
 var PALETAS = [
   {name:'Oc\u00e9ano',    primary:'#1B4F72',accent:'#1ABC9C',gold:'#C9A84C'},
   {name:'Esmeralda', primary:'#1A5276',accent:'#27AE60',gold:'#F39C12'},
