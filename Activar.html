@@ -3,43 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AgendaTuCita · Configuración</title>
+<title>AgendaTuCita &middot; Activar</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --primary:#1B4F72; --primary-lt:#2E86C1; --accent:#1ABC9C;
-    --bg:#F4F6F9; --surface:#fff; --border:#D5DCE8;
-    --text:#1C2833; --text-muted:#7F8C8D;
-    --radius:12px; --shadow:0 4px 24px rgba(27,79,114,.10);
-  }
+  :root{--primary:#1B4F72;--primary-lt:#2E86C1;--accent:#1ABC9C;--bg:#F4F6F9;--surface:#fff;--border:#D5DCE8;--text:#1C2833;--text-muted:#7F8C8D;--radius:12px;--shadow:0 4px 24px rgba(27,79,114,.10)}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
   header{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-lt) 100%);color:#fff;padding:28px 24px;text-align:center;position:relative;overflow:hidden}
   header::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E")}
   header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,3vw,2rem);position:relative}
   header p{font-size:.9rem;opacity:.85;margin-top:6px;position:relative}
-
   .container{max-width:680px;margin:0 auto;padding:28px 16px 60px}
-
-  /* Steps */
-  .steps{display:flex;justify-content:center;gap:0;margin-bottom:28px;flex-wrap:wrap;gap:4px}
+  .steps{display:flex;justify-content:center;gap:4px;margin-bottom:28px;flex-wrap:wrap}
   .step{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted);font-weight:500}
-  .step.active{color:var(--primary)}
-  .step.done{color:var(--accent)}
+  .step.active{color:var(--primary)}.step.done{color:var(--accent)}
   .step-num{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;background:var(--surface);transition:all .3s}
   .step.active .step-num{background:var(--primary);border-color:var(--primary);color:#fff}
   .step.done .step-num{background:var(--accent);border-color:var(--accent);color:#fff}
   .step-line{width:24px;height:2px;background:var(--border);margin:0 2px}
   .step-line.done{background:var(--accent)}
-
-  /* Card */
   .card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;margin-bottom:20px;border:1px solid var(--border)}
   .card-title{font-size:.7rem;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--primary-lt);margin-bottom:20px;display:flex;align-items:center;gap:8px}
   .card-title::after{content:'';flex:1;height:1px;background:var(--border)}
   .step-title{font-size:1.2rem;font-weight:600;color:var(--primary);margin-bottom:6px}
   .step-desc{font-size:.88rem;color:var(--text-muted);margin-bottom:24px}
-
-  /* Form */
   .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:16px}
   .form-group{display:flex;flex-direction:column}
   .form-group.full{grid-column:1/-1}
@@ -47,23 +34,15 @@
   .form-group input,.form-group select{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.92rem;transition:all .2s;background:#fff}
   .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(27,79,114,.1)}
   .form-hint{font-size:.75rem;color:var(--text-muted);margin-top:4px}
-
-  /* Day chips */
   .day-chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 16px}
   .day-chip{width:40px;height:40px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text-muted);background:var(--surface);user-select:none}
   .day-chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
-
-  /* Duration chips */
   .dur-chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
   .dur-chip{padding:8px 16px;border-radius:20px;border:2px solid var(--border);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text-muted);background:var(--surface);user-select:none}
   .dur-chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
-
-  /* Buffer */
   .buffer-opts{display:flex;gap:8px;margin:8px 0}
   .buf-btn{padding:8px 20px;border-radius:20px;border:2px solid var(--border);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text-muted);background:var(--surface)}
   .buf-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
-
-  /* Toggle */
   .toggle-row{display:flex;align-items:center;gap:12px;margin:12px 0}
   .toggle{position:relative;width:44px;height:24px}
   .toggle input{opacity:0;width:0;height:0}
@@ -72,13 +51,9 @@
   .toggle input:checked + .toggle-slider{background:var(--accent)}
   .toggle input:checked + .toggle-slider::before{transform:translateX(20px)}
   .toggle-label{font-size:.88rem;font-weight:500;color:var(--text)}
-
-  /* Time row */
   .time-row{display:flex;align-items:center;gap:12px;margin:8px 0;flex-wrap:wrap}
   .time-row label{font-size:.82rem;color:var(--text-muted);min-width:60px}
   .time-row input[type=time]{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;background:#fff}
-
-  /* Color palettes */
   .palettes{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin:12px 0}
   .palette{border:2px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all .2s;position:relative}
   .palette.active{border-color:var(--primary);box-shadow:0 0 0 3px rgba(27,79,114,.15)}
@@ -87,10 +62,8 @@
   .palette-name{font-size:.78rem;font-weight:600;color:var(--text)}
   .palette-check{position:absolute;top:8px;right:8px;font-size:1rem;display:none}
   .palette.active .palette-check{display:block}
-
-  /* Instrucciones Calendar */
   .instruction-box{background:#EBF5FB;border:1px solid #AED6F1;border-radius:10px;padding:20px;margin:16px 0}
-  .instruction-box h3{color:#1B4F72;font-size:.95rem;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .instruction-box h3{color:#1B4F72;font-size:.95rem;margin-bottom:12px}
   .instruction-step{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start}
   .instruction-num{width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
   .instruction-text{font-size:.85rem;color:#1C2833;line-height:1.5}
@@ -98,22 +71,16 @@
   .email-copy span{font-weight:600;color:var(--primary);flex:1;font-size:.9rem}
   .btn-copy-sm{padding:4px 12px;border:1px solid var(--primary);border-radius:6px;background:transparent;color:var(--primary);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s}
   .btn-copy-sm:hover{background:var(--primary);color:#fff}
-
-  /* Checkbox confirm */
   .confirm-check{display:flex;align-items:flex-start;gap:12px;padding:16px;background:#F0FBF8;border:1px solid #A9DFBF;border-radius:10px;cursor:pointer;margin:16px 0}
   .confirm-check input{width:18px;height:18px;margin-top:2px;cursor:pointer;accent-color:var(--accent)}
   .confirm-check span{font-size:.88rem;color:var(--text);line-height:1.5}
-
-  /* Link resultado */
   .link-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin:16px 0}
   .link-box label{font-size:.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:block}
   .link-input-wrap{display:flex;gap:8px}
-  .link-input{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--primary);background:#fff;word-break:break-all}
+  .link-input{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--primary);background:#fff}
   .btn-copy-link{padding:10px 16px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:.85rem;cursor:pointer;white-space:nowrap;transition:all .2s}
   .btn-copy-link:hover{background:#154360}
   .btn-copy-link.copied{background:var(--accent)}
-
-  /* Buttons */
   .btn{padding:12px 20px;border:none;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
   .btn-primary{background:var(--primary);color:#fff}
   .btn-primary:hover:not(:disabled){background:#154360}
@@ -122,32 +89,24 @@
   .btn-ghost:hover{border-color:var(--primary);background:var(--bg)}
   .btn-success{background:var(--accent);color:#fff}
   .btn-success:hover{background:#148F77}
-
   .btn-row{display:flex;gap:12px;margin-top:24px}
   .btn-row .btn-primary{flex:1}
-
   .alert{padding:12px 16px;border-radius:8px;margin:8px 0;font-size:.88rem}
   .alert-error{background:#FDECEA;color:#C0392B;border:1px solid #F5C6CB}
-  .alert-success{background:#E9F7EF;color:#1E8449;border:1px solid #A9DFBF}
-
   .success-wrap{text-align:center;padding:20px 0}
   .success-icon{width:80px;height:80px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:3rem;margin:0 auto 20px}
   .success-title{font-size:1.5rem;font-weight:600;color:var(--primary);margin-bottom:8px}
   .success-text{color:var(--text-muted);margin-bottom:24px;font-size:.92rem}
-
   footer{text-align:center;padding:20px;font-size:.78rem;color:var(--text-muted);border-top:1px solid var(--border);margin-top:40px}
   footer strong{color:var(--primary)}
 </style>
 </head>
 <body>
-
 <header>
   <h1>&#9881;&#65039; AgendaTuCita</h1>
-  <p>Configura tu agenda profesional en 5 pasos</p>
+  <p>Activa tu agenda profesional en 5 pasos</p>
 </header>
-
 <div class="container">
-
   <div class="steps" id="steps-bar">
     <div class="step active" id="stp1"><div class="step-num">1</div><span>Perfil</span></div>
     <div class="step-line" id="ln1"></div>
@@ -160,25 +119,25 @@
     <div class="step" id="stp5"><div class="step-num">5</div><span>Tu link</span></div>
   </div>
 
-  <!-- PASO 1: Perfil -->
+  <!-- PASO 1 -->
   <div id="panel1">
     <div class="card">
       <div class="card-title">Paso 1 de 5</div>
       <div class="step-title">&#128100; Tu perfil profesional</div>
-      <div class="step-desc">Esta información aparecerá en la página que verán tus clientes.</div>
+      <div class="step-desc">Esta informaci&oacute;n aparecer&aacute; en la p&aacute;gina que ver&aacute;n tus clientes.</div>
       <div class="form-grid">
         <div class="form-group">
           <label>Nombre completo *</label>
-          <input type="text" id="p1-nombre" placeholder="Ej: Dra. Ana García">
+          <input type="text" id="p1-nombre" placeholder="Ej: Dra. Ana Garc&iacute;a">
         </div>
         <div class="form-group">
-          <label>Profesión / Especialidad *</label>
-          <input type="text" id="p1-profesion" placeholder="Ej: Fisioterapeuta · SST">
+          <label>Profesi&oacute;n / Especialidad *</label>
+          <input type="text" id="p1-profesion" placeholder="Ej: Fisioterapeuta &middot; SST">
         </div>
         <div class="form-group full">
           <label>Email de Google Calendar *</label>
           <input type="email" id="p1-email" placeholder="tu@gmail.com">
-          <span class="form-hint">&#128274; Este email se usa solo para leer disponibilidad. Nunca se publica.</span>
+          <span class="form-hint">&#128274; Solo se usa para leer disponibilidad. Nunca se publica.</span>
         </div>
       </div>
       <div id="err1"></div>
@@ -188,59 +147,49 @@
     </div>
   </div>
 
-  <!-- PASO 2: Horario -->
+  <!-- PASO 2 -->
   <div id="panel2" style="display:none">
     <div class="card">
       <div class="card-title">Paso 2 de 5</div>
-      <div class="step-title">&#128197; Horario de atención</div>
-      <div class="step-desc">Define qué días y horarios atiendes a tus clientes.</div>
-
-      <label style="font-size:.82rem;font-weight:600;color:var(--primary);margin-bottom:6px;display:block">Días de atención *</label>
+      <div class="step-title">&#128197; Horario de atenci&oacute;n</div>
+      <div class="step-desc">Define qu&eacute; d&iacute;as y horarios atiendes a tus clientes.</div>
+      <label style="font-size:.82rem;font-weight:600;color:var(--primary);margin-bottom:6px;display:block">D&iacute;as de atenci&oacute;n *</label>
       <div class="day-chips">
         <div class="day-chip active" data-day="1">Lu</div>
         <div class="day-chip active" data-day="2">Ma</div>
         <div class="day-chip active" data-day="3">Mi</div>
         <div class="day-chip active" data-day="4">Ju</div>
         <div class="day-chip active" data-day="5">Vi</div>
-        <div class="day-chip" data-day="6">Sá</div>
+        <div class="day-chip" data-day="6">S&aacute;</div>
         <div class="day-chip" data-day="0">Do</div>
       </div>
-
-      <label style="font-size:.82rem;font-weight:600;color:var(--primary);margin:12px 0 6px;display:block">Turno mañana *</label>
+      <label style="font-size:.82rem;font-weight:600;color:var(--primary);margin:12px 0 6px;display:block">Turno ma&ntilde;ana *</label>
       <div class="time-row">
-        <label>Desde</label>
-        <input type="time" id="am-start" value="07:00">
-        <label>Hasta</label>
-        <input type="time" id="am-end" value="11:00">
+        <label>Desde</label><input type="time" id="am-start" value="07:00">
+        <label>Hasta</label><input type="time" id="am-end" value="11:00">
       </div>
-
       <div class="toggle-row" style="margin-top:16px">
         <label class="toggle"><input type="checkbox" id="pm-toggle" checked onchange="togglePM()"><span class="toggle-slider"></span></label>
         <span class="toggle-label">Turno tarde activo</span>
       </div>
       <div id="pm-panel">
         <div class="time-row">
-          <label>Desde</label>
-          <input type="time" id="pm-start" value="14:00">
-          <label>Hasta</label>
-          <input type="time" id="pm-end" value="17:00">
+          <label>Desde</label><input type="time" id="pm-start" value="14:00">
+          <label>Hasta</label><input type="time" id="pm-end" value="17:00">
         </div>
       </div>
-
-      <label style="font-size:.82rem;font-weight:600;color:var(--primary);margin:16px 0 4px;display:block">Duración de cada cita * <span style="font-weight:400;color:var(--text-muted)">(puedes elegir varias)</span></label>
+      <label style="font-size:.82rem;font-weight:600;color:var(--primary);margin:16px 0 4px;display:block">Duraci&oacute;n de cada cita * <span style="font-weight:400;color:var(--text-muted)">(puedes elegir varias)</span></label>
       <div class="dur-chips">
         <div class="dur-chip active" data-dur="1.5">1h 30min</div>
         <div class="dur-chip active" data-dur="2.5">2h 30min</div>
         <div class="dur-chip active" data-dur="3.5">3h 30min</div>
       </div>
-
       <label style="font-size:.82rem;font-weight:600;color:var(--primary);margin:16px 0 4px;display:block">Tiempo entre citas</label>
       <div class="buffer-opts">
         <button class="buf-btn active" data-buf="0">Sin pausa</button>
         <button class="buf-btn" data-buf="15">15 min</button>
         <button class="buf-btn" data-buf="30">30 min</button>
       </div>
-
       <div id="err2"></div>
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="goStep(1)">&#8592; Volver</button>
@@ -249,15 +198,13 @@
     </div>
   </div>
 
-  <!-- PASO 3: Colores -->
+  <!-- PASO 3 -->
   <div id="panel3" style="display:none">
     <div class="card">
       <div class="card-title">Paso 3 de 5</div>
-      <div class="step-title">&#127912; Personalización visual</div>
-      <div class="step-desc">Elige el esquema de colores de tu página de agendamiento.</div>
-
+      <div class="step-title">&#127912; Personalizaci&oacute;n visual</div>
+      <div class="step-desc">Elige el esquema de colores de tu p&aacute;gina de agendamiento.</div>
       <div class="palettes" id="palettes-container"></div>
-
       <div id="err3"></div>
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="goStep(2)">&#8592; Volver</button>
@@ -266,13 +213,12 @@
     </div>
   </div>
 
-  <!-- PASO 4: Google Calendar -->
+  <!-- PASO 4 -->
   <div id="panel4" style="display:none">
     <div class="card">
       <div class="card-title">Paso 4 de 5</div>
       <div class="step-title">&#128197; Conecta tu Google Calendar</div>
-      <div class="step-desc">Para que el sistema pueda crear citas en tu calendario, debes compartirlo una sola vez.</div>
-
+      <div class="step-desc">Para que el sistema cree citas en tu calendario, comp&aacute;rtelo una sola vez.</div>
       <div class="instruction-box">
         <h3>&#128221; Instrucciones (solo una vez)</h3>
         <div class="instruction-step">
@@ -281,31 +227,29 @@
         </div>
         <div class="instruction-step">
           <div class="instruction-num">2</div>
-          <div class="instruction-text">En el menú izquierdo, busca tu calendario y haz clic en los <strong>tres puntos ⋮</strong> → <strong>"Configuración y uso compartido"</strong></div>
+          <div class="instruction-text">En el men&uacute; izquierdo busca tu calendario &#8594; clic en los <strong>tres puntos &#8942;</strong> &#8594; <strong>"Configuraci&oacute;n y uso compartido"</strong></div>
         </div>
         <div class="instruction-step">
           <div class="instruction-num">3</div>
-          <div class="instruction-text">Baja hasta <strong>"Compartir con personas específicas"</strong> → <strong>"+ Agregar personas"</strong></div>
+          <div class="instruction-text">Baja hasta <strong>"Compartir con personas espec&iacute;ficas"</strong> &#8594; <strong>"+ Agregar personas"</strong></div>
         </div>
         <div class="instruction-step">
           <div class="instruction-num">4</div>
-          <div class="instruction-text">Agrega este email y dale permiso <strong>"Hacer cambios en los eventos"</strong>:</div>
+          <div class="instruction-text">Agrega este email con permiso <strong>"Realizar cambios en los eventos"</strong>:</div>
         </div>
         <div class="email-copy">
           <span>agendatucita12@gmail.com</span>
-          <button class="btn-copy-sm" onclick="copyEmail()">&#128203; Copiar</button>
+          <button class="btn-copy-sm" onclick="copyAgendaEmail(this)">&#128203; Copiar</button>
         </div>
         <div class="instruction-step">
           <div class="instruction-num">5</div>
           <div class="instruction-text">Haz clic en <strong>"Enviar"</strong> para confirmar.</div>
         </div>
       </div>
-
       <label class="confirm-check" for="chk-calendar">
         <input type="checkbox" id="chk-calendar">
-        <span>&#10003; Ya compartí mi calendario con <strong>agendatucita12@gmail.com</strong> y le di permisos para hacer cambios en los eventos.</span>
+        <span>&#10003; Ya compart&iacute; mi calendario con <strong>agendatucita12@gmail.com</strong> y le di permisos para realizar cambios en los eventos.</span>
       </label>
-
       <div id="err4"></div>
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="goStep(3)">&#8592; Volver</button>
@@ -314,16 +258,15 @@
     </div>
   </div>
 
-  <!-- PASO 5: Link generado -->
+  <!-- PASO 5 -->
   <div id="panel5" style="display:none">
     <div class="card">
       <div class="card-title">Paso 5 de 5</div>
       <div class="success-wrap">
         <div class="success-icon">&#127881;</div>
-        <div class="success-title">&#161;Tu agenda está lista!</div>
+        <div class="success-title">&#161;Tu agenda est&aacute; lista!</div>
         <div class="success-text">Comparte este link con tus clientes para que puedan agendar sus citas.</div>
       </div>
-
       <div class="link-box">
         <label>Tu link personalizado</label>
         <div class="link-input-wrap">
@@ -331,17 +274,25 @@
           <button class="btn-copy-link" id="btn-copy-final" onclick="copyFinalLink()">&#128203; Copiar</button>
         </div>
       </div>
-
+      <div id="short-link-box" style="display:none;margin-top:4px">
+        <div class="link-box">
+          <label>Link corto</label>
+          <div class="link-input-wrap">
+            <input type="text" id="short-link" class="link-input" readonly>
+            <button class="btn-copy-link" id="btn-copy-short" onclick="copyShortLink()">&#128203; Copiar</button>
+          </div>
+        </div>
+      </div>
       <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
         <button class="btn btn-success" style="flex:1" onclick="previewLink()">&#128065;&#65039; Previsualizar</button>
-        <button class="btn btn-ghost" onclick="goStep(1)">&#8635; Nueva configuración</button>
+        <button class="btn btn-ghost" onclick="shortenLink()">&#9986;&#65039; Acortar link</button>
+        <button class="btn btn-ghost" onclick="goStep(1)">&#8635; Nueva configuraci&oacute;n</button>
       </div>
-
       <div class="instruction-box" style="margin-top:20px">
-        <h3>&#128161; ¿Cómo usarlo?</h3>
+        <h3>&#128161; C&oacute;mo usarlo</h3>
         <div class="instruction-step">
           <div class="instruction-num">1</div>
-          <div class="instruction-text">Copia el link y compártelo por WhatsApp, email o tu página web.</div>
+          <div class="instruction-text">Copia el link y comp&aacute;rtelo por WhatsApp, email o tu p&aacute;gina web.</div>
         </div>
         <div class="instruction-step">
           <div class="instruction-num">2</div>
@@ -349,147 +300,92 @@
         </div>
         <div class="instruction-step">
           <div class="instruction-num">3</div>
-          <div class="instruction-text">Al agendar, recibes un correo de notificación y el evento se crea automáticamente en tu Google Calendar.</div>
+          <div class="instruction-text">Al agendar, recibes un correo de notificaci&oacute;n y el evento se crea autom&aacute;ticamente en tu Google Calendar.</div>
         </div>
       </div>
     </div>
   </div>
-
 </div>
-
 <footer><strong>AgendaTuCita</strong> &middot; Sistema de agendamiento profesional</footer>
 
 <script>
-// ══ PALETAS DE COLOR ═══════════════════════════════════
 var PALETAS = [
-  { name:'Océano',      primary:'#1B4F72', accent:'#1ABC9C', gold:'#C9A84C' },
-  { name:'Esmeralda',   primary:'#1A5276', accent:'#27AE60', gold:'#F39C12' },
-  { name:'Violeta',     primary:'#6C3483', accent:'#AF7AC5', gold:'#F1C40F' },
-  { name:'Coral',       primary:'#A93226', accent:'#E74C3C', gold:'#F0B27A' },
-  { name:'Pizarra',     primary:'#2C3E50', accent:'#3498DB', gold:'#F1C40F' },
-  { name:'Bosque',      primary:'#1E8449', accent:'#58D68D', gold:'#D4AC0D' },
-  { name:'Teal',        primary:'#0E7490', accent:'#22D3EE', gold:'#FBBF24' },
-  { name:'Frambuesa',   primary:'#862D59', accent:'#D63384', gold:'#FFD700' }
+  {name:'Oc\u00e9ano',    primary:'#1B4F72',accent:'#1ABC9C',gold:'#C9A84C'},
+  {name:'Esmeralda', primary:'#1A5276',accent:'#27AE60',gold:'#F39C12'},
+  {name:'Violeta',   primary:'#6C3483',accent:'#AF7AC5',gold:'#F1C40F'},
+  {name:'Coral',     primary:'#A93226',accent:'#E74C3C',gold:'#F0B27A'},
+  {name:'Pizarra',   primary:'#2C3E50',accent:'#3498DB',gold:'#F1C40F'},
+  {name:'Bosque',    primary:'#1E8449',accent:'#58D68D',gold:'#D4AC0D'},
+  {name:'Teal',      primary:'#0E7490',accent:'#22D3EE',gold:'#FBBF24'},
+  {name:'Frambuesa', primary:'#862D59',accent:'#D63384',gold:'#FFD700'}
 ];
 var selectedPaleta = 0;
 
-// Renderizar paletas
 var pc = document.getElementById('palettes-container');
-PALETAS.forEach(function(p, i) {
+PALETAS.forEach(function(p,i){
   var d = document.createElement('div');
-  d.className = 'palette' + (i===0?' active':'');
+  d.className = 'palette'+(i===0?' active':'');
   d.innerHTML =
-    '<div class="palette-preview">' +
-    '<div class="palette-swatch" style="background:'+p.primary+'"></div>' +
-    '<div class="palette-swatch" style="background:'+p.accent+'"></div>' +
-    '<div class="palette-swatch" style="background:'+p.gold+'"></div>' +
-    '</div>' +
-    '<div class="palette-name">'+p.name+'</div>' +
+    '<div class="palette-preview">'+
+    '<div class="palette-swatch" style="background:'+p.primary+'"></div>'+
+    '<div class="palette-swatch" style="background:'+p.accent+'"></div>'+
+    '<div class="palette-swatch" style="background:'+p.gold+'"></div>'+
+    '</div><div class="palette-name">'+p.name+'</div>'+
     '<span class="palette-check">&#10003;</span>';
-  d.onclick = function() {
-    document.querySelectorAll('.palette').forEach(function(x){ x.classList.remove('active'); });
-    d.classList.add('active');
-    selectedPaleta = i;
+  d.onclick = function(){
+    document.querySelectorAll('.palette').forEach(function(x){x.classList.remove('active');});
+    d.classList.add('active'); selectedPaleta = i;
   };
   pc.appendChild(d);
 });
 
-// ══ DAY CHIPS ══════════════════════════════════════════
-document.querySelectorAll('.day-chip').forEach(function(chip) {
-  chip.onclick = function() { chip.classList.toggle('active'); };
-});
-
-// ══ DUR CHIPS ══════════════════════════════════════════
-document.querySelectorAll('.dur-chip').forEach(function(chip) {
-  chip.onclick = function() { chip.classList.toggle('active'); };
-});
-
-// ══ BUFFER ═════════════════════════════════════════════
-document.querySelectorAll('.buf-btn').forEach(function(btn) {
-  btn.onclick = function() {
-    document.querySelectorAll('.buf-btn').forEach(function(b){ b.classList.remove('active'); });
-    btn.classList.add('active');
+document.querySelectorAll('.day-chip').forEach(function(c){c.onclick=function(){c.classList.toggle('active');};});
+document.querySelectorAll('.dur-chip').forEach(function(c){c.onclick=function(){c.classList.toggle('active');};});
+document.querySelectorAll('.buf-btn').forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll('.buf-btn').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');
   };
 });
 
-// ══ PM TOGGLE ══════════════════════════════════════════
-function togglePM() {
-  var on = document.getElementById('pm-toggle').checked;
-  document.getElementById('pm-panel').style.display = on ? 'block' : 'none';
+function togglePM(){
+  document.getElementById('pm-panel').style.display = document.getElementById('pm-toggle').checked?'block':'none';
 }
 
-// ══ STEPS ══════════════════════════════════════════════
-function goStep(n) {
-  if (n > 1 && !validateStep(n-1)) return;
-
-  // Actualizar step bar
-  for (var i=1; i<=5; i++) {
-    var stp = document.getElementById('stp'+i);
-    var ln  = document.getElementById('ln'+i);
-    stp.className = 'step' + (i===n?' active':i<n?' done':'');
-    if (ln) ln.className = 'step-line' + (i<n?' done':'');
+function goStep(n){
+  if(n>1 && !validateStep(n-1)) return;
+  for(var i=1;i<=5;i++){
+    document.getElementById('stp'+i).className='step'+(i===n?' active':i<n?' done':'');
+    var ln=document.getElementById('ln'+i);
+    if(ln) ln.className='step-line'+(i<n?' done':'');
+    document.getElementById('panel'+i).style.display=i===n?'block':'none';
   }
-
-  // Mostrar panel
-  for (var j=1; j<=5; j++) {
-    document.getElementById('panel'+j).style.display = j===n?'block':'none';
-  }
-
-  // Al llegar al paso 4 mostrar email
-  if (n===4) {
-    document.getElementById('inst-email').textContent = document.getElementById('p1-email').value;
-  }
-
-  // Al llegar al paso 5 generar link
-  if (n===5) generateLink();
-
-  window.scrollTo({top:0, behavior:'smooth'});
+  if(n===4) document.getElementById('inst-email').textContent=document.getElementById('p1-email').value;
+  if(n===5) generateLink();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ══ VALIDACIONES ═══════════════════════════════════════
-function validateStep(n) {
-  var err = document.getElementById('err'+n);
-  err.innerHTML = '';
-
-  if (n===1) {
-    var nom  = document.getElementById('p1-nombre').value.trim();
-    var prof = document.getElementById('p1-profesion').value.trim();
-    var mail = document.getElementById('p1-email').value.trim();
-    if (!nom || !prof || !mail) {
-      err.innerHTML = '<div class="alert alert-error">&#9888;&#65039; Completa todos los campos obligatorios.</div>';
-      return false;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
-      err.innerHTML = '<div class="alert alert-error">&#9888;&#65039; El email no es válido.</div>';
-      return false;
-    }
+function validateStep(n){
+  var err=document.getElementById('err'+n);
+  err.innerHTML='';
+  if(n===1){
+    var nom=document.getElementById('p1-nombre').value.trim();
+    var prof=document.getElementById('p1-profesion').value.trim();
+    var mail=document.getElementById('p1-email').value.trim();
+    if(!nom||!prof||!mail){err.innerHTML='<div class="alert alert-error">&#9888;&#65039; Completa todos los campos.</div>';return false;}
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){err.innerHTML='<div class="alert alert-error">&#9888;&#65039; Email no v&aacute;lido.</div>';return false;}
   }
-
-  if (n===2) {
-    var dias = document.querySelectorAll('.day-chip.active');
-    var durs = document.querySelectorAll('.dur-chip.active');
-    if (dias.length === 0) {
-      err.innerHTML = '<div class="alert alert-error">&#9888;&#65039; Selecciona al menos un día de atención.</div>';
-      return false;
-    }
-    if (durs.length === 0) {
-      err.innerHTML = '<div class="alert alert-error">&#9888;&#65039; Selecciona al menos una duración de cita.</div>';
-      return false;
-    }
+  if(n===2){
+    if(!document.querySelectorAll('.day-chip.active').length){err.innerHTML='<div class="alert alert-error">&#9888;&#65039; Selecciona al menos un d&iacute;a.</div>';return false;}
+    if(!document.querySelectorAll('.dur-chip.active').length){err.innerHTML='<div class="alert alert-error">&#9888;&#65039; Selecciona al menos una duraci&oacute;n.</div>';return false;}
   }
-
-  if (n===4) {
-    if (!document.getElementById('chk-calendar').checked) {
-      err.innerHTML = '<div class="alert alert-error">&#9888;&#65039; Confirma que compartiste tu calendario antes de continuar.</div>';
-      return false;
-    }
+  if(n===4){
+    if(!document.getElementById('chk-calendar').checked){err.innerHTML='<div class="alert alert-error">&#9888;&#65039; Confirma que compartiste tu calendario.</div>';return false;}
   }
-
   return true;
 }
 
-// ══ GENERAR LINK ═══════════════════════════════════════
-function generateLink() {
+function generateLink(){
   var nombre  = document.getElementById('p1-nombre').value.trim();
   var prof    = document.getElementById('p1-profesion').value.trim();
   var email   = document.getElementById('p1-email').value.trim();
@@ -498,66 +394,68 @@ function generateLink() {
   var pmOn    = document.getElementById('pm-toggle').checked;
   var pmStart = document.getElementById('pm-start').value;
   var pmEnd   = document.getElementById('pm-end').value;
+  var days=[]; document.querySelectorAll('.day-chip.active').forEach(function(c){days.push(c.dataset.day);});
+  var durs=[]; document.querySelectorAll('.dur-chip.active').forEach(function(c){durs.push(c.dataset.dur);});
+  var buf=0; var bb=document.querySelector('.buf-btn.active'); if(bb) buf=bb.dataset.buf;
+  var pal=PALETAS[selectedPaleta];
 
-  var days = [];
-  document.querySelectorAll('.day-chip.active').forEach(function(c){ days.push(c.dataset.day); });
-
-  var durs = [];
-  document.querySelectorAll('.dur-chip.active').forEach(function(c){ durs.push(c.dataset.dur); });
-
-  var buffer = 0;
-  var bufBtn = document.querySelector('.buf-btn.active');
-  if (bufBtn) buffer = bufBtn.dataset.buf;
-
-  var pal = PALETAS[selectedPaleta];
-
-  // Construir URL base correctamente
-  var pathParts = window.location.pathname.split('/');
-  pathParts[pathParts.length - 1] = 'agendar.html';
-  var base = window.location.origin + pathParts.join('/');
+  // URL base robusta — funciona con cualquier nombre de archivo
+  var loc = window.location.href.split('?')[0];
+  var base = loc.substring(0, loc.lastIndexOf('/') + 1) + 'agendar.html';
 
   var params = new URLSearchParams({
-    name:       nombre,
-    profession: prof,
-    email:      email,
-    am_start:   amStart,
-    am_end:     amEnd,
-    pm_enabled: pmOn ? '1' : '0',
-    pm_start:   pmStart,
-    pm_end:     pmEnd,
-    days:       days.join(','),
-    duration:   durs.join(','),
-    buffer:     buffer,
-    primary:    pal.primary,
-    accent:     pal.accent,
-    gold:       pal.gold
+    name:nombre, profession:prof, email:email,
+    am_start:amStart, am_end:amEnd,
+    pm_enabled:pmOn?'1':'0', pm_start:pmStart, pm_end:pmEnd,
+    days:days.join(','), duration:durs.join(','), buffer:buf,
+    primary:pal.primary, accent:pal.accent, gold:pal.gold
   });
-
-  var link = base + '?' + params.toString();
-  document.getElementById('generated-link').value = link;
+  document.getElementById('generated-link').value = base+'?'+params.toString();
+  document.getElementById('short-link-box').style.display='none';
 }
 
-// ══ COPIAR LINK ════════════════════════════════════════
-function copyFinalLink() {
-  var input = document.getElementById('generated-link');
-  navigator.clipboard.writeText(input.value).then(function() {
-    var btn = document.getElementById('btn-copy-final');
-    btn.textContent = '&#10003; Copiado!';
-    btn.classList.add('copied');
-    setTimeout(function(){ btn.innerHTML='&#128203; Copiar'; btn.classList.remove('copied'); }, 2000);
+function copyFinalLink(){
+  var v=document.getElementById('generated-link').value;
+  navigator.clipboard.writeText(v).then(function(){
+    var b=document.getElementById('btn-copy-final');
+    b.textContent='\u2713 Copiado!'; b.classList.add('copied');
+    setTimeout(function(){b.innerHTML='&#128203; Copiar';b.classList.remove('copied');},2000);
   });
 }
 
-function copyEmail() {
-  navigator.clipboard.writeText('agendatucita12@gmail.com').then(function() {
-    event.target.textContent = '&#10003; Copiado';
-    setTimeout(function(){ event.target.innerHTML='&#128203; Copiar'; }, 2000);
+async function shortenLink(){
+  var link=document.getElementById('generated-link').value;
+  var box=document.getElementById('short-link-box');
+  var inp=document.getElementById('short-link');
+  box.style.display='block';
+  inp.value='Generando...';
+  try{
+    var res=await fetch('https://tinyurl.com/api-create.php?url='+encodeURIComponent(link));
+    inp.value=await res.text();
+  }catch(e){
+    inp.value='Error - abre tinyurl.com para acortar manualmente';
+    window.open('https://tinyurl.com/app','_blank');
+  }
+}
+
+function copyShortLink(){
+  var v=document.getElementById('short-link').value;
+  navigator.clipboard.writeText(v).then(function(){
+    var b=document.getElementById('btn-copy-short');
+    b.textContent='\u2713 Copiado!'; b.classList.add('copied');
+    setTimeout(function(){b.innerHTML='&#128203; Copiar';b.classList.remove('copied');},2000);
   });
 }
 
-function previewLink() {
-  var link = document.getElementById('generated-link').value;
-  window.open(link, '_blank');
+function copyAgendaEmail(btn){
+  navigator.clipboard.writeText('agendatucita12@gmail.com').then(function(){
+    btn.textContent='\u2713 Copiado';
+    setTimeout(function(){btn.innerHTML='&#128203; Copiar';},2000);
+  });
+}
+
+function previewLink(){
+  window.open(document.getElementById('generated-link').value,'_blank');
 }
 </script>
 </body>
