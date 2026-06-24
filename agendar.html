@@ -339,7 +339,7 @@
 </div>
 
 <footer>
-  <strong>AgendaTuCita</strong> &middot; <span id="footer-name"></span> &middot; <span id="footer-profession"></span> &middot; C&#250;cuta, Norte de Santander<br>
+  <strong>AgendaTuCita</strong> &middot; <span id="footer-name"></span> &middot; <span id="footer-profession"></span> &middot; <span id="footer-city"></span><br>
 </footer>
 
 <script>
@@ -362,7 +362,8 @@ function getQueryParams() {
     pm_start:    params.get('pm_start')    || '14:00',
     pm_end:      params.get('pm_end')      || '17:00',
     duration:    params.get('duration') || '1.5,2.5,3.5',
-    buffer:      parseInt(params.get('buffer') || '0')
+    buffer:      parseInt(params.get('buffer') || '0'),
+    city:        params.get('city') || 'Colombia'
   };
 }
 
@@ -376,9 +377,10 @@ document.documentElement.style.setProperty('--accent-dk', darken(config.accent, 
 document.documentElement.style.setProperty('--gold', config.gold);
 
 document.getElementById('header-profession').textContent = config.profession;
-document.getElementById('header-badge').textContent = config.name + ' \u00b7 C\u00facuta, Norte de Santander';
+document.getElementById('header-badge').textContent = config.name + ' \u00b7 ' + config.city;
 document.getElementById('footer-name').textContent = config.name;
 document.getElementById('footer-profession').textContent = config.profession;
+document.getElementById('footer-city').textContent = config.city;
 
 // ══ CONFIGURACIÓN ══════════════════════════════════════
 const API_KEY     = config.api_key;
