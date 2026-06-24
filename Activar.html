@@ -437,8 +437,14 @@ function generateLink(){
   var loc = window.location.href.split('?')[0];
   var base = loc.substring(0, loc.lastIndexOf('/') + 1) + 'agendar.html';
 
+  // Credenciales fijas del producto
+  var PROD_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbyGtA1PVdk4xcruLBTRVjC8V1AYEHFOVMx08PFyFy5qH6nHjG_idZjZnQIFfSDElOdS/exec';
+  var PROD_API_KEY     = 'AIzaSyDVynTeTFMHDi1VB-7DouJSLAsRAZ9S7JA';
+
   var params = new URLSearchParams({
     name:nombre, profession:prof, email:email,
+    apps_script:PROD_APPS_SCRIPT,
+    api_key:PROD_API_KEY,
     am_start:amStart, am_end:amEnd,
     pm_enabled:pmOn?'1':'0', pm_start:pmStart, pm_end:pmEnd,
     days:days.join(','), duration:durs.join(','), buffer:buf,
