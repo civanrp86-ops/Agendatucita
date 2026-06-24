@@ -105,7 +105,19 @@
   .cal-day.available:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
   .cal-day.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
   .cal-day.today::after { content: ''; position: absolute; bottom: 2px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+  .cal-day.has-slots::before { content: ''; position: absolute; bottom: 3px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: .75; }
+  .cal-day.selected.has-slots::before { background: #fff; }
   .cal-day.disabled { color: var(--text-muted); opacity: .4; cursor: not-allowed; }
+  /* ── Festivos ─────────────────────────────────────── */
+  .cal-day.festivo { color: #C0392B !important; opacity: .6; cursor: not-allowed; font-style: italic; }
+  .cal-day[data-tip] { overflow: visible; z-index: 1; }
+  .cal-day[data-tip]:hover::before {
+    content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%); background: #2C3E50; color: #fff;
+    font-size: .68rem; white-space: nowrap; padding: 4px 10px;
+    border-radius: 6px; pointer-events: none; z-index: 30;
+    font-style: normal; font-weight: 500;
+  }
 
   .slots-wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 8px; }
   .slot-btn {
@@ -195,7 +207,7 @@
 <body>
 
 <header>
-  <h1>📅 AgendaTuCita</h1>
+  <h1>&#128197; AgendaTuCita</h1>
   <p id="header-profession">Consultas Profesionales</p>
   <div class="badge-esp" id="header-badge"></div>
 </header>
@@ -211,15 +223,14 @@
   </div>
 
   <div class="info-bar">
-    <div class="info-chip">🕐 <span>07:00–11:00</span> y <span>14:00–17:00</span></div>
-    <div class="info-chip">📅 <span>Lunes a Viernes</span></div>
+    <div class="info-chip">&#128336; <span>07:00&#8211;11:00</span> y <span>14:00&#8211;17:00</span></div>
+    <div class="info-chip">&#128197; <span>Lunes a Viernes</span></div>
     <div class="dur-wrap">
-      <span class="dur-label">⏱ Duración</span>
+      <span class="dur-label">&#9200; Duraci&#243;n</span>
       <div id="dur-btns-container"></div>
     </div>
   </div>
 
-  <!-- Cuadro de tipo de servicio -->
   <div class="service-info" id="service-info">
     <div class="service-icon" id="service-icon"></div>
     <div class="service-text">
@@ -245,10 +256,10 @@
       <div class="card" id="slots-card" style="display:none">
         <div class="card-title">Horarios disponibles</div>
         <div id="slots-container">
-          <div class="loader"><div class="spinner"></div> Consultando disponibilidad…</div>
+          <div class="loader"><div class="spinner"></div> Consultando disponibilidad&#8230;</div>
         </div>
         <div style="margin-top:18px">
-          <button class="btn btn-primary" id="btn-next1" onclick="irPaso2()" disabled>Continuar →</button>
+          <button class="btn btn-primary" id="btn-next1" onclick="irPaso2()" disabled>Continuar &#8594;</button>
         </div>
       </div>
     </div>
@@ -268,29 +279,29 @@
             <input type="text" id="inp-apellido" placeholder="Tu apellido" required>
           </div>
           <div class="form-group">
-            <label>Teléfono / WhatsApp</label>
+            <label>Tel&#233;fono / WhatsApp</label>
             <input type="tel" id="inp-tel" placeholder="300 000 0000" required>
           </div>
           <div class="form-group">
-            <label>Correo electrónico</label>
+            <label>Correo electr&#243;nico</label>
             <input type="email" id="inp-email" placeholder="tu@correo.com">
           </div>
           <div class="form-group">
             <label>Modalidad</label>
             <select id="inp-modalidad">
-              <option value="Presencial">🏥 Presencial</option>
-              <option value="Virtual">💻 Virtual</option>
+              <option value="Presencial">&#127973; Presencial</option>
+              <option value="Virtual">&#128187; Virtual</option>
             </select>
           </div>
           <div class="form-group full">
             <label>Motivo de la consulta</label>
-            <textarea id="inp-motivo" placeholder="Describe brevemente tu condición o motivo…"></textarea>
+            <textarea id="inp-motivo" placeholder="Describe brevemente tu condici&#243;n o motivo&#8230;"></textarea>
           </div>
         </div>
         <div id="form-error"></div>
         <div style="display:flex;gap:12px;margin-top:20px">
-          <button class="btn btn-ghost" onclick="goStep1()">← Volver</button>
-          <button class="btn btn-primary" onclick="goStep3()" style="flex:1">Revisar cita →</button>
+          <button class="btn btn-ghost" onclick="goStep1()">&#8592; Volver</button>
+          <button class="btn btn-primary" onclick="goStep3()" style="flex:1">Revisar cita &#8594;</button>
         </div>
       </div>
     </div>
@@ -302,8 +313,8 @@
         <div class="summary-box" id="full-summary"></div>
         <div id="confirm-error"></div>
         <div style="display:flex;gap:12px;margin-top:20px">
-          <button class="btn btn-ghost" onclick="goStep2()">← Editar</button>
-          <button class="btn btn-primary" id="btn-confirm" onclick="confirmarCita()" style="flex:1">✅ Confirmar cita</button>
+          <button class="btn btn-ghost" onclick="goStep2()">&#8592; Editar</button>
+          <button class="btn btn-primary" id="btn-confirm" onclick="confirmarCita()" style="flex:1">&#9989; Confirmar cita</button>
         </div>
       </div>
     </div>
@@ -312,9 +323,9 @@
 
   <!-- ÉXITO -->
   <div id="success-screen" class="card" style="display:none;text-align:center">
-    <div class="success-icon">✓</div>
-    <div class="success-title">¡Cita confirmada!</div>
-    <div class="success-text">Tu cita ha sido registrada exitosamente. Recibirás un email de confirmación en breve.</div>
+    <div class="success-icon">&#10003;</div>
+    <div class="success-title">&#161;Cita confirmada!</div>
+    <div class="success-text">Tu cita ha sido registrada exitosamente. Recibir&#225;s un email de confirmaci&#243;n en breve.</div>
     <div id="success-details"></div>
     <div style="margin-top:24px">
       <button class="btn btn-primary" onclick="reiniciar()">Agendar otra cita</button>
@@ -324,7 +335,7 @@
 </div>
 
 <footer>
-  <strong>AgendaTuCita</strong> · <span id="footer-name"></span> · <span id="footer-profession"></span> · Cúcuta, Norte de Santander<br>
+  <strong>AgendaTuCita</strong> &middot; <span id="footer-name"></span> &middot; <span id="footer-profession"></span> &middot; C&#250;cuta, Norte de Santander<br>
 </footer>
 
 <script>
@@ -333,7 +344,7 @@ function getQueryParams() {
   var params = new URLSearchParams(window.location.search);
   return {
     email:       params.get('email')       || 'estuval2022@gmail.com',
-    name:        params.get('name')        || 'Sandra Estupiñán',
+    name:        params.get('name')        || 'Sandra Estupi\u00f1\u00e1n',
     profession:  params.get('profession')  || 'Consultas Profesionales',
     api_key:     params.get('api_key')     || 'AIzaSyAPocHbXxs17BKkavW0rKkCyc4avUCyRpM',
     apps_script: params.get('apps_script') || 'https://script.google.com/macros/s/AKfycbwpxHEiPh4gkyvEdmy5VNaOSq0I8ZfGFBs0prUVwsYNI0yJgVs4Ok5ebHOhy1pskseZ/exec',
@@ -360,11 +371,8 @@ document.documentElement.style.setProperty('--accent', config.accent);
 document.documentElement.style.setProperty('--accent-dk', darken(config.accent, 15));
 document.documentElement.style.setProperty('--gold', config.gold);
 
-// Actualizar header
 document.getElementById('header-profession').textContent = config.profession;
-document.getElementById('header-badge').textContent = config.name + ' · Cúcuta, Norte de Santander';
-
-// Actualizar footer
+document.getElementById('header-badge').textContent = config.name + ' \u00b7 C\u00facuta, Norte de Santander';
 document.getElementById('footer-name').textContent = config.name;
 document.getElementById('footer-profession').textContent = config.profession;
 
@@ -378,6 +386,52 @@ const WORK_DAYS    = config.days.split(',').map(Number);
 const BUFFER_MINS  = config.buffer;
 const DURATIONS    = config.duration.split(',').map(Number);
 const DEFAULT_DUR  = DURATIONS[0];
+
+// ══ FESTIVOS COLOMBIA 2026 – 2027 ══════════════════════
+var FESTIVOS_CO = {
+  /* 2026 */
+  '2026-01-01': 'A\u00f1o Nuevo',
+  '2026-01-12': 'Reyes Magos',
+  '2026-03-23': 'San Jos\u00e9',
+  '2026-04-02': 'Jueves Santo',
+  '2026-04-03': 'Viernes Santo',
+  '2026-05-01': 'D\u00eda del Trabajo',
+  '2026-05-18': 'Ascensi\u00f3n del Se\u00f1or',
+  '2026-06-08': 'Corpus Christi',
+  '2026-06-15': 'Sagrado Coraz\u00f3n',
+  '2026-06-29': 'San Pedro y San Pablo',
+  '2026-07-20': 'Independencia de Colombia',
+  '2026-08-07': 'Batalla de Boyac\u00e1',
+  '2026-08-17': 'Asunci\u00f3n de la Virgen',
+  '2026-10-12': 'D\u00eda de la Raza',
+  '2026-11-02': 'Todos los Santos',
+  '2026-11-16': 'Independencia de Cartagena',
+  '2026-12-08': 'Inmaculada Concepci\u00f3n',
+  '2026-12-25': 'Navidad',
+  /* 2027 */
+  '2027-01-01': 'A\u00f1o Nuevo',
+  '2027-01-11': 'Reyes Magos',
+  '2027-03-22': 'San Jos\u00e9',
+  '2027-03-25': 'Jueves Santo',
+  '2027-03-26': 'Viernes Santo',
+  '2027-05-01': 'D\u00eda del Trabajo',
+  '2027-05-10': 'Ascensi\u00f3n del Se\u00f1or',
+  '2027-05-31': 'Corpus Christi',
+  '2027-06-07': 'Sagrado Coraz\u00f3n',
+  '2027-06-28': 'San Pedro y San Pablo',
+  '2027-07-20': 'Independencia de Colombia',
+  '2027-08-07': 'Batalla de Boyac\u00e1',
+  '2027-08-16': 'Asunci\u00f3n de la Virgen',
+  '2027-10-18': 'D\u00eda de la Raza',
+  '2027-11-01': 'Todos los Santos',
+  '2027-11-15': 'Independencia de Cartagena',
+  '2027-12-08': 'Inmaculada Concepci\u00f3n',
+  '2027-12-25': 'Navidad'
+};
+
+function esFestivo(date) {
+  return FESTIVOS_CO[toDateStr(date)] || null;
+}
 
 // ══ HORARIOS BASE ══════════════════════════════════════
 function buildSlots(startTime, endTime, dur) {
@@ -414,9 +468,9 @@ function endHour(h, dur) {
 
 // ══ TIPOS DE SERVICIO ══════════════════════════════════
 const SERVICE_TYPES = {
-  1.5: { icon: '📚', title: 'Capacitación',           desc: 'Sesión de formación y entrenamiento (1h 30min)' },
-  2.5: { icon: '💼', title: 'Asesoría',               desc: 'Consulta y orientación especializada (2h 30min)' },
-  3.5: { icon: '🔍', title: 'Inspección y/o Asesoría', desc: 'Visita de inspección con análisis en sitio (3h 30min)' }
+  1.5: { icon: '\u{1F4DA}', title: 'Capacitaci\u00f3n',           desc: 'Sesi\u00f3n de formaci\u00f3n y entrenamiento (1h 30min)' },
+  2.5: { icon: '\u{1F4BC}', title: 'Asesor\u00eda',               desc: 'Consulta y orientaci\u00f3n especializada (2h 30min)' },
+  3.5: { icon: '\u{1F50D}', title: 'Inspecci\u00f3n y/o Asesor\u00eda', desc: 'Visita de inspecci\u00f3n con an\u00e1lisis en sitio (3h 30min)' }
 };
 
 // ══ UTILIDADES DE COLOR ════════════════════════════════
@@ -430,9 +484,26 @@ function lighten(color, percent) {
     (G<255?G<1?0:G:255)*0x100+(B<255?B<1?0:B:255))
     .toString(16).slice(1);
 }
+function darken(color, percent) { return lighten(color, -percent); }
 
-function darken(color, percent) {
-  return lighten(color, -percent);
+// ══ FECHAS EN ESPAÑOL (100% manual, sin depender del locale) ══
+var DIAS_ES  = ['domingo','lunes','martes','mi\u00e9rcoles','jueves','viernes','s\u00e1bado'];
+var MESES_ES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+function spanishDate(d) {
+  return cap(DIAS_ES[d.getDay()]) + ', ' + d.getDate() + ' de ' + MESES_ES[d.getMonth()] + ' de ' + d.getFullYear();
+}
+
+// Recibe "2026-08-07T07:00:00" o "2026-08-07" y devuelve fecha en español
+function formatDateES(isoStr) {
+  var p = isoStr.substring(0,10).split('-');
+  return spanishDate(new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2])));
+}
+
+function formatTime(isoStr) {
+  var p = isoStr.split('T');
+  if (p.length > 1) return p[1].substring(0,5);
+  return isoStr;
 }
 
 // ══ ESTADO ═════════════════════════════════════════════
@@ -444,7 +515,6 @@ var busySlots    = {};
 var formData     = {};
 
 // ══ INIT ═══════════════════════════════════════════════
-// Generar botones de duración según DURATIONS
 const DUR_LABELS = { 1.5: '1h30', 2.5: '2h30', 3.5: '3h30' };
 var durContainer = document.getElementById('dur-btns-container');
 DURATIONS.forEach(function(d, i) {
@@ -462,7 +532,7 @@ showServiceInfo(DEFAULT_DUR);
 function setDuration(h) {
   sessionDur = h;
   document.querySelectorAll('.dur-btn').forEach(function(b) {
-    b.classList.toggle('active', parseFloat(b.textContent) === h || 
+    b.classList.toggle('active', parseFloat(b.textContent) === h ||
       (h === 1.5 && b.textContent === '1h30') ||
       (h === 2.5 && b.textContent === '2h30') ||
       (h === 3.5 && b.textContent === '3h30'));
@@ -492,13 +562,14 @@ function isWorkDay(date) {
 function renderCalendar() {
   var y = currentDate.getFullYear();
   var m = currentDate.getMonth();
-  var label = new Date(y, m, 1).toLocaleDateString('es-CO', { month:'long', year:'numeric' });
-  document.getElementById('month-label').textContent = label.charAt(0).toUpperCase() + label.slice(1);
+  // Nombre del mes en español manual
+  document.getElementById('month-label').textContent =
+    cap(MESES_ES[m]) + ' ' + y;
 
   var grid = document.getElementById('calendar');
   grid.innerHTML = '';
 
-  ['Lu','Ma','Mi','Ju','Vi','Sá','Do'].forEach(function(d) {
+  ['Lu','Ma','Mi','Ju','Vi','S\u00e1','Do'].forEach(function(d) {
     var h = document.createElement('div');
     h.className = 'cal-head';
     h.textContent = d;
@@ -511,8 +582,7 @@ function renderCalendar() {
   var today = new Date(); today.setHours(0,0,0,0);
 
   for (var i = 0; i < startOffset; i++) {
-    var empty = document.createElement('div');
-    grid.appendChild(empty);
+    grid.appendChild(document.createElement('div'));
   }
 
   for (var d = 1; d <= daysInMonth; d++) {
@@ -522,12 +592,24 @@ function renderCalendar() {
       cell.className = 'cal-day';
       cell.textContent = day;
 
+      var festivo = esFestivo(date);
+
       if (date < today || !isWorkDay(date)) {
         cell.classList.add('disabled');
+      } else if (festivo) {
+        // Día festivo: bloqueado en rojo con tooltip
+        cell.classList.add('disabled');
+        cell.classList.add('festivo');
+        cell.setAttribute('data-tip', festivo);
       } else {
         if (date.getTime() === today.getTime()) cell.classList.add('today');
         if (selectedDate && selectedDate.getTime() === date.getTime()) cell.classList.add('selected');
         cell.classList.add('available');
+        // Mostrar punto verde si el día tiene al menos un slot libre
+        var dStr   = toDateStr(date);
+        var busy   = busySlots[dStr] || [];
+        var total  = getAllH(sessionDur).length;
+        if (total > 0 && busy.length < total) cell.classList.add('has-slots');
         cell.onclick = function() { selectDate(new Date(date)); };
       }
 
@@ -576,10 +658,10 @@ function selectSlot(h) {
 
 function loadMonthBusy(y, m) {
   var monthStart = new Date(y, m, 1);
-  var monthEnd = new Date(y, m + 1, 0);
+  var monthEnd   = new Date(y, m + 1, 0);
 
-  fetch('https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(CALENDAR_ID) + 
-        '/events?key=' + API_KEY + 
+  fetch('https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(CALENDAR_ID) +
+        '/events?key=' + API_KEY +
         '&timeMin=' + monthStart.toISOString() +
         '&timeMax=' + monthEnd.toISOString() +
         '&singleEvents=true&orderBy=startTime')
@@ -599,11 +681,12 @@ function loadMonthBusy(y, m) {
       if (selectedDate) renderSlots(selectedDate);
     })
     .catch(err => {
-      document.getElementById('slots-container').innerHTML = '<div class="alert alert-error">Error al cargar disponibilidad</div>';
+      document.getElementById('slots-container').innerHTML =
+        '<div class="alert alert-error">Error al cargar disponibilidad</div>';
     });
 }
 
-// ══ PASOS ══════════════════════════════════════
+// ══ PASOS ══════════════════════════════════════════════
 function updateSteps(step) {
   ['step1','step2','step3'].forEach((s,i) => {
     document.getElementById(s).classList.toggle('active', s === 'step' + step);
@@ -617,19 +700,9 @@ function updateSteps(step) {
   });
 }
 
-function goStep1() { updateSteps(1); window.scrollTo({top:0, behavior:'smooth'}); }
-
-// Ir del Paso 1 al Paso 2 (sin validación)
-function irPaso2() {
-  updateSteps(2);
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-
-// Ir del Paso 2 al Paso 3 (con validación)
-function goStep2() {
-  updateSteps(2);
-  window.scrollTo({top:0, behavior:'smooth'});
-}
+function goStep1() { updateSteps(1); window.scrollTo({top:0,behavior:'smooth'}); }
+function irPaso2() { updateSteps(2); window.scrollTo({top:0,behavior:'smooth'}); }
+function goStep2() { updateSteps(2); window.scrollTo({top:0,behavior:'smooth'}); }
 
 function goStep3() {
   var nombre   = document.getElementById('inp-nombre').value.trim();
@@ -637,7 +710,8 @@ function goStep3() {
   var tel      = document.getElementById('inp-tel').value.trim();
 
   if (!nombre || !apellido || !tel) {
-    document.getElementById('form-error').innerHTML = '<div class="alert alert-error">⚠️ Por favor completa todos los campos obligatorios</div>';
+    document.getElementById('form-error').innerHTML =
+      '<div class="alert alert-error">\u26a0\ufe0f Por favor completa todos los campos obligatorios</div>';
     return;
   }
 
@@ -648,21 +722,20 @@ function goStep3() {
   formData.modalidad = document.getElementById('inp-modalidad').value;
   formData.motivo    = document.getElementById('inp-motivo').value;
 
-  var fmtDate = selectedDate.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  var fmtDate = spanishDate(selectedDate);
   var summary =
-    '<div class="summary-row"><span class="summary-icon">👤</span><span class="summary-label">Nombre</span><span class="summary-val">' + nombre + ' ' + apellido + '</span></div>' +
-    '<div class="summary-row"><span class="summary-icon">📅</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>' +
-    '<div class="summary-row"><span class="summary-icon">🕐</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' – ' + endHour(selectedHour, sessionDur) + '</span></div>' +
-    '<div class="summary-row"><span class="summary-icon">⏱</span><span class="summary-label">Duración</span><span class="summary-val">' + sessionDur + ' hora' + (sessionDur > 1 ? 's' : '') + '</span></div>' +
-    '<div class="summary-row"><span class="summary-icon">📞</span><span class="summary-label">Teléfono</span><span class="summary-val">' + tel + '</span></div>' +
-    (formData.email ? '<div class="summary-row"><span class="summary-icon">📧</span><span class="summary-label">Email</span><span class="summary-val">' + formData.email + '</span></div>' : '') +
-    '<div class="summary-row"><span class="summary-icon">📋</span><span class="summary-label">Modalidad</span><span class="summary-val">' + formData.modalidad + '</span></div>';
+    '<div class="summary-row"><span class="summary-icon">\u{1F464}</span><span class="summary-label">Nombre</span><span class="summary-val">' + nombre + ' ' + apellido + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">\u{1F4C5}</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">\u{1F550}</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' \u2013 ' + endHour(selectedHour, sessionDur) + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">\u23f1</span><span class="summary-label">Duraci\u00f3n</span><span class="summary-val">' + sessionDur + ' hora' + (sessionDur > 1 ? 's' : '') + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">\u{1F4DE}</span><span class="summary-label">Tel\u00e9fono</span><span class="summary-val">' + tel + '</span></div>' +
+    (formData.email ? '<div class="summary-row"><span class="summary-icon">\u{1F4E7}</span><span class="summary-label">Email</span><span class="summary-val">' + formData.email + '</span></div>' : '') +
+    '<div class="summary-row"><span class="summary-icon">\u{1F4CB}</span><span class="summary-label">Modalidad</span><span class="summary-val">' + formData.modalidad + '</span></div>';
   document.getElementById('full-summary').innerHTML = summary;
   updateSteps(3);
-  window.scrollTo({top:0, behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ══ CONFIRMAR CITA ═════════════════════════════════════
 // ══ EMAILJS ════════════════════════════════════════════
 const EMAILJS_PUBLIC_KEY  = 'l8kIrftm9RT_1UTwc';
 const EMAILJS_SERVICE_ID  = 'service_ro19ta2';
@@ -670,16 +743,6 @@ const EMAILJS_TPL_CLIENTE = 'template_oulw4u7';
 const EMAILJS_TPL_OWNER   = 'template_jwnaab7';
 
 emailjs.init(EMAILJS_PUBLIC_KEY);
-
-function formatDateES(dateStr) {
-  var d = new Date(dateStr);
-  return d.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-}
-
-function formatTime(dateStr) {
-  var d = new Date(dateStr);
-  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-}
 
 async function enviarCorreos(payload) {
   var startISO = payload.start_time;
@@ -704,29 +767,23 @@ async function enviarCorreos(payload) {
     email:            payload.client_email
   };
 
-  // Correo al cliente (solo si tiene email)
   if (payload.client_email) {
     try {
       await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TPL_CLIENTE, params);
-    } catch(e) {
-      console.warn('Error correo cliente:', e);
-    }
+    } catch(e) { console.warn('Error correo cliente:', e); }
   }
 
-  // Correo al dueño/profesional
   var paramsOwner = Object.assign({}, params, { to_email: payload.owner_email });
   try {
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TPL_OWNER, paramsOwner);
-  } catch(e) {
-    console.warn('Error correo owner:', e);
-  }
+  } catch(e) { console.warn('Error correo owner:', e); }
 }
 
 async function confirmarCita() {
   var btn    = document.getElementById('btn-confirm');
   var errDiv = document.getElementById('confirm-error');
   btn.disabled = true;
-  btn.innerHTML = '<div class="spinner"></div> Procesando…';
+  btn.innerHTML = '<div class="spinner"></div> Procesando\u2026';
   errDiv.innerHTML = '';
 
   var dateStr  = toDateStr(selectedDate);
@@ -748,23 +805,21 @@ async function confirmarCita() {
   };
 
   try {
-    // 1. Crear evento en calendario (Apps Script)
     await fetch(APPS_SCRIPT, {
       method: 'POST',
       mode: 'no-cors',
       body: JSON.stringify(payload)
     });
 
-    // 2. Enviar correos vía EmailJS
     await enviarCorreos(payload);
 
     if (!busySlots[dateStr]) busySlots[dateStr] = [];
     busySlots[dateStr].push(selectedHour);
     mostrarExito(nombre);
   } catch(err) {
-    errDiv.innerHTML = '<div class="alert alert-error">⚠️ ' + (err.message || 'Error de conexión. Intenta de nuevo.') + '</div>';
+    errDiv.innerHTML = '<div class="alert alert-error">\u26a0\ufe0f ' + (err.message || 'Error de conexi\u00f3n. Intenta de nuevo.') + '</div>';
     btn.disabled = false;
-    btn.innerHTML = '✅ Confirmar cita';
+    btn.innerHTML = '\u2705 Confirmar cita';
   }
 }
 
@@ -773,13 +828,13 @@ function mostrarExito(nombre) {
   hide('steps-bar');
   var ss = document.getElementById('success-screen');
   ss.style.display = 'block';
-  var fmtDate = selectedDate.toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  var fmtDate = spanishDate(selectedDate);
   document.getElementById('success-details').innerHTML =
-    '<div class="summary-row"><span class="summary-icon">👤</span><span class="summary-label">Paciente</span><span class="summary-val">' + nombre + '</span></div>' +
-    '<div class="summary-row"><span class="summary-icon">📅</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>' +
-    '<div class="summary-row"><span class="summary-icon">🕐</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' – ' + endHour(selectedHour, sessionDur) + '</span></div>' +
-    '<div class="summary-row"><span class="summary-icon">⏱</span><span class="summary-label">Duración</span><span class="summary-val">' + sessionDur + ' hora' + (sessionDur > 1 ? 's' : '') + '</span></div>';
-  ss.scrollIntoView({ behavior:'smooth' });
+    '<div class="summary-row"><span class="summary-icon">\u{1F464}</span><span class="summary-label">Cliente</span><span class="summary-val">' + nombre + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">\u{1F4C5}</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">\u{1F550}</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' \u2013 ' + endHour(selectedHour, sessionDur) + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">\u23f1</span><span class="summary-label">Duraci\u00f3n</span><span class="summary-val">' + sessionDur + ' hora' + (sessionDur > 1 ? 's' : '') + '</span></div>';
+  ss.scrollIntoView({behavior:'smooth'});
 }
 
 function reiniciar() {
@@ -789,10 +844,10 @@ function reiniciar() {
   document.getElementById('success-screen').style.display = 'none';
   show('booking-screen'); show('steps-bar');
   goStep1();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ══ UTILIDADES =════════════════════════════════════════
+// ══ UTILIDADES ═════════════════════════════════════════
 function toDateStr(d) {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
