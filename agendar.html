@@ -351,7 +351,7 @@ function getQueryParams() {
     name:        params.get('name')        || 'Profesional',
     profession:  params.get('profession')  || 'Agenda tu cita',
     api_key:     params.get('api_key')     || 'AIzaSyDVynTeTFMHDi1VB-7DouJSLAsRAZ9S7JA',
-    apps_script: params.get('apps_script') || 'https://script.google.com/macros/s/AKfycbyGtA1PVdk4xcruLBTRVjC8V1AYEHFOVMx08PFyFy5qH6nHjG_idZjZnQIFfSDElOdS/exec',
+    apps_script: params.get('apps_script') || 'https://script.google.com/macros/s/AKfycbx5rcBRpX_UATvMAKeKgRxFffRRSX6xn93Xcm3efDY3U87kgzO6AZ4Mo1_vUzCCk14/exec',
     primary:     params.get('primary')     || '#1B4F72',
     accent:      params.get('accent')      || '#1ABC9C',
     gold:        params.get('gold')        || '#C9A84C',
@@ -756,7 +756,7 @@ async function enviarCorreos(payload) {
   var startISO = payload.start_time;
   var endISO   = payload.end_time;
   var durH     = sessionDur;
-  var durStr = durH === 1 ? '1 hora' : durH === 2 ? '2 horas' : durH === 3 ? '3 horas' : durH === 1.5 ? '1h 30min' : durH === 2.5 ? '2h 30min' : '3h 30min';
+  var durStr   = durH === 1 ? '1 hora' : durH === 2 ? '2 horas' : durH === 3 ? '3 horas' : durH === 1.5 ? '1h 30min' : durH === 2.5 ? '2h 30min' : '3h 30min';
 
   var params = {
     to_email:         payload.client_email,
