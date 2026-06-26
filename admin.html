@@ -450,6 +450,9 @@ function lighten(c,p){var n=parseInt(c.replace('#',''),16),a=Math.round(2.55*p),
 function darken(c,p){return lighten(c,-p);}
 function hexToRgb(hex){var n=parseInt(hex.replace('#',''),16);return[(n>>16)&255,(n>>8)&255,n&255].join(',');}
 
+// Helper para abrir empresa desde data attribute
+function empClick(el){ abrirEmpresa(el.getAttribute('data-emp')); }
+
 // LOCK
 function verificarAcceso(){var inp=document.getElementById('lock-email').value.trim().toLowerCase();var err=document.getElementById('lock-error');if(!CFG.email){err.textContent='Link sin email configurado.';err.style.display='block';return;}if(inp===CFG.email.toLowerCase()){document.getElementById('lock-screen').style.display='none';document.getElementById('admin-screen').style.display='block';iniciarAdmin();}else{err.style.display='block';document.getElementById('lock-email').value='';document.getElementById('lock-email').focus();}}
 function cerrarSesion(){document.getElementById('admin-screen').style.display='none';document.getElementById('lock-screen').style.display='flex';document.getElementById('lock-email').value='';document.getElementById('lock-error').style.display='none';}
@@ -579,7 +582,7 @@ function renderCitas(){
     html+='<div class="cita-item">'+
       '<div class="cita-time-block" onclick="abrirModal(\''+ev.id+'\')"><div class="hora">'+horaStr(c.start)+'</div><div class="dur">'+durStr(c.start,c.end)+'</div></div>'+
       '<div class="cita-info" onclick="abrirModal(\''+ev.id+'\')"><div class="nombre">'+(c.cliente||ev.summary.replace('Cita:','').trim())+'</div>'+
-      (c.empresa?'<div class="empresa" onclick="event.stopPropagation();abrirEmpresa(\''+c.empresa.replace(/'/g,"\\'")+'\')" >&#127970; '+c.empresa+'</div>':'')+
+      (c.empresa?'<div class="empresa" data-emp="'+c.empresa.replace(/"/g,'&quot;')+'" onclick="event.stopPropagation();empClick(this)">&#127970; '+c.empresa+'</div>':'')+
       '<div class="detalles">&#128197; '+spanishDate(c.start)+'</div></div>'+
       badge+'</div>';
   });
@@ -808,65 +811,70 @@ function renderEstadisticas(){
   document.getElementById('st-horas-lbl').innerHTML=lH;
 }
 
-// SEGUIMIENTO EMPRESAS
+// SEGUIMIENTO EMPRESAS — array global para evitar escaping de nombres
+window._segArr = [];
+
 function renderSeguimiento(){
   var iniAnio = new Date(new Date().getFullYear(),0,1);
   var hoy     = new Date();
   var buscar  = (document.getElementById('seg-buscar').value||'').toLowerCase();
   var orden   = document.getElementById('seg-orden').value;
 
-  // Agrupar por empresa desde enero
-  var empMap  = {};
+  var empMap = {};
   todasLasCitas.forEach(function(ev){
     var s = new Date(ev.start.dateTime);
     if(s < iniAnio || s > hoy) return;
     var c = parseCita(ev);
     var nombre = c.empresa || c.cliente || ev.summary;
     if(!nombre) return;
-    if(!empMap[nombre]) empMap[nombre] = {visitas:0, ultima:null, citas:[]};
+    if(!empMap[nombre]) empMap[nombre] = {visitas:0, ultima:null};
     empMap[nombre].visitas++;
     if(!empMap[nombre].ultima || s > empMap[nombre].ultima) empMap[nombre].ultima = s;
-    empMap[nombre].citas.push(ev);
   });
 
-  var arr = Object.entries(empMap).map(function(e){return{nombre:e[0],visitas:e[1].visitas,ultima:e[1].ultima,citas:e[1].citas};});
+  var arr = Object.entries(empMap).map(function(e){
+    return {nombre:e[0], visitas:e[1].visitas, ultima:e[1].ultima};
+  });
 
-  // Filtrar
   if(buscar) arr = arr.filter(function(e){return e.nombre.toLowerCase().includes(buscar);});
 
-  // Ordenar
-  if(orden==='visitas') arr.sort(function(a,b){return b.visitas-a.visitas;});
-  else if(orden==='nombre') arr.sort(function(a,b){return a.nombre.localeCompare(b.nombre);});
-  else arr.sort(function(a,b){return b.ultima-a.ultima;});
+  if(orden==='visitas')      arr.sort(function(a,b){return b.visitas - a.visitas;});
+  else if(orden==='nombre')  arr.sort(function(a,b){return a.nombre.localeCompare(b.nombre);});
+  else                       arr.sort(function(a,b){return (b.ultima||0) - (a.ultima||0);});
+
+  // Guardar en array global para acceder sin escaping de strings
+  window._segArr = arr.map(function(e){return e.nombre;});
 
   document.getElementById('seg-count').textContent = arr.length;
-  var maxV = arr.length ? arr[0].visitas : 1;
-  if(orden!=='visitas') maxV = Math.max.apply(null,arr.map(function(e){return e.visitas;})) || 1;
 
   if(!arr.length){
-    document.getElementById('seg-table').innerHTML='<div class="empty-state"><div class="empty-icon">&#127970;</div><p>No se encontraron empresas</p></div>';
+    document.getElementById('seg-table').innerHTML = '<div class="empty-state"><div class="empty-icon">&#127970;</div><p>No se encontraron empresas</p></div>';
     return;
   }
 
+  var maxV = Math.max.apply(null, arr.map(function(e){return e.visitas;})) || 1;
   var html = '<div class="seg-head"><div>Empresa / Cliente</div><div style="text-align:center">Visitas</div><div style="text-align:center">% del total</div><div>&#218;ltima visita</div><div>Estado</div><div></div></div>';
 
-  arr.forEach(function(e){
-    var key     = 'emp_'+CFG.email+'_'+e.nombre;
-    var saved   = JSON.parse(localStorage.getItem(key)||'{}');
+  arr.forEach(function(e, idx){
+    var key     = 'emp_' + CFG.email + '_' + e.nombre;
+    var saved   = JSON.parse(localStorage.getItem(key) || '{}');
     var estado  = saved.estado || 'normal';
-    var badgeCls= estado==='pendiente'?'seg-badge-p':estado==='novedad'?'seg-badge-n2':'seg-badge-n';
-    var badgeTxt= estado==='pendiente'?'&#128993; Pendiente':estado==='novedad'?'&#128308; Novedad':'&#128994; Normal';
+    var badgeCls= estado === 'pendiente' ? 'seg-badge-p' : estado === 'novedad' ? 'seg-badge-n2' : 'seg-badge-n';
+    var badgeTxt= estado === 'pendiente' ? '&#128993; Pendiente' : estado === 'novedad' ? '&#128308; Novedad' : '&#128994; Normal';
     var pct     = Math.round(e.visitas / maxV * 100);
-    var ultStr  = e.ultima ? spanishDateShort(e.ultima) : '—';
-    html += '<div class="seg-row" onclick="abrirEmpresa(''+e.nombre.replace(/'/g,"\'")+'')">'
-      + '<div class="seg-empresa">&#127970; '+e.nombre+'</div>'
-      + '<div class="seg-num '+(e.visitas>=5?'highlight':'')+'">'+e.visitas+'</div>'
-      + '<div><div class="seg-bar-wrap"><div class="seg-bar" style="width:'+pct+'%"></div></div></div>'
-      + '<div class="seg-date">'+ultStr+'</div>'
-      + '<div><span class="'+badgeCls+'">'+badgeTxt+'</span></div>'
-      + '<div><button class="seg-detail-btn" onclick="event.stopPropagation();abrirEmpresa(''+e.nombre.replace(/'/g,"\'")+'')" title="Ver detalle">&#8594;</button></div>'
-      + '</div>';
+    var ultStr  = e.ultima ? spanishDateShort(e.ultima) : '&#8212;';
+
+    // Usar índice del array global para evitar problemas de escaping con nombres
+    html += '<div class="seg-row" onclick="abrirEmpresa(window._segArr[' + idx + '])">'
+          + '<div class="seg-empresa">&#127970; ' + e.nombre + '</div>'
+          + '<div class="seg-num' + (e.visitas >= 5 ? ' highlight' : '') + '">' + e.visitas + '</div>'
+          + '<div><div class="seg-bar-wrap"><div class="seg-bar" style="width:' + pct + '%"></div></div></div>'
+          + '<div class="seg-date">' + ultStr + '</div>'
+          + '<div><span class="' + badgeCls + '">' + badgeTxt + '</span></div>'
+          + '<div><button class="seg-detail-btn" onclick="event.stopPropagation();abrirEmpresa(window._segArr[' + idx + '])" title="Ver detalle">&#8594;</button></div>'
+          + '</div>';
   });
+
   document.getElementById('seg-table').innerHTML = html;
 }
 
