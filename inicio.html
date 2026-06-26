@@ -215,11 +215,7 @@ footer strong{color:rgba(255,255,255,.5)}
     Agendar mi cita
   </a>
 
-  <br>
-  <a class="btn-admin" id="btn-admin" href="#">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-    Acceder al panel
-  </a>
+
 
 </div>
 
@@ -289,14 +285,6 @@ var agendarParams = new URLSearchParams({
   primary: cfg.primary, accent: cfg.accent, gold: cfg.gold
 });
 document.getElementById('btn-agendar').href = base + 'agendar.html?' + agendarParams.toString();
-
-var adminParams = new URLSearchParams({
-  name: cfg.name, email: cfg.email,
-  city: cfg.city + (cfg.department ? ', ' + cfg.department : ''),
-  api_key: cfg.api_key, apps_script: cfg.apps_script,
-  primary: cfg.primary, accent: cfg.accent, gold: cfg.gold
-});
-document.getElementById('btn-admin').href = base + 'admin.html?' + adminParams.toString();
 
 // ── Partículas ───────────────────────────────────
 var container = document.getElementById('particles');
