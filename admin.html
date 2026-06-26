@@ -468,7 +468,7 @@ async function cargarCitas(){
   document.getElementById('citas-list').innerHTML='<div class="loader"><div class="spinner"></div><div>Cargando citas\u2026</div></div>';
   var hoy=new Date();
   var tMin=new Date(hoy.getFullYear()-3,0,1).toISOString();
-  var tMax=new Date(hoy.getFullYear(),hoy.getMonth()+4,1).toISOString();
+  var tMax=new Date(hoy.getFullYear(),hoy.getMonth()+6,1).toISOString();
   var url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(CFG.email)+'/events?key='+CFG.api_key+'&timeMin='+encodeURIComponent(tMin)+'&timeMax='+encodeURIComponent(tMax)+'&singleEvents=true&orderBy=startTime&maxResults=2500';
   try{
     var res=await fetch(url);
