@@ -222,6 +222,21 @@ input[type=date]{padding:5px 9px;border:1px solid var(--border);border-radius:7p
 .loader{text-align:center;padding:44px;color:var(--text-muted)}
 .spinner{display:inline-block;width:22px;height:22px;border:3px solid var(--border);border-radius:50%;border-top-color:var(--primary);animation:spin .6s linear infinite;margin-bottom:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
+.seg-row{display:grid;grid-template-columns:2fr 80px 80px 110px 100px 36px;gap:10px;align-items:center;padding:11px 18px;border-bottom:1px solid var(--border);font-size:.84rem;cursor:pointer;transition:background .15s}
+.seg-row:hover{background:var(--surface-2)}
+.seg-row:last-child{border-bottom:none}
+.seg-head{display:grid;grid-template-columns:2fr 80px 80px 110px 100px 36px;gap:10px;padding:8px 18px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.seg-empresa{font-weight:700;color:var(--text)}
+.seg-num{text-align:center;font-weight:700;color:var(--primary);font-size:.95rem}
+.seg-num.highlight{font-size:1.05rem}
+.seg-date{font-size:.78rem;color:var(--text-muted)}
+.seg-badge-n{display:inline-block;padding:3px 8px;border-radius:12px;font-size:.68rem;font-weight:700;background:#E8F8F5;color:var(--accent-dk);border:1px solid #A9DFBF}
+.seg-badge-p{display:inline-block;padding:3px 8px;border-radius:12px;font-size:.68rem;font-weight:700;background:#FFFBEB;color:#92400E;border:1px solid var(--warn)}
+.seg-badge-n2{display:inline-block;padding:3px 8px;border-radius:12px;font-size:.68rem;font-weight:700;background:#FEF2F2;color:var(--danger);border:1px solid #FECACA}
+.seg-bar-wrap{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.seg-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .6s}
+.seg-detail-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--primary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .2s}
+.seg-detail-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
 footer{text-align:center;padding:14px;font-size:.72rem;color:var(--text-muted);border-top:1px solid var(--border);margin-top:14px}
 footer strong{color:var(--primary)}
 </style>
@@ -270,6 +285,7 @@ footer strong{color:var(--primary)}
     <button class="tab-btn active" onclick="setTab('agenda',this)">&#128203; Agenda</button>
     <button class="tab-btn" onclick="setTab('calendario',this)">&#128198; Calendario</button>
     <button class="tab-btn" onclick="setTab('estadisticas',this)">&#128200; Estad&iacute;sticas</button>
+    <button class="tab-btn" onclick="setTab('seguimiento',this)">&#127970; Seguimiento</button>
   </div>
 
   <!-- AGENDA -->
@@ -351,6 +367,28 @@ footer strong{color:var(--primary)}
       <div class="sw"><div class="wt">&#127970; Top empresas</div><div id="st-emp"></div></div>
       <div class="sw"><div class="wt">&#128200; Tendencia mensual (6 meses)</div><div id="st-mens"></div></div>
       <div class="sw full"><div class="wt">&#128336; Distribuci&oacute;n por hora</div><div class="hour-grid" id="st-horas"></div><div class="hour-grid" id="st-horas-lbl" style="margin-top:3px"></div></div>
+    </div>
+  </div>
+
+
+  <!-- SEGUIMIENTO EMPRESAS -->
+  <div class="tab-panel" id="tab-seguimiento">
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">&#127970; Seguimiento de empresas &mdash; Enero a la fecha</span>
+        <span class="card-count" id="seg-count">0</span>
+      </div>
+      <div style="padding:12px 18px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <input type="text" id="seg-buscar" placeholder="&#128269; Buscar empresa&#8230;" oninput="renderSeguimiento()"
+          style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;flex:1;min-width:180px">
+        <select id="seg-orden" onchange="renderSeguimiento()"
+          style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem">
+          <option value="visitas">Mayor a menor visitas</option>
+          <option value="nombre">Nombre A-Z</option>
+          <option value="ultima">&#218;ltima visita reciente</option>
+        </select>
+      </div>
+      <div id="seg-table"></div>
     </div>
   </div>
 
@@ -770,8 +808,76 @@ function renderEstadisticas(){
   document.getElementById('st-horas-lbl').innerHTML=lH;
 }
 
+// SEGUIMIENTO EMPRESAS
+function renderSeguimiento(){
+  var iniAnio = new Date(new Date().getFullYear(),0,1);
+  var hoy     = new Date();
+  var buscar  = (document.getElementById('seg-buscar').value||'').toLowerCase();
+  var orden   = document.getElementById('seg-orden').value;
+
+  // Agrupar por empresa desde enero
+  var empMap  = {};
+  todasLasCitas.forEach(function(ev){
+    var s = new Date(ev.start.dateTime);
+    if(s < iniAnio || s > hoy) return;
+    var c = parseCita(ev);
+    var nombre = c.empresa || c.cliente || ev.summary;
+    if(!nombre) return;
+    if(!empMap[nombre]) empMap[nombre] = {visitas:0, ultima:null, citas:[]};
+    empMap[nombre].visitas++;
+    if(!empMap[nombre].ultima || s > empMap[nombre].ultima) empMap[nombre].ultima = s;
+    empMap[nombre].citas.push(ev);
+  });
+
+  var arr = Object.entries(empMap).map(function(e){return{nombre:e[0],visitas:e[1].visitas,ultima:e[1].ultima,citas:e[1].citas};});
+
+  // Filtrar
+  if(buscar) arr = arr.filter(function(e){return e.nombre.toLowerCase().includes(buscar);});
+
+  // Ordenar
+  if(orden==='visitas') arr.sort(function(a,b){return b.visitas-a.visitas;});
+  else if(orden==='nombre') arr.sort(function(a,b){return a.nombre.localeCompare(b.nombre);});
+  else arr.sort(function(a,b){return b.ultima-a.ultima;});
+
+  document.getElementById('seg-count').textContent = arr.length;
+  var maxV = arr.length ? arr[0].visitas : 1;
+  if(orden!=='visitas') maxV = Math.max.apply(null,arr.map(function(e){return e.visitas;})) || 1;
+
+  if(!arr.length){
+    document.getElementById('seg-table').innerHTML='<div class="empty-state"><div class="empty-icon">&#127970;</div><p>No se encontraron empresas</p></div>';
+    return;
+  }
+
+  var html = '<div class="seg-head"><div>Empresa / Cliente</div><div style="text-align:center">Visitas</div><div style="text-align:center">% del total</div><div>&#218;ltima visita</div><div>Estado</div><div></div></div>';
+
+  arr.forEach(function(e){
+    var key     = 'emp_'+CFG.email+'_'+e.nombre;
+    var saved   = JSON.parse(localStorage.getItem(key)||'{}');
+    var estado  = saved.estado || 'normal';
+    var badgeCls= estado==='pendiente'?'seg-badge-p':estado==='novedad'?'seg-badge-n2':'seg-badge-n';
+    var badgeTxt= estado==='pendiente'?'&#128993; Pendiente':estado==='novedad'?'&#128308; Novedad':'&#128994; Normal';
+    var pct     = Math.round(e.visitas / maxV * 100);
+    var ultStr  = e.ultima ? spanishDateShort(e.ultima) : '—';
+    html += '<div class="seg-row" onclick="abrirEmpresa(''+e.nombre.replace(/'/g,"\'")+'')">'
+      + '<div class="seg-empresa">&#127970; '+e.nombre+'</div>'
+      + '<div class="seg-num '+(e.visitas>=5?'highlight':'')+'">'+e.visitas+'</div>'
+      + '<div><div class="seg-bar-wrap"><div class="seg-bar" style="width:'+pct+'%"></div></div></div>'
+      + '<div class="seg-date">'+ultStr+'</div>'
+      + '<div><span class="'+badgeCls+'">'+badgeTxt+'</span></div>'
+      + '<div><button class="seg-detail-btn" onclick="event.stopPropagation();abrirEmpresa(''+e.nombre.replace(/'/g,"\'")+'')" title="Ver detalle">&#8594;</button></div>'
+      + '</div>';
+  });
+  document.getElementById('seg-table').innerHTML = html;
+}
+
 // TABS
-function setTab(tab,btn){document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});if(btn)btn.classList.add('active');document.getElementById('tab-'+tab).classList.add('active');}
+function setTab(tab,btn){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab==='seguimiento') renderSeguimiento();
+}
 </script>
 </body>
 </html>
