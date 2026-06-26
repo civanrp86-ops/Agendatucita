@@ -74,16 +74,13 @@
   .confirm-check{display:flex;align-items:flex-start;gap:12px;padding:16px;background:#F0FBF8;border:1px solid #A9DFBF;border-radius:10px;cursor:pointer;margin:16px 0}
   .confirm-check input{width:18px;height:18px;margin-top:2px;cursor:pointer;accent-color:var(--accent)}
   .confirm-check span{font-size:.88rem;color:var(--text);line-height:1.5}
-  .link-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin:12px 0}
+  .link-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin:16px 0}
   .link-box label{font-size:.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:block}
   .link-input-wrap{display:flex;gap:8px}
   .link-input{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--primary);background:#fff}
   .btn-copy-link{padding:10px 16px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:.85rem;cursor:pointer;white-space:nowrap;transition:all .2s}
   .btn-copy-link:hover{background:#154360}
   .btn-copy-link.copied{background:var(--accent)}
-  .link-box-admin{background:#EBF5FB;border:1px solid #AED6F1;border-radius:10px;padding:16px;margin:12px 0}
-  .link-box-admin label{font-size:.75rem;font-weight:600;color:#1B4F72;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:block}
-  .link-box-admin .link-hint{font-size:.75rem;color:#5D6D7E;margin-top:8px;display:flex;align-items:center;gap:6px}
   .btn{padding:12px 20px;border:none;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
   .btn-primary{background:var(--primary);color:#fff}
   .btn-primary:hover:not(:disabled){background:#154360}
@@ -119,7 +116,6 @@
   <h1>&#9881;&#65039; AgendaTuCita</h1>
   <p>Activa tu agenda profesional en 5 pasos</p>
 </header>
-
 <!-- PANTALLA DE ACTIVACIÓN -->
 <div class="lock-screen" id="lock-screen">
   <div class="lock-card">
@@ -143,7 +139,7 @@
     <div class="step-line" id="ln3"></div>
     <div class="step" id="stp4"><div class="step-num">4</div><span>Calendario</span></div>
     <div class="step-line" id="ln4"></div>
-    <div class="step" id="stp5"><div class="step-num">5</div><span>Tus links</span></div>
+    <div class="step" id="stp5"><div class="step-num">5</div><span>Tu link</span></div>
   </div>
 
   <!-- PASO 1 -->
@@ -162,12 +158,8 @@
           <input type="text" id="p1-profesion" placeholder="Ej: Fisioterapeuta &middot; SST">
         </div>
         <div class="form-group">
-          <label>Ciudad / Municipio *</label>
-          <input type="text" id="p1-ciudad" placeholder="Ej: Bogot&#225;, C&#250;cuta, Medell&#237;n">
-        </div>
-        <div class="form-group">
-          <label>Departamento *</label>
-          <input type="text" id="p1-departamento" placeholder="Ej: Cundinamarca, Antioquia">
+          <label>Ciudad *</label>
+          <input type="text" id="p1-ciudad" placeholder="Ej: Bogot&#225;, Medell&#237;n, C&#250;cuta">
         </div>
         <div class="form-group full">
           <label>Email de Google Calendar *</label>
@@ -238,7 +230,7 @@
     <div class="card">
       <div class="card-title">Paso 3 de 5</div>
       <div class="step-title">&#127912; Personalizaci&oacute;n visual</div>
-      <div class="step-desc">Elige el esquema de colores de tu p&aacute;gina de agendamiento y panel admin.</div>
+      <div class="step-desc">Elige el esquema de colores de tu p&aacute;gina de agendamiento.</div>
       <div class="palettes" id="palettes-container"></div>
       <div id="err3"></div>
       <div class="btn-row">
@@ -288,7 +280,7 @@
       <div id="err4"></div>
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="goStep(3)">&#8592; Volver</button>
-        <button class="btn btn-primary" onclick="goStep(5)">Generar mis links &#8594;</button>
+        <button class="btn btn-primary" onclick="goStep(5)">Generar mi link &#8594;</button>
       </div>
     </div>
   </div>
@@ -300,38 +292,26 @@
       <div class="success-wrap">
         <div class="success-icon">&#127881;</div>
         <div class="success-title">&#161;Tu agenda est&aacute; lista!</div>
-        <div class="success-text">Guarda estos dos links en un lugar seguro. Son &uacute;nicos para ti.</div>
+        <div class="success-text">Comparte este link con tus clientes para que puedan agendar sus citas.</div>
       </div>
-
-      <!-- LINK CLIENTES -->
       <div class="link-box">
-        <label>&#128279; Link para tus clientes &mdash; comp&aacute;rtelo libremente</label>
+        <label>Tu link personalizado</label>
         <div class="link-input-wrap">
           <input type="text" id="generated-link" class="link-input" readonly>
-          <button class="btn-copy-link" id="btn-copy-final" onclick="copyLink('generated-link','btn-copy-final')">&#128203; Copiar</button>
+          <button class="btn-copy-link" id="btn-copy-final" onclick="copyFinalLink()">&#128203; Copiar</button>
         </div>
       </div>
 
-      <!-- LINK ADMIN -->
-      <div class="link-box-admin">
-        <label>&#128274; Tu panel de administraci&oacute;n &mdash; solo para ti</label>
-        <div class="link-input-wrap">
-          <input type="text" id="admin-link" class="link-input" readonly style="background:#fff">
-          <button class="btn-copy-link" id="btn-copy-admin" onclick="copyLink('admin-link','btn-copy-admin')">&#128203; Copiar</button>
-        </div>
-        <div class="link-hint">&#9888;&#65039; No compartas este link. Con &eacute;l accedes a tu panel para ver citas, estad&iacute;sticas y empresas.</div>
-      </div>
+      <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
+        <button class="btn btn-success" style="flex:1" onclick="previewLink()">&#128065;&#65039; Previsualizar</button>
 
-      <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
-        <button class="btn btn-success" style="flex:1" onclick="previewLink()">&#128065;&#65039; Ver p&aacute;gina clientes</button>
         <button class="btn btn-ghost" onclick="goStep(1)">&#8635; Nueva configuraci&oacute;n</button>
       </div>
-
       <div class="instruction-box" style="margin-top:20px">
         <h3>&#128161; C&oacute;mo usarlo</h3>
         <div class="instruction-step">
           <div class="instruction-num">1</div>
-          <div class="instruction-text">Copia el <strong>link de clientes</strong> y comp&aacute;rtelo por WhatsApp, email o tu p&aacute;gina web.</div>
+          <div class="instruction-text">Copia el link y comp&aacute;rtelo por WhatsApp, email o tu p&aacute;gina web.</div>
         </div>
         <div class="instruction-step">
           <div class="instruction-num">2</div>
@@ -339,20 +319,18 @@
         </div>
         <div class="instruction-step">
           <div class="instruction-num">3</div>
-          <div class="instruction-text">Al agendar, recibes un correo y el evento se crea en tu Google Calendar.</div>
-        </div>
-        <div class="instruction-step">
-          <div class="instruction-num">4</div>
-          <div class="instruction-text">Usa el <strong>link del panel admin</strong> para gestionar citas, ver estad&iacute;sticas y hacer seguimiento de empresas.</div>
+          <div class="instruction-text">Al agendar, recibes un correo de notificaci&oacute;n y el evento se crea autom&aacute;ticamente en tu Google Calendar.</div>
         </div>
       </div>
     </div>
   </div>
+</div>
 </div><!-- /main-container -->
 <footer><strong>AgendaTuCita</strong> &middot; Sistema de agendamiento profesional</footer>
 
 <script>
 // ══ CÓDIGO DE ACTIVACIÓN ══════════════════════════════
+// Cambia esta contraseña cuando entregues el producto a un cliente
 var ACTIVATION_CODE = 'AgendaPro2026';
 
 function checkCode() {
@@ -421,7 +399,7 @@ function goStep(n){
     document.getElementById('panel'+i).style.display=i===n?'block':'none';
   }
   if(n===4) document.getElementById('inst-email').textContent=document.getElementById('p1-email').value;
-  if(n===5) generateLinks();
+  if(n===5) generateLink();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -429,19 +407,12 @@ function validateStep(n){
   var err=document.getElementById('err'+n);
   err.innerHTML='';
   if(n===1){
-    var nom   = document.getElementById('p1-nombre').value.trim();
-    var prof  = document.getElementById('p1-profesion').value.trim();
-    var mail  = document.getElementById('p1-email').value.trim();
-    var ciudad= document.getElementById('p1-ciudad').value.trim();
-    var depto = document.getElementById('p1-departamento').value.trim();
-    if(!nom||!prof||!mail||!ciudad||!depto){
-      err.innerHTML='<div class="alert alert-error">&#9888;&#65039; Completa todos los campos.</div>';
-      return false;
-    }
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){
-      err.innerHTML='<div class="alert alert-error">&#9888;&#65039; Email no v&aacute;lido.</div>';
-      return false;
-    }
+    var nom=document.getElementById('p1-nombre').value.trim();
+    var prof=document.getElementById('p1-profesion').value.trim();
+    var mail=document.getElementById('p1-email').value.trim();
+    var ciudad = document.getElementById('p1-ciudad').value.trim();
+    if(!nom||!prof||!mail||!ciudad){err.innerHTML='<div class="alert alert-error">&#9888;&#65039; Completa todos los campos.</div>';return false;}
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){err.innerHTML='<div class="alert alert-error">&#9888;&#65039; Email no v&aacute;lido.</div>';return false;}
   }
   if(n===2){
     if(!document.querySelectorAll('.day-chip.active').length){err.innerHTML='<div class="alert alert-error">&#9888;&#65039; Selecciona al menos un d&iacute;a.</div>';return false;}
@@ -453,11 +424,10 @@ function validateStep(n){
   return true;
 }
 
-function generateLinks(){
+function generateLink(){
   var nombre  = document.getElementById('p1-nombre').value.trim();
   var prof    = document.getElementById('p1-profesion').value.trim();
   var ciudad  = document.getElementById('p1-ciudad').value.trim();
-  var depto   = document.getElementById('p1-departamento').value.trim();
   var email   = document.getElementById('p1-email').value.trim();
   var amStart = document.getElementById('am-start').value;
   var amEnd   = document.getElementById('am-end').value;
@@ -467,24 +437,18 @@ function generateLinks(){
   var days=[]; document.querySelectorAll('.day-chip.active').forEach(function(c){days.push(c.dataset.day);});
   var durs=[]; document.querySelectorAll('.dur-chip.active').forEach(function(c){durs.push(c.dataset.dur);});
   var buf=0; var bb=document.querySelector('.buf-btn.active'); if(bb) buf=bb.dataset.buf;
-  var pal = PALETAS[selectedPaleta];
+  var pal=PALETAS[selectedPaleta];
 
-  // Ciudad completa = Ciudad, Departamento
-  var cityFull = ciudad + ', ' + depto;
-
-  // URL base robusta
-  var loc  = window.location.href.split('?')[0];
-  var base = loc.substring(0, loc.lastIndexOf('/') + 1);
+  // URL base robusta — funciona con cualquier nombre de archivo
+  var loc = window.location.href.split('?')[0];
+  var base = loc.substring(0, loc.lastIndexOf('/') + 1) + 'agendar.html';
 
   // Credenciales fijas del producto
   var PROD_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbx5rcBRpX_UATvMAKeKgRxFffRRSX6xn93Xcm3efDY3U87kgzO6AZ4Mo1_vUzCCk14/exec';
   var PROD_API_KEY     = 'AIzaSyDVynTeTFMHDi1VB-7DouJSLAsRAZ9S7JA';
 
-  // ── LINK CLIENTES (agendar.html) ──────────────────────
-  var paramsAgendar = new URLSearchParams({
-    name:nombre, profession:prof,
-    email:email,
-    city:ciudad, department:depto,
+  var params = new URLSearchParams({
+    name:nombre, profession:prof, email:email, city:ciudad,
     apps_script:PROD_APPS_SCRIPT,
     api_key:PROD_API_KEY,
     am_start:amStart, am_end:amEnd,
@@ -492,27 +456,16 @@ function generateLinks(){
     days:days.join(','), duration:durs.join(','), buffer:buf,
     primary:pal.primary, accent:pal.accent, gold:pal.gold
   });
-  document.getElementById('generated-link').value = base + 'agendar.html?' + paramsAgendar.toString();
+  document.getElementById('generated-link').value = base+'?'+params.toString();
 
-  // ── LINK ADMIN (admin.html) — mismos colores ──────────
-  var paramsAdmin = new URLSearchParams({
-    name:nombre,
-    email:email,
-    city:cityFull,
-    api_key:PROD_API_KEY,
-    apps_script:PROD_APPS_SCRIPT,
-    primary:pal.primary, accent:pal.accent, gold:pal.gold
-  });
-  document.getElementById('admin-link').value = base + 'admin.html?' + paramsAdmin.toString();
 }
 
-function copyLink(inputId, btnId){
-  var v = document.getElementById(inputId).value;
+function copyFinalLink(){
+  var v=document.getElementById('generated-link').value;
   navigator.clipboard.writeText(v).then(function(){
-    var b = document.getElementById(btnId);
-    b.textContent = '\u2713 Copiado!';
-    b.classList.add('copied');
-    setTimeout(function(){ b.innerHTML='&#128203; Copiar'; b.classList.remove('copied'); }, 2000);
+    var b=document.getElementById('btn-copy-final');
+    b.textContent='\u2713 Copiado!'; b.classList.add('copied');
+    setTimeout(function(){b.innerHTML='&#128203; Copiar';b.classList.remove('copied');},2000);
   });
 }
 
