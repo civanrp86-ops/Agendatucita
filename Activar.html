@@ -119,7 +119,7 @@
   <h1>&#9881;&#65039; AgendaTuCita</h1>
   <p>Activa tu agenda profesional en 5 pasos</p>
 </header>
- 
+
 <!-- PANTALLA DE ACTIVACIÓN -->
 <div class="lock-screen" id="lock-screen">
   <div class="lock-card">
@@ -132,7 +132,7 @@
     <div class="lock-hint">&#128222; Si no tienes tu c&oacute;digo, contacta a AgendaTuCita</div>
   </div>
 </div>
- 
+
 <div class="container" id="main-container" style="display:none">
   <div class="steps" id="steps-bar">
     <div class="step active" id="stp1"><div class="step-num">1</div><span>Perfil</span></div>
@@ -145,7 +145,7 @@
     <div class="step-line" id="ln4"></div>
     <div class="step" id="stp5"><div class="step-num">5</div><span>Tus links</span></div>
   </div>
- 
+
   <!-- PASO 1 -->
   <div id="panel1">
     <div class="card">
@@ -181,7 +181,7 @@
       </div>
     </div>
   </div>
- 
+
   <!-- PASO 2 -->
   <div id="panel2" style="display:none">
     <div class="card">
@@ -232,7 +232,7 @@
       </div>
     </div>
   </div>
- 
+
   <!-- PASO 3 -->
   <div id="panel3" style="display:none">
     <div class="card">
@@ -247,7 +247,7 @@
       </div>
     </div>
   </div>
- 
+
   <!-- PASO 4 -->
   <div id="panel4" style="display:none">
     <div class="card">
@@ -292,7 +292,7 @@
       </div>
     </div>
   </div>
- 
+
   <!-- PASO 5 -->
   <div id="panel5" style="display:none">
     <div class="card">
@@ -302,7 +302,7 @@
         <div class="success-title">&#161;Tu agenda est&aacute; lista!</div>
         <div class="success-text">Guarda estos dos links en un lugar seguro. Son &uacute;nicos para ti.</div>
       </div>
- 
+
       <!-- LINK CLIENTES -->
       <div class="link-box">
         <label>&#128279; Link para tus clientes &mdash; comp&aacute;rtelo libremente</label>
@@ -311,7 +311,7 @@
           <button class="btn-copy-link" id="btn-copy-final" onclick="copyLink('generated-link','btn-copy-final')">&#128203; Copiar</button>
         </div>
       </div>
- 
+
       <!-- LINK ADMIN -->
       <div class="link-box-admin">
         <label>&#128274; Tu panel de administraci&oacute;n &mdash; solo para ti</label>
@@ -321,12 +321,12 @@
         </div>
         <div class="link-hint">&#9888;&#65039; No compartas este link. Con &eacute;l accedes a tu panel para ver citas, estad&iacute;sticas y empresas.</div>
       </div>
- 
+
       <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
         <button class="btn btn-success" style="flex:1" onclick="previewLink()">&#128065;&#65039; Ver p&aacute;gina clientes</button>
         <button class="btn btn-ghost" onclick="goStep(1)">&#8635; Nueva configuraci&oacute;n</button>
       </div>
- 
+
       <div class="instruction-box" style="margin-top:20px">
         <h3>&#128161; C&oacute;mo usarlo</h3>
         <div class="instruction-step">
@@ -350,11 +350,11 @@
   </div>
 </div><!-- /main-container -->
 <footer><strong>AgendaTuCita</strong> &middot; Sistema de agendamiento profesional</footer>
- 
+
 <script>
 // ══ CÓDIGO DE ACTIVACIÓN ══════════════════════════════
 var ACTIVATION_CODE = 'AgendaPro2026';
- 
+
 function checkCode() {
   var input = document.getElementById('lock-code').value.trim();
   var err   = document.getElementById('lock-error');
@@ -368,7 +368,7 @@ function checkCode() {
     document.getElementById('lock-code').focus();
   }
 }
- 
+
 var PALETAS = [
   {name:'Oc\u00e9ano',    primary:'#1B4F72',accent:'#1ABC9C',gold:'#C9A84C'},
   {name:'Esmeralda', primary:'#1A5276',accent:'#27AE60',gold:'#F39C12'},
@@ -380,7 +380,7 @@ var PALETAS = [
   {name:'Frambuesa', primary:'#862D59',accent:'#D63384',gold:'#FFD700'}
 ];
 var selectedPaleta = 0;
- 
+
 var pc = document.getElementById('palettes-container');
 PALETAS.forEach(function(p,i){
   var d = document.createElement('div');
@@ -398,7 +398,7 @@ PALETAS.forEach(function(p,i){
   };
   pc.appendChild(d);
 });
- 
+
 document.querySelectorAll('.day-chip').forEach(function(c){c.onclick=function(){c.classList.toggle('active');};});
 document.querySelectorAll('.dur-chip').forEach(function(c){c.onclick=function(){c.classList.toggle('active');};});
 document.querySelectorAll('.buf-btn').forEach(function(b){
@@ -407,11 +407,11 @@ document.querySelectorAll('.buf-btn').forEach(function(b){
     b.classList.add('active');
   };
 });
- 
+
 function togglePM(){
   document.getElementById('pm-panel').style.display = document.getElementById('pm-toggle').checked?'block':'none';
 }
- 
+
 function goStep(n){
   if(n>1 && !validateStep(n-1)) return;
   for(var i=1;i<=5;i++){
@@ -424,7 +424,7 @@ function goStep(n){
   if(n===5) generateLinks();
   window.scrollTo({top:0,behavior:'smooth'});
 }
- 
+
 function validateStep(n){
   var err=document.getElementById('err'+n);
   err.innerHTML='';
@@ -452,7 +452,7 @@ function validateStep(n){
   }
   return true;
 }
- 
+
 function generateLinks(){
   var nombre  = document.getElementById('p1-nombre').value.trim();
   var prof    = document.getElementById('p1-profesion').value.trim();
@@ -468,18 +468,18 @@ function generateLinks(){
   var durs=[]; document.querySelectorAll('.dur-chip.active').forEach(function(c){durs.push(c.dataset.dur);});
   var buf=0; var bb=document.querySelector('.buf-btn.active'); if(bb) buf=bb.dataset.buf;
   var pal = PALETAS[selectedPaleta];
- 
+
   // Ciudad completa = Ciudad, Departamento
   var cityFull = ciudad + ', ' + depto;
- 
+
   // URL base robusta
   var loc  = window.location.href.split('?')[0];
   var base = loc.substring(0, loc.lastIndexOf('/') + 1);
- 
+
   // Credenciales fijas del producto
   var PROD_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbx5rcBRpX_UATvMAKeKgRxFffRRSX6xn93Xcm3efDY3U87kgzO6AZ4Mo1_vUzCCk14/exec';
   var PROD_API_KEY     = 'AIzaSyDVynTeTFMHDi1VB-7DouJSLAsRAZ9S7JA';
- 
+
   // ── LINK CLIENTES (agendar.html) ──────────────────────
   var paramsAgendar = new URLSearchParams({
     name:nombre, profession:prof,
@@ -493,7 +493,7 @@ function generateLinks(){
     primary:pal.primary, accent:pal.accent, gold:pal.gold
   });
   document.getElementById('generated-link').value = base + 'agendar.html?' + paramsAgendar.toString();
- 
+
   // ── LINK ADMIN (admin.html) — mismos colores ──────────
   var paramsAdmin = new URLSearchParams({
     name:nombre,
@@ -505,7 +505,7 @@ function generateLinks(){
   });
   document.getElementById('admin-link').value = base + 'admin.html?' + paramsAdmin.toString();
 }
- 
+
 function copyLink(inputId, btnId){
   var v = document.getElementById(inputId).value;
   navigator.clipboard.writeText(v).then(function(){
@@ -515,14 +515,14 @@ function copyLink(inputId, btnId){
     setTimeout(function(){ b.innerHTML='&#128203; Copiar'; b.classList.remove('copied'); }, 2000);
   });
 }
- 
+
 function copyAgendaEmail(btn){
   navigator.clipboard.writeText('agendatucita12@gmail.com').then(function(){
     btn.textContent='\u2713 Copiado';
     setTimeout(function(){btn.innerHTML='&#128203; Copiar';},2000);
   });
 }
- 
+
 function previewLink(){
   window.open(document.getElementById('generated-link').value,'_blank');
 }
