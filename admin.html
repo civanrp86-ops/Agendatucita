@@ -134,6 +134,9 @@ input[type=date]{padding:5px 9px;border:1px solid var(--border);border-radius:7p
 .gcal-event.ev-v{background:var(--accent);color:#fff}
 .gcal-event.ev-b{background:var(--danger);color:#fff}
 .gcal-event.ev-otro{background:#8B9DC3;color:#fff}
+.gcal-cell.festivo-cell{background:#FEF2F2}
+.gcal-festivo{font-size:.63rem;font-weight:700;color:var(--danger);padding:2px 3px;border-radius:3px;background:#FECACA;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcal-day-num.festivo-num{color:var(--danger) !important;font-weight:800}
 .gcal-more{font-size:.62rem;color:var(--primary-lt);font-weight:600;cursor:pointer;padding:1px 3px}
 .gcal-more:hover{text-decoration:underline}
 
@@ -461,6 +464,27 @@ var DIAS_ES=['domingo','lunes','martes','mi\u00e9rcoles','jueves','viernes','s\u
 var MESES_ES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 var todasLasCitas=[],filtroActual='hoy',calFecha=new Date(),chartTend=null,citaActual=null,empresaActual=null;
 
+// ── FESTIVOS COLOMBIA 2026-2027 ───────────────────────
+var FESTIVOS_CO={
+  '2026-01-01':'A\u00f1o Nuevo','2026-01-12':'Reyes Magos','2026-03-23':'San Jos\u00e9',
+  '2026-04-02':'Jueves Santo','2026-04-03':'Viernes Santo','2026-05-01':'D\u00eda del Trabajo',
+  '2026-05-18':'Ascensi\u00f3n del Se\u00f1or','2026-06-08':'Corpus Christi',
+  '2026-06-15':'Sagrado Coraz\u00f3n','2026-06-29':'San Pedro y San Pablo',
+  '2026-07-20':'Independencia de Colombia','2026-08-07':'Batalla de Boyac\u00e1',
+  '2026-08-17':'Asunci\u00f3n de la Virgen','2026-10-12':'D\u00eda de la Raza',
+  '2026-11-02':'Todos los Santos','2026-11-16':'Independencia de Cartagena',
+  '2026-12-08':'Inmaculada Concepci\u00f3n','2026-12-25':'Navidad',
+  '2027-01-01':'A\u00f1o Nuevo','2027-01-11':'Reyes Magos','2027-03-22':'San Jos\u00e9',
+  '2027-03-25':'Jueves Santo','2027-03-26':'Viernes Santo','2027-05-01':'D\u00eda del Trabajo',
+  '2027-05-10':'Ascensi\u00f3n del Se\u00f1or','2027-05-31':'Corpus Christi',
+  '2027-06-07':'Sagrado Coraz\u00f3n','2027-06-28':'San Pedro y San Pablo',
+  '2027-07-20':'Independencia de Colombia','2027-08-07':'Batalla de Boyac\u00e1',
+  '2027-08-16':'Asunci\u00f3n de la Virgen','2027-10-18':'D\u00eda de la Raza',
+  '2027-11-01':'Todos los Santos','2027-11-15':'Independencia de Cartagena',
+  '2027-12-08':'Inmaculada Concepci\u00f3n','2027-12-25':'Navidad'
+};
+function esFestivoCO(dateStr){ return FESTIVOS_CO[dateStr] || null; }
+
 function toDateStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'';}
 function spanishDate(d){return cap(DIAS_ES[d.getDay()])+', '+d.getDate()+' de '+MESES_ES[d.getMonth()]+' de '+d.getFullYear();}
@@ -509,7 +533,7 @@ async function cargarCitas(){
   document.getElementById('citas-list').innerHTML='<div class="loader"><div class="spinner"></div><div>Cargando citas\u2026</div></div>';
   var hoy=new Date();
   var tMin=new Date(hoy.getFullYear()-3,0,1).toISOString();
-  var tMax=new Date(hoy.getFullYear(),hoy.getMonth()+6,1).toISOString();
+  var tMax=new Date(hoy.getFullYear(),hoy.getMonth()+12,1).toISOString();
   var url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(CFG.email)+'/events?key='+CFG.api_key+'&timeMin='+encodeURIComponent(tMin)+'&timeMax='+encodeURIComponent(tMax)+'&singleEvents=true&orderBy=startTime&maxResults=2500';
   try{
     var res=await fetch(url);
@@ -728,8 +752,11 @@ function renderCalendario(){
       var date=new Date(y,m,day);var dStr=toDateStr(date);
       var citasD=todasLasCitas.filter(function(ev){return toDateStr(new Date(ev.start.dateTime))===dStr;});
       var cell=document.createElement('div');cell.className='gcal-cell'+(date.getTime()===today.getTime()?' today-cell':'');
-      var html='<div class="gcal-day-num">'+day+'</div>';
-      var max=3;
+      var festivo = esFestivoCO(dStr);
+      var html='<div class="gcal-day-num'+(festivo?' festivo-num':'')+'">'+ day+'</div>';
+      if(festivo) html+='<div class="gcal-festivo" title="'+festivo+'">&#127988; '+festivo+'</div>';
+      if(festivo) cell.classList.add('festivo-cell');
+      var max=festivo?2:3;
       citasD.slice(0,max).forEach(function(ev){
         var c=parseCita(ev);
         var sum=ev.summary||'';
@@ -738,6 +765,7 @@ function renderCalendario(){
         var cls=isBlocked?'ev-b':(c.modalidad==='Virtual'?'ev-v':'ev-p');
         if(!isCita&&!isBlocked)cls='ev-otro';
         var nom=sum.startsWith('Cita:')?sum.replace('Cita:','').split('-')[0].trim().split(' ')[0]:sum.split(' ')[0];
+        if(isBlocked)nom=sum.replace('BLOQUEADO - ','').replace('RESERVADO','Reservado');
         html+='<div class="gcal-event '+cls+'" onclick="abrirModal(\''+ev.id+'\')" title="'+(c.cliente||ev.summary)+'">'+horaStr(c.start)+' '+nom+'</div>';
       });
       if(citasD.length>max)html+='<div class="gcal-more" onclick="verDia(\''+dStr+'\')">'+(citasD.length-max)+' m\u00e1s&#8230;</div>';
