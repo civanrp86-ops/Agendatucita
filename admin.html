@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AgendaTuCita &middot; Panel Admin</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <style>
 :root{--primary:#1B4F72;--primary-lt:#2E86C1;--primary-dk:#154360;--accent:#1ABC9C;--accent-dk:#148F77;--gold:#C9A84C;--danger:#DC2626;--warn:#F59E0B;--purple:#7C3AED;--bg:#F0F4F8;--surface:#fff;--surface-2:#F8FAFC;--border:#D5DCE8;--text:#1C2833;--text-muted:#7F8C8D;--radius:12px;--shadow:0 4px 24px rgba(27,79,114,.10)}
@@ -403,9 +404,17 @@ footer strong{color:var(--primary)}
   <div class="modal">
     <div class="modal-hdr"><h3>&#128100; Detalle de cita</h3><button class="modal-close" onclick="cerrarModal('modal-cita')">&#10005;</button></div>
     <div class="modal-body" id="modal-body"></div>
-    <div class="modal-footer">
-      <button class="btn btn-cancel" id="btn-cancelar-cita" onclick="cancelarCita()">&#10060; Cancelar cita</button>
+    <div class="modal-footer" id="modal-footer-normal">
+      <button class="btn btn-cancel" id="btn-cancelar-cita" onclick="mostrarMotivo()">&#10060; Cancelar cita</button>
       <button class="btn btn-ghost" onclick="cerrarModal('modal-cita')">Cerrar</button>
+    </div>
+    <div id="modal-footer-motivo" style="display:none;padding:14px 20px;border-top:1px solid var(--border)">
+      <div style="font-size:.83rem;font-weight:700;color:var(--danger);margin-bottom:8px">&#10060; Motivo de cancelaci&oacute;n</div>
+      <textarea id="inp-motivo-cancel" placeholder="Explica el motivo de la cancelaci&oacute;n&#8230;" style="width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;resize:none;min-height:72px;line-height:1.5"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-ghost" onclick="ocultarMotivo()" style="flex:1">&#8592; Volver</button>
+        <button class="btn btn-cancel" id="btn-confirmar-cancel" onclick="cancelarCita()" style="flex:1">&#10003; Confirmar cancelaci&oacute;n</button>
+      </div>
     </div>
   </div>
 </div>
@@ -682,33 +691,53 @@ function abrirModal(id){
   var c=parseCita(citaActual);
   var rows=[['&#128100; Cliente',c.cliente||'—'],['&#127970; Empresa',c.empresa||'—'],['&#128231; Email',c.email||'—'],['&#128222; Tel\u00e9fono',c.telefono||'—'],['&#128197; Fecha',spanishDate(c.start)],['&#128336; Hora',horaStr(c.start)+' \u2013 '+horaStr(c.end)],['&#9201; Duraci\u00f3n',durStr(c.start,c.end)],['&#128203; Modalidad',c.modalidad||'—'],['&#128221; Motivo',c.motivo||'—']];
   document.getElementById('modal-body').innerHTML=rows.map(function(r){return'<div class="detail-row"><div class="detail-label">'+r[0]+'</div><div class="detail-val">'+r[1]+'</div></div>';}).join('');
-  document.getElementById('btn-cancelar-cita').disabled=false;
-  document.getElementById('btn-cancelar-cita').innerHTML='&#10060; Cancelar cita';
+  // Resetear footer
+  document.getElementById('modal-footer-normal').style.display='flex';
+  document.getElementById('modal-footer-motivo').style.display='none';
+  document.getElementById('inp-motivo-cancel').value='';
   document.getElementById('modal-cita').classList.add('open');
+}
+function mostrarMotivo(){
+  document.getElementById('modal-footer-normal').style.display='none';
+  document.getElementById('modal-footer-motivo').style.display='block';
+  document.getElementById('inp-motivo-cancel').focus();
+}
+function ocultarMotivo(){
+  document.getElementById('modal-footer-normal').style.display='flex';
+  document.getElementById('modal-footer-motivo').style.display='none';
 }
 function cerrarModal(id){document.getElementById(id).classList.remove('open');}
 document.getElementById('modal-cita').addEventListener('click',function(e){if(e.target===this)cerrarModal('modal-cita');});
 document.getElementById('empresa-overlay').addEventListener('click',function(e){if(e.target===this)cerrarModal('empresa-overlay');});
 
-// CANCELAR CITA
+// CANCELAR CITA — correos via Apps Script
 async function cancelarCita(){
   if(!citaActual)return;
-  if(!confirm('¿Confirmas que deseas cancelar esta cita? Se eliminará del calendario.'))return;
-  var btn=document.getElementById('btn-cancelar-cita');
+  var motivo=document.getElementById('inp-motivo-cancel').value.trim()||'Sin motivo especificado';
+  var btn=document.getElementById('btn-confirmar-cancel');
   btn.disabled=true;btn.innerHTML='Cancelando&#8230;';
+  var c=parseCita(citaActual);
   try{
     await fetch(CFG.apps_script,{method:'POST',mode:'no-cors',body:JSON.stringify({
       action:'cancel_event',
       calendar_id:CFG.email,
       event_start:citaActual.start.dateTime,
       event_end:citaActual.end.dateTime,
-      event_title:citaActual.summary
+      event_title:citaActual.summary,
+      owner_name:CFG.name,
+      owner_email:CFG.email,
+      client_name:c.cliente||'Cliente',
+      client_email:c.email||'',
+      cancel_reason:motivo
     })});
     todasLasCitas=todasLasCitas.filter(function(ev){return ev.id!==citaActual.id;});
     cerrarModal('modal-cita');
     calcularStats();renderCitas();renderProximas();renderResumen();renderCalendario();renderEstadisticas();
     citaActual=null;
-  }catch(err){btn.disabled=false;btn.innerHTML='&#10060; Cancelar cita';alert('Error: '+err.message);}
+  }catch(err){
+    btn.disabled=false;btn.innerHTML='&#10003; Confirmar cancelaci\u00f3n';
+    alert('Error: '+err.message);
+  }
 }
 
 // BLOQUEAR DÍAS
@@ -771,7 +800,7 @@ function guardarEmpresa(){
   var key='emp_'+CFG.email+'_'+empresaActual;
   localStorage.setItem(key,JSON.stringify({estado:estadoActual,contacto:document.getElementById('ep-contacto').value,notas:document.getElementById('ep-notas').value}));
   var b=document.getElementById('ep-save-btn');b.textContent='\u2713 Guardado';b.classList.add('saved');
-  setTimeout(function(){b.textContent='&#128190; Guardar';b.classList.remove('saved');},2000);
+  setTimeout(function(){b.textContent='\uD83D\uDCBE Guardar';b.classList.remove('saved');},2000);
 }
 
 // CALENDARIO
