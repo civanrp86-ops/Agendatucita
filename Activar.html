@@ -303,6 +303,15 @@
         <div class="success-text">Guarda estos dos links en un lugar seguro. Son &uacute;nicos para ti.</div>
       </div>
 
+      <!-- LINK PÁGINA DE INICIO -->
+      <div class="link-box" style="border-color:var(--gold);background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03))">
+        <label style="color:var(--gold)">&#11088; Tu p&aacute;gina de presentaci&oacute;n &mdash; comp&aacute;rtela como tu sitio web</label>
+        <div class="link-input-wrap">
+          <input type="text" id="inicio-link" class="link-input" readonly style="background:#fff">
+          <button class="btn-copy-link" id="btn-copy-inicio" onclick="copyLink('inicio-link','btn-copy-inicio')" style="background:var(--gold)">&#128203; Copiar</button>
+        </div>
+      </div>
+
       <!-- LINK CLIENTES -->
       <div class="link-box">
         <label>&#128279; Link para tus clientes &mdash; comp&aacute;rtelo libremente</label>
@@ -479,6 +488,20 @@ function generateLinks(){
   // Credenciales fijas del producto
   var PROD_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbx5rcBRpX_UATvMAKeKgRxFffRRSX6xn93Xcm3efDY3U87kgzO6AZ4Mo1_vUzCCk14/exec';
   var PROD_API_KEY     = 'AIzaSyDVynTeTFMHDi1VB-7DouJSLAsRAZ9S7JA';
+
+  // ── LINK PÁGINA DE INICIO (inicio.html) ──────────
+  var paramsInicio = new URLSearchParams({
+    name:nombre, profession:prof,
+    email:email,
+    city:ciudad, department:depto,
+    api_key:PROD_API_KEY,
+    apps_script:PROD_APPS_SCRIPT,
+    am_start:amStart, am_end:amEnd,
+    pm_enabled:pmOn?'1':'0', pm_start:pmStart, pm_end:pmEnd,
+    days:days.join(','), duration:durs.join(','), buffer:buf,
+    primary:pal.primary, accent:pal.accent, gold:pal.gold
+  });
+  document.getElementById('inicio-link').value = base + 'inicio.html?' + paramsInicio.toString();
 
   // ── LINK CLIENTES (agendar.html) ──────────────────────
   var paramsAgendar = new URLSearchParams({
