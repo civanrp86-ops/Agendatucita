@@ -460,11 +460,32 @@ function hexToRgb(hex){var n=parseInt(hex.replace('#',''),16);return[(n>>16)&255
 // Helper para abrir empresa desde data attribute
 function empClick(el){ abrirEmpresa(el.getAttribute('data-emp')); }
 
-// LOCK — compara contra ACCESS_CODE hardcodeado
+// LOCK — compara contra ACCESS_CODE hardcodeado + sesión 7 días
+var SESSION_KEY = 'ata_session';
+var SESSION_DAYS = 7;
+
+function checkSession(){
+  try{
+    var s=JSON.parse(localStorage.getItem(SESSION_KEY));
+    if(s && s.code===ACCESS_CODE && Date.now() < s.expires){
+      document.getElementById('lock-screen').style.display='none';
+      document.getElementById('admin-screen').style.display='block';
+      iniciarAdmin();
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
 function verificarAcceso(){
   var inp=document.getElementById('lock-code').value.trim();
   var err=document.getElementById('lock-error');
   if(inp===ACCESS_CODE){
+    // Guardar sesión por 7 días
+    localStorage.setItem(SESSION_KEY,JSON.stringify({
+      code:ACCESS_CODE,
+      expires:Date.now()+(SESSION_DAYS*24*60*60*1000)
+    }));
     document.getElementById('lock-screen').style.display='none';
     document.getElementById('admin-screen').style.display='block';
     iniciarAdmin();
@@ -474,7 +495,17 @@ function verificarAcceso(){
     document.getElementById('lock-code').focus();
   }
 }
-function cerrarSesion(){document.getElementById('admin-screen').style.display='none';document.getElementById('lock-screen').style.display='flex';document.getElementById('lock-code').value='';document.getElementById('lock-error').style.display='none';}
+
+function cerrarSesion(){
+  localStorage.removeItem(SESSION_KEY);
+  document.getElementById('admin-screen').style.display='none';
+  document.getElementById('lock-screen').style.display='flex';
+  document.getElementById('lock-code').value='';
+  document.getElementById('lock-error').style.display='none';
+}
+
+// Verificar sesión al cargar
+checkSession();
 
 var DIAS_ES=['domingo','lunes','martes','mi\u00e9rcoles','jueves','viernes','s\u00e1bado'];
 var MESES_ES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
