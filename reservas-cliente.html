@@ -288,7 +288,7 @@
           </div>
           <div class="form-group">
             <label>Modalidad</label>
-            <select id="inp-modalidad">
+            <select id="inp-modalidad" onchange="toggleDireccion()">
               <option value="Presencial">&#127973; Presencial</option>
               <option value="Virtual">&#128187; Virtual</option>
             </select>
@@ -296,6 +296,10 @@
           <div class="form-group">
             <label>Empresa / Organizaci&#243;n</label>
             <input type="text" id="inp-empresa" placeholder="Nombre de la empresa (opcional)">
+          </div>
+          <div class="form-group full" id="grp-direccion">
+            <label>Direcci&#243;n donde se realizar&#225; la cita</label>
+            <input type="text" id="inp-direccion" placeholder="Calle o carrera, n&#250;mero, barrio, ciudad">
           </div>
           <div class="form-group full">
             <label>Motivo de la consulta</label>
@@ -747,6 +751,15 @@ function goStep3() {
   formData.empresa   = document.getElementById('inp-empresa').value.trim();
   formData.modalidad = document.getElementById('inp-modalidad').value;
   formData.motivo    = document.getElementById('inp-motivo').value;
+  formData.direccion = (document.getElementById('inp-direccion').value || '').trim();
+
+  if (formData.modalidad === 'Presencial' && !formData.direccion) {
+    document.getElementById('form-error').innerHTML =
+      '<div class="alert alert-error">\u26a0\ufe0f Por favor escribe la direcci\u00f3n donde se realizar\u00e1 la cita</div>';
+    return;
+  }
+  if (formData.modalidad !== 'Presencial') formData.direccion = '';
+  document.getElementById('form-error').innerHTML = '';
 
   var fmtDate = spanishDate(selectedDate);
   var summary =
@@ -757,6 +770,7 @@ function goStep3() {
     '<div class="summary-row"><span class="summary-icon">\u{1F4DE}</span><span class="summary-label">Tel\u00e9fono</span><span class="summary-val">' + tel + '</span></div>' +
     (formData.email ? '<div class="summary-row"><span class="summary-icon">\u{1F4E7}</span><span class="summary-label">Email</span><span class="summary-val">' + formData.email + '</span></div>' : '') +
     (formData.empresa ? '<div class="summary-row"><span class="summary-icon">&#127970;</span><span class="summary-label">Empresa</span><span class="summary-val">' + formData.empresa + '</span></div>' : '') +
+    (formData.direccion ? '<div class="summary-row"><span class="summary-icon">\u{1F4CD}</span><span class="summary-label">Direcci\u00f3n</span><span class="summary-val">' + escHtml(formData.direccion) + '</span></div>' : '') +
     '<div class="summary-row"><span class="summary-icon">\u{1F4CB}</span><span class="summary-label">Modalidad</span><span class="summary-val">' + formData.modalidad + '</span></div>';
   document.getElementById('full-summary').innerHTML = summary;
   updateSteps(3);
@@ -789,6 +803,8 @@ async function enviarCorreos(payload) {
     meeting_duration: durStr,
     meeting_reason:   payload.meeting_reason,
     meeting_type:     payload.meeting_type,
+    client_address:   payload.client_address || 'No aplica',
+    maps_link:        payload.maps_link || '',
     owner_name:       payload.owner_name,
     owner_email:      payload.owner_email,
     meet_link:        'No aplica',
@@ -826,6 +842,9 @@ async function confirmarCita() {
     client_empresa: formData.empresa || '',
     meeting_reason: formData.motivo || 'No especificado',
     meeting_type:   formData.modalidad || 'Presencial',
+    client_address: formData.direccion || '',
+    location:       formData.direccion || '',
+    maps_link:      formData.direccion ? mapsLink(formData.direccion) : '',
     start_time:     startISO,
     end_time:       endISO,
     owner_email:    OWNER_EMAIL,
@@ -883,9 +902,20 @@ function reiniciar() {
 function toDateStr(d) {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
+function mapsLink(addr) {
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr);
+}
+function escHtml(t) {
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function toggleDireccion() {
+  var presencial = document.getElementById('inp-modalidad').value === 'Presencial';
+  document.getElementById('grp-direccion').style.display = presencial ? '' : 'none';
+}
 function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 function show(id) { document.getElementById(id).style.display = ''; }
 function hide(id) { document.getElementById(id).style.display = 'none'; }
+toggleDireccion();
 </script>
 </body>
 </html>
