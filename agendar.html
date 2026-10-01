@@ -357,7 +357,7 @@ function getQueryParams() {
     // ── HORARIOS FIJOS (hora de inicio de cada cita) ──
     am_slots:    params.get('am_slots')    || '07:00,08:30,10:30',   // mañana
     pm_enabled:  params.get('pm_enabled') !== '0',
-    pm_slots:    params.get('pm_slots')    || '15:00,16:30',         // tarde
+    pm_slots:    params.get('pm_slots')    || '15:30,16:30',         // tarde
 
     duration:    params.get('duration')    || '1,2',
     city:        params.get('city')        || 'Colombia'
@@ -425,6 +425,14 @@ function esFestivo(date) { return FESTIVOS_CO[toDateStr(date)] || null; }
 function parseSlots(str) {
   return str.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return /^\d{1,2}:\d{2}$/.test(s); })
             .map(function(s) { var p = s.split(':'); return (p[0].length < 2 ? '0' : '') + p[0] + ':' + p[1]; });
+}
+
+// Muestra la hora en formato 12 horas (3:30 PM) sin cambiar el valor interno
+function fmt12(h) {
+  var p = h.split(':'), hr = parseInt(p[0]), m = p[1];
+  var suf = hr >= 12 ? 'PM' : 'AM';
+  hr = hr % 12; if (hr === 0) hr = 12;
+  return hr + ':' + m + ' ' + suf;
 }
 
 function getAM(dur) { return parseSlots(config.am_slots); }
@@ -604,7 +612,7 @@ function renderSlots(d) {
   avail.forEach(function(h) {
     var isBusy = busy.includes(h);
     html += '<button class="slot-btn' + (isBusy ? ' busy' : '') + (h === selectedHour ? ' selected' : '') +
-            '" ' + (isBusy ? 'disabled' : 'onclick="selectSlot(\'' + h + '\')"') + '>' + h + '</button>';
+            '" ' + (isBusy ? 'disabled' : 'onclick="selectSlot(\'' + h + '\')"') + '>' + fmt12(h) + '</button>';
   });
   document.getElementById('slots-container').innerHTML = html || '<div class="alert alert-info">No hay horarios disponibles para este d\u00eda.</div>';
 }
@@ -701,7 +709,7 @@ function goStep3() {
   var summary =
     '<div class="summary-row"><span class="summary-icon">\uD83D\uDC64</span><span class="summary-label">Nombre</span><span class="summary-val">' + nombre + ' ' + apellido + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\uD83D\uDCC5</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>' +
-    '<div class="summary-row"><span class="summary-icon">\uD83D\uDD50</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' \u2013 ' + endHour(selectedHour, sessionDur) + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">\uD83D\uDD50</span><span class="summary-label">Hora</span><span class="summary-val">' + fmt12(selectedHour) + ' \u2013 ' + fmt12(endHour(selectedHour, sessionDur)) + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\u23F1</span><span class="summary-label">Servicio</span><span class="summary-val">' + (SERVICE_TYPES[sessionDur] ? SERVICE_TYPES[sessionDur].title + ' \u2014 ' : '') + durStr(sessionDur) + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\uD83D\uDCDE</span><span class="summary-label">Tel\u00e9fono</span><span class="summary-val">' + tel + '</span></div>' +
     (formData.email ? '<div class="summary-row"><span class="summary-icon">\uD83D\uDCE7</span><span class="summary-label">Email</span><span class="summary-val">' + formData.email + '</span></div>' : '') +
@@ -801,7 +809,7 @@ function mostrarExito(nombre) {
   document.getElementById('success-details').innerHTML =
     '<div class="summary-row"><span class="summary-icon">\uD83D\uDC64</span><span class="summary-label">Cliente</span><span class="summary-val">' + nombre + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\uD83D\uDCC5</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>' +
-    '<div class="summary-row"><span class="summary-icon">\uD83D\uDD50</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' \u2013 ' + endHour(selectedHour, sessionDur) + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">\uD83D\uDD50</span><span class="summary-label">Hora</span><span class="summary-val">' + fmt12(selectedHour) + ' \u2013 ' + fmt12(endHour(selectedHour, sessionDur)) + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\u23F1</span><span class="summary-label">Servicio</span><span class="summary-val">' + (SERVICE_TYPES[sessionDur] ? SERVICE_TYPES[sessionDur].title + ' \u2014 ' : '') + durStr(sessionDur) + '</span></div>';
   ss.scrollIntoView({behavior:'smooth'});
 }
