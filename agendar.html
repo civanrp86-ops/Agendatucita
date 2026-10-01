@@ -353,11 +353,12 @@ function getQueryParams() {
     accent:      params.get('accent')      || '#1ABC9C',
     gold:        params.get('gold')        || '#C9A84C',
     days:        params.get('days')        || '1,2,3,4,5',
-    am_start:    params.get('am_start')    || '07:00',
-    am_end:      params.get('am_end')      || '11:00',
+
+    // ── HORARIOS FIJOS (hora de inicio de cada cita) ──
+    am_slots:    params.get('am_slots')    || '07:00,08:30,10:30',   // mañana
     pm_enabled:  params.get('pm_enabled') !== '0',
-    pm_start:    params.get('pm_start')    || '14:00',
-    pm_end:      params.get('pm_end')      || '17:00',
+    pm_slots:    params.get('pm_slots')    || '15:00,16:30',         // tarde
+
     duration:    params.get('duration')    || '1,2',
     city:        params.get('city')        || 'Colombia'
   };
@@ -385,7 +386,6 @@ const APPS_SCRIPT = config.apps_script;
 const OWNER_EMAIL = config.email;
 const OWNER_NAME  = config.name;
 const WORK_DAYS   = config.days.split(',').map(Number);
-const BUFFER_MINS = 60; // ── Tiempo entre citas: fijo 1 hora ──
 const DURATIONS   = config.duration.split(',').map(Number);
 const DEFAULT_DUR = DURATIONS[0];
 
@@ -421,28 +421,14 @@ var FESTIVOS_CO = {
 };
 function esFestivo(date) { return FESTIVOS_CO[toDateStr(date)] || null; }
 
-// ══ HORARIOS BASE ══════════════════════════════════════
-function buildSlots(startTime, endTime, dur) {
-  var slots = [];
-  var startH = parseInt(startTime.split(':')[0]);
-  var startM = parseInt(startTime.split(':')[1]);
-  var endH   = parseInt(endTime.split(':')[0]);
-  var endM   = parseInt(endTime.split(':')[1]);
-  var startTotal = startH * 60 + startM;
-  var endTotal   = endH * 60 + endM;
-  var durMins    = Math.round(dur * 60);
-  var cur = startTotal;
-  while (cur + durMins <= endTotal) {
-    var h = Math.floor(cur / 60);
-    var m = cur % 60;
-    slots.push((h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m);
-    cur += durMins + BUFFER_MINS; // ── 1 hora de buffer entre citas ──
-  }
-  return slots;
+// ══ HORARIOS BASE (lista fija, no depende de la duración) ═
+function parseSlots(str) {
+  return str.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return /^\d{1,2}:\d{2}$/.test(s); })
+            .map(function(s) { var p = s.split(':'); return (p[0].length < 2 ? '0' : '') + p[0] + ':' + p[1]; });
 }
 
-function getAM(dur) { return buildSlots(config.am_start, config.am_end, dur); }
-function getPM(dur) { return config.pm_enabled ? buildSlots(config.pm_start, config.pm_end, dur) : []; }
+function getAM(dur) { return parseSlots(config.am_slots); }
+function getPM(dur) { return config.pm_enabled ? parseSlots(config.pm_slots) : []; }
 function getAllH(dur) { return [...getAM(dur), ...getPM(dur)]; }
 
 function endHour(h, dur) {
@@ -497,6 +483,7 @@ var selectedDate = null;
 var selectedHour = null;
 var sessionDur   = DEFAULT_DUR;
 var busySlots    = {};
+var monthEvents  = [];
 var formData     = {};
 
 // ══ INIT ═══════════════════════════════════════════════
@@ -522,6 +509,7 @@ function setDuration(h) {
   showServiceInfo(h);
   selectedHour = null;
   document.getElementById('btn-next1').disabled = true;
+  computeBusy();
   if (selectedDate) renderSlots(selectedDate);
   renderCalendar();
 }
@@ -627,10 +615,32 @@ function selectSlot(h) {
   document.getElementById('btn-next1').disabled = false;
 }
 
-// ══ CARGA DE DISPONIBILIDAD con detección de BLOQUEOS ═
+// ══ DISPONIBILIDAD: se calcula con la duración activa ══
+function computeBusy() {
+  busySlots = {};
+  monthEvents.forEach(function(evt) {
+    if (!evt.start || !evt.start.dateTime) return;
+    var evStart = new Date(evt.start.dateTime);
+    var evEnd   = evt.end && evt.end.dateTime ? new Date(evt.end.dateTime) : new Date(evStart.getTime() + 3600000);
+    var dateStr = toDateStr(evStart);
+    if (!busySlots[dateStr]) busySlots[dateStr] = [];
+
+    // ── Cualquier evento (cita, bloqueo o evento manual) bloquea
+    //    todos los slots que se solapen con la duración del servicio ──
+    getAllH(sessionDur).forEach(function(slot) {
+      var p         = slot.split(':');
+      var slotStart = new Date(evStart); slotStart.setHours(parseInt(p[0]), parseInt(p[1]), 0, 0);
+      var slotEnd   = new Date(slotStart.getTime() + Math.round(sessionDur * 60) * 60000);
+      if (slotStart < evEnd && slotEnd > evStart && !busySlots[dateStr].includes(slot)) {
+        busySlots[dateStr].push(slot);
+      }
+    });
+  });
+}
+
 function loadMonthBusy(y, m) {
   var monthStart = new Date(y, m, 1);
-  var monthEnd   = new Date(y, m + 1, 0);
+  var monthEnd   = new Date(y, m + 1, 0, 23, 59, 59);
 
   fetch('https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(CALENDAR_ID) +
         '/events?key=' + API_KEY +
@@ -639,27 +649,8 @@ function loadMonthBusy(y, m) {
         '&singleEvents=true&orderBy=startTime')
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      busySlots = {};
-      if (data.items) {
-        data.items.forEach(function(evt) {
-          if (!evt.start || !evt.start.dateTime) return;
-          var evStart = new Date(evt.start.dateTime);
-          var evEnd   = evt.end && evt.end.dateTime ? new Date(evt.end.dateTime) : new Date(evStart.getTime() + 3600000);
-          var dateStr = toDateStr(evStart);
-          if (!busySlots[dateStr]) busySlots[dateStr] = [];
-
-          // ── Cualquier evento (cita, bloqueo o evento manual) bloquea
-          //    todos los slots que se solapen con su duración ──
-          getAllH(sessionDur).forEach(function(slot) {
-            var parts     = slot.split(':');
-            var slotStart = new Date(evStart); slotStart.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0);
-            var slotEnd   = new Date(slotStart.getTime() + Math.round(sessionDur * 60) * 60000);
-            if (slotStart < evEnd && slotEnd > evStart) {
-              if (!busySlots[dateStr].includes(slot)) busySlots[dateStr].push(slot);
-            }
-          });
-        });
-      }
+      monthEvents = data.items || [];
+      computeBusy();
       renderCalendar();
       if (selectedDate) renderSlots(selectedDate);
     })
@@ -819,6 +810,7 @@ function reiniciar() {
   selectedDate = null; selectedHour = null; formData = {}; sessionDur = DEFAULT_DUR;
   document.querySelectorAll('.dur-btn').forEach(function(b, i) { b.classList.toggle('active', i === 0); });
   showServiceInfo(DEFAULT_DUR);
+  computeBusy();
   document.getElementById('success-screen').style.display = 'none';
   show('booking-screen'); show('steps-bar');
   goStep1();
