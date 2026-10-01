@@ -223,7 +223,7 @@
   </div>
 
   <div class="info-bar">
-    <div class="info-chip">&#128336; <span>07:00&#8211;11:00</span> y <span>14:00&#8211;17:00</span></div>
+    <div class="info-chip">&#128336; <span id="horario-chip"></span></div>
     <div class="info-chip">&#128197; <span>Lunes a Viernes</span></div>
     <div class="dur-wrap">
       <span class="dur-label">&#9200; Duraci&#243;n</span>
@@ -356,13 +356,13 @@ function getQueryParams() {
     accent:      params.get('accent')      || '#1ABC9C',
     gold:        params.get('gold')        || '#C9A84C',
     days:        params.get('days')        || '1,2,3,4,5',
-    am_start:    params.get('am_start')    || '07:00',
-    am_end:      params.get('am_end')      || '11:00',
+
+    // ── HORARIOS FIJOS (hora de inicio de cada cita, formato 24 h) ──
+    am_slots:    params.get('am_slots')    || '07:00,08:30,10:30',   // mañana
     pm_enabled:  params.get('pm_enabled') !== '0',
-    pm_start:    params.get('pm_start')    || '14:00',
-    pm_end:      params.get('pm_end')      || '17:00',
-    duration:    params.get('duration') || '1.5,2.5,3.5',
-    buffer:      parseInt(params.get('buffer') || '0')
+    pm_slots:    params.get('pm_slots')    || '15:30,16:30',         // tarde
+
+    duration:    params.get('duration') || '1.5,2.5,3.5'
   };
 }
 
@@ -387,7 +387,6 @@ const APPS_SCRIPT = config.apps_script;
 const OWNER_EMAIL = config.email;
 const OWNER_NAME  = config.name;
 const WORK_DAYS    = config.days.split(',').map(Number);
-const BUFFER_MINS  = config.buffer;
 const DURATIONS    = config.duration.split(',').map(Number);
 const DEFAULT_DUR  = DURATIONS[0];
 
@@ -437,29 +436,24 @@ function esFestivo(date) {
   return FESTIVOS_CO[toDateStr(date)] || null;
 }
 
-// ══ HORARIOS BASE ══════════════════════════════════════
-function buildSlots(startTime, endTime, dur) {
-  var slots = [];
-  var startH = parseInt(startTime.split(':')[0]);
-  var startM = parseInt(startTime.split(':')[1]);
-  var endH   = parseInt(endTime.split(':')[0]);
-  var endM   = parseInt(endTime.split(':')[1]);
-  var startTotal = startH * 60 + startM;
-  var endTotal   = endH * 60 + endM;
-  var durMins    = Math.round(dur * 60);
-  var bufMins    = BUFFER_MINS;
-  var cur = startTotal;
-  while (cur + durMins <= endTotal) {
-    var h = Math.floor(cur / 60);
-    var m = cur % 60;
-    slots.push((h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m);
-    cur += durMins + bufMins;
-  }
-  return slots;
+// ══ HORARIOS BASE (lista fija, no depende de la duración) ═
+function parseSlots(str) {
+  return str.split(',')
+    .map(function(s) { return s.trim(); })
+    .filter(function(s) { return /^\d{1,2}:\d{2}$/.test(s); })
+    .map(function(s) { var p = s.split(':'); return (p[0].length < 2 ? '0' : '') + p[0] + ':' + p[1]; });
 }
 
-function getAM(dur) { return buildSlots(config.am_start, config.am_end, dur); }
-function getPM(dur) { return config.pm_enabled ? buildSlots(config.pm_start, config.pm_end, dur) : []; }
+// Muestra la hora en formato 12 horas (3:30 PM) sin cambiar el valor interno
+function fmt12(h) {
+  var p = h.split(':'), hr = parseInt(p[0]), m = p[1];
+  var suf = hr >= 12 ? 'PM' : 'AM';
+  hr = hr % 12; if (hr === 0) hr = 12;
+  return hr + ':' + m + ' ' + suf;
+}
+
+function getAM(dur) { return parseSlots(config.am_slots); }
+function getPM(dur) { return config.pm_enabled ? parseSlots(config.pm_slots) : []; }
 function getAllH(dur) { return [...getAM(dur), ...getPM(dur)]; }
 
 function endHour(h, dur) {
@@ -528,6 +522,13 @@ DURATIONS.forEach(function(d, i) {
   btn.onclick = function() { setDuration(d); };
   durContainer.appendChild(btn);
 });
+
+// Chip de horarios (se arma con los horarios configurados)
+(function() {
+  var am = getAM().map(fmt12).join(', ');
+  var pm = getPM().map(fmt12).join(', ');
+  document.getElementById('horario-chip').textContent = pm ? (am + '  \u00b7  ' + pm) : am;
+})();
 
 renderCalendar();
 loadMonthBusy(currentDate.getFullYear(), currentDate.getMonth());
@@ -655,17 +656,17 @@ function isSlotBusy(dateStr, slotTime, durHours) {
 
 function renderSlots(d) {
   var dateStr = toDateStr(d);
-  var busy = busySlots[dateStr] || [];
   var avail = getAllH(sessionDur);
   var html = '';
 
   avail.forEach(function(h) {
     var isBusy = isSlotBusy(dateStr, h, sessionDur);
     html += '<button class="slot-btn' + (isBusy ? ' busy' : '') + (h === selectedHour ? ' selected' : '') +
-            '" ' + (isBusy ? 'disabled' : 'onclick="selectSlot(\'' + h + '\')"') + '>' + h + '</button>';
+            '" ' + (isBusy ? 'disabled' : 'onclick="selectSlot(\'' + h + '\')"') + '>' + fmt12(h) + '</button>';
   });
 
-  document.getElementById('slots-container').innerHTML = html;
+  document.getElementById('slots-container').innerHTML = html ||
+    '<div class="alert alert-info">No hay horarios disponibles para este d\u00eda.</div>';
 }
 
 function selectSlot(h) {
@@ -751,7 +752,7 @@ function goStep3() {
   var summary =
     '<div class="summary-row"><span class="summary-icon">\u{1F464}</span><span class="summary-label">Nombre</span><span class="summary-val">' + nombre + ' ' + apellido + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\u{1F4C5}</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>' +
-    '<div class="summary-row"><span class="summary-icon">\u{1F550}</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' \u2013 ' + endHour(selectedHour, sessionDur) + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">\u{1F550}</span><span class="summary-label">Hora</span><span class="summary-val">' + fmt12(selectedHour) + ' \u2013 ' + fmt12(endHour(selectedHour, sessionDur)) + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\u23f1</span><span class="summary-label">Duraci\u00f3n</span><span class="summary-val">' + sessionDur + ' hora' + (sessionDur > 1 ? 's' : '') + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\u{1F4DE}</span><span class="summary-label">Tel\u00e9fono</span><span class="summary-val">' + tel + '</span></div>' +
     (formData.email ? '<div class="summary-row"><span class="summary-icon">\u{1F4E7}</span><span class="summary-label">Email</span><span class="summary-val">' + formData.email + '</span></div>' : '') +
@@ -841,8 +842,11 @@ async function confirmarCita() {
 
     await enviarCorreos(payload);
 
+    // Marcar el rango como ocupado (mismo formato que usa isSlotBusy)
     if (!busySlots[dateStr]) busySlots[dateStr] = [];
-    busySlots[dateStr].push(selectedHour);
+    var sp = selectedHour.split(':');
+    var sMin = parseInt(sp[0]) * 60 + parseInt(sp[1]);
+    busySlots[dateStr].push({ s: sMin, e: sMin + Math.round(sessionDur * 60) });
     mostrarExito(nombre);
   } catch(err) {
     errDiv.innerHTML = '<div class="alert alert-error">\u26a0\ufe0f ' + (err.message || 'Error de conexi\u00f3n. Intenta de nuevo.') + '</div>';
@@ -860,7 +864,7 @@ function mostrarExito(nombre) {
   document.getElementById('success-details').innerHTML =
     '<div class="summary-row"><span class="summary-icon">\u{1F464}</span><span class="summary-label">Cliente</span><span class="summary-val">' + nombre + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\u{1F4C5}</span><span class="summary-label">Fecha</span><span class="summary-val">' + cap(fmtDate) + '</span></div>' +
-    '<div class="summary-row"><span class="summary-icon">\u{1F550}</span><span class="summary-label">Hora</span><span class="summary-val">' + selectedHour + ' \u2013 ' + endHour(selectedHour, sessionDur) + '</span></div>' +
+    '<div class="summary-row"><span class="summary-icon">\u{1F550}</span><span class="summary-label">Hora</span><span class="summary-val">' + fmt12(selectedHour) + ' \u2013 ' + fmt12(endHour(selectedHour, sessionDur)) + '</span></div>' +
     '<div class="summary-row"><span class="summary-icon">\u23f1</span><span class="summary-label">Duraci\u00f3n</span><span class="summary-val">' + sessionDur + ' hora' + (sessionDur > 1 ? 's' : '') + '</span></div>';
   ss.scrollIntoView({behavior:'smooth'});
 }
